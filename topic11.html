@@ -1,55 +1,103 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Topic 11: Transfer Learning & Pre-trained Model Adaptation</title>
+    <title>Topic 11: Transfer Learning &amp; Pre-trained Model Adaptation</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Top Navigation -->
-    <nav class="top-nav">
-        <div class="nav-brand">
-            <a href="index.html">ML Course Notes</a>
-        </div>
+    <!-- Top Navigation Bar -->
+    <div class="top-nav">
+        <a href="index.html" class="logo">&#8592; TTTC2453 ML Hub</a>
         <div class="nav-links">
-            <a href="index.html">Home</a>
-            <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span class="icon">&#9728;</span> Toggle Theme</button>
+            <a href="index.html">All Topics</a>
         </div>
-    </nav>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="theme-toggle" id="themeToggle">
+        <span class="icon">&#9728;</span>
+        <span class="label-text">Toggle Theme</span>
+    </button>
+
+    <!-- Mobile Sidebar Toggle -->
+    <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
 
     <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
-        <div class="progress-container">
-            <div class="progress-bar" id="progress-bar"></div>
-            <span class="progress-text" id="progress-text">0%</span>
+        <div class="sidebar-title">Sections</div>
+        <a class="nav-item active" data-section="section-1" href="#section-1">
+            <span class="nav-emoji">&#128176;</span> From Building to Reusing
+        </a>
+        <a class="nav-item" data-section="section-2" href="#section-2">
+            <span class="nav-emoji">&#129504;</span> Why Transfer Works
+        </a>
+        <a class="nav-item" data-section="section-3" href="#section-3">
+            <span class="nav-emoji">&#9888;</span> When Transfer Helps
+        </a>
+        <a class="nav-item" data-section="section-4" href="#section-4">
+            <span class="nav-emoji">&#128209;</span> Formal Definitions
+        </a>
+        <a class="nav-item" data-section="section-5" href="#section-5">
+            <span class="nav-emoji">&#127793;</span> Taxonomy
+        </a>
+        <a class="nav-item" data-section="section-6" href="#section-6">
+            <span class="nav-emoji">&#128736;</span> Two Core Strategies
+        </a>
+        <a class="nav-item" data-section="section-7" href="#section-7">
+            <span class="nav-emoji">&#128202;</span> Freezing Math
+        </a>
+        <a class="nav-item" data-section="section-8" href="#section-8">
+            <span class="nav-emoji">&#128218;</span> Worked Example
+        </a>
+        <a class="nav-item" data-section="section-9" href="#section-9">
+            <span class="nav-emoji">&#129504;</span> Model Zoo
+        </a>
+        <a class="nav-item" data-section="section-10" href="#section-10">
+            <span class="nav-emoji">&#128256;</span> Adaptation Spectrum
+        </a>
+        <a class="nav-item" data-section="section-11" href="#section-11">
+            <span class="nav-emoji">&#128165;</span> Catastrophic Forgetting
+        </a>
+        <a class="nav-item" data-section="section-12" href="#section-12">
+            <span class="nav-emoji">&#128200;</span> Layer-wise LR
+        </a>
+        <a class="nav-item" data-section="section-13" href="#section-13">
+            <span class="nav-emoji">&#9889;</span> Warmup + Cosine
+        </a>
+        <a class="nav-item" data-section="section-14" href="#section-14">
+            <span class="nav-emoji">&#128295;</span> LoRA - PEFT
+        </a>
+        <a class="nav-item" data-section="section-15" href="#section-15">
+            <span class="nav-emoji">&#128295;</span> EWC
+        </a>
+        <a class="nav-item" data-section="section-16" href="#section-16">
+            <span class="nav-emoji">&#128203;</span> Comparison Table
+        </a>
+        <a class="nav-item" data-section="section-17" href="#section-17">
+            <span class="nav-emoji">&#127919;</span> Decision Workflow
+        </a>
+        <a class="nav-item" data-section="section-flashcards" href="#section-flashcards">
+            <span class="nav-emoji">&#128179;</span> Flashcards
+        </a>
+        <a class="nav-item" data-section="section-quiz" href="#section-quiz">
+            <span class="nav-emoji">&#128221;</span> Quiz
+        </a>
+        <a class="nav-item" data-section="section-fill-blank" href="#section-fill-blank">
+            <span class="nav-emoji">&#9997;</span> Fill in the Blank
+        </a>
+        <a class="nav-item" data-section="section-scenario" href="#section-scenario">
+            <span class="nav-emoji">&#128218;</span> Scenario
+        </a>
+
+        <div class="sidebar-progress">
+            <div class="progress-label">Topic Progress</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar-fill" style="width:0%"></div>
+            </div>
+            <div class="progress-pct" style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">0%</div>
         </div>
-        <nav class="section-nav">
-            <h3>Topic 11: Transfer Learning</h3>
-            <ul>
-                <li><a href="#section-1" class="nav-link active">1. From Building to Reusing</a></li>
-                <li><a href="#section-2" class="nav-link">2. Why Transfer Works</a></li>
-                <li><a href="#section-3" class="nav-link">3. When Transfer Helps & Hurts</a></li>
-                <li><a href="#section-4" class="nav-link">4. Formal Definitions</a></li>
-                <li><a href="#section-5" class="nav-link">5. Taxonomy of Transfer Learning</a></li>
-                <li><a href="#section-6" class="nav-link">6. Two Core Strategies</a></li>
-                <li><a href="#section-7" class="nav-link">7. Mathematics of Freezing</a></li>
-                <li><a href="#section-8" class="nav-link">8. Worked Example: Parameters</a></li>
-                <li><a href="#section-9" class="nav-link">9. Pre-trained Model Zoo</a></li>
-                <li><a href="#section-10" class="nav-link">10. Adaptation Spectrum</a></li>
-                <li><a href="#section-11" class="nav-link">11. Catastrophic Forgetting</a></li>
-                <li><a href="#section-12" class="nav-link">12. Layer-wise LR Decay</a></li>
-                <li><a href="#section-13" class="nav-link">13. Warmup + Cosine LR</a></li>
-                <li><a href="#section-14" class="nav-link">14. LoRA - PEFT</a></li>
-                <li><a href="#section-15" class="nav-link">15. EWC - Elastic Weight</a></li>
-                <li><a href="#section-16" class="nav-link">16. Comparison Table</a></li>
-                <li><a href="#section-17" class="nav-link">17. Practical Decision Workflow</a></li>
-                <li><a href="#section-flashcards" class="nav-link">Flashcards</a></li>
-                <li><a href="#section-quiz" class="nav-link">Quiz</a></li>
-                <li><a href="#section-fill-blank" class="nav-link">Fill-in-the-Blank</a></li>
-                <li><a href="#section-scenario" class="nav-link">Scenario</a></li>
-            </ul>
-        </nav>
     </div>
 
     <!-- Main Content -->
@@ -1102,240 +1150,295 @@ Have pre-trained model on similar domain?
         </section>
 
         <!-- FLASHCARDS SECTION -->
-        <section id="section-flashcards" class="content-section" data-progress-section>
-            <h2>Flashcards</h2>
-            
-            <div class="flashcard-container">
-                <div class="flashcard">
-                    <div class="flashcard-front">
-                        <h3>What is Transfer Learning?</h3>
-                    </div>
-                    <div class="flashcard-back">
-                        <p>Reusing knowledge learned from one problem (source task) to help solve a related problem (target task) faster, with less data, or with better performance.</p>
-                    </div>
-                </div>
+        <div id="section-flashcards" class="flashcard-container" data-progress-section="s-flashcards">
+            <div class="section-header">
+                <span class="emoji">&#128179;</span>
+                <h2>Flashcards</h2>
+            </div>
 
-                <div class="flashcard">
-                    <div class="flashcard-front">
-                        <h3>What is Negative Transfer?</h3>
-                    </div>
-                    <div class="flashcard-back">
-                        <p>When borrowed features from the source task actually mislead the target model, resulting in worse performance than training from scratch. Occurs when source and target domains are very different.</p>
-                    </div>
-                </div>
+            <div class="flashcard-controls">
+                <button class="btn btn-sm btn-secondary flash-prev">Previous</button>
+                <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
+                <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
+                <button class="btn btn-sm btn-secondary flash-next">Next</button>
+            </div>
+            <div class="flashcard-counter"></div>
 
-                <div class="flashcard">
-                    <div class="flashcard-front">
-                        <h3>Why do lower layers transfer better than upper layers?</h3>
-                    </div>
+            <div class="flashcard" data-progress-section="s-flash-1">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">What is Transfer Learning?</div>
                     <div class="flashcard-back">
-                        <p>Lower layers learn generic features (edges, textures) useful for any task. Upper layers learn task-specific features (faces, objects) that may not apply to a new task. Transferability decreases from generic to specific layers.</p>
-                    </div>
-                </div>
-
-                <div class="flashcard">
-                    <div class="flashcard-front">
-                        <h3>What is the key difference between Feature Extraction and Fine-Tuning?</h3>
-                    </div>
-                    <div class="flashcard-back">
-                        <p>Feature extraction freezes all pre-trained layers and only trains a new head. Fine-tuning unfreezes some/all layers and continues training with a small learning rate. Feature extraction is cheaper but has lower ceiling; fine-tuning is more expensive but more flexible.</p>
-                    </div>
-                </div>
-
-                <div class="flashcard">
-                    <div class="flashcard-front">
-                        <h3>What is LoRA and why is it parameter-efficient?</h3>
-                    </div>
-                    <div class="flashcard-back">
-                        <p>LoRA (Low-Rank Adaptation) decomposes weight updates as BA where B∈R^(d×r) and A∈R^(r×k) with r<<min(d,k). Only A and B are trained while original weights W₀ are frozen. This captures low-rank updates with ~2% of parameters.</p>
-                    </div>
-                </div>
-
-                <div class="flashcard">
-                    <div class="flashcard-front">
-                        <h3>What is Catastrophic Forgetting?</h3>
-                    </div>
-                    <div class="flashcard-back">
-                        <p>When a neural network forgets previously learned information while learning new information. During fine-tuning with large LR, weights move far from pre-trained values, scrambling general features. Prevented by small LR, freezing lower layers, or EWC.</p>
-                    </div>
-                </div>
-
-                <div class="flashcard">
-                    <div class="flashcard-front">
-                        <h3>What does EWC stand for and what does it do?</h3>
-                    </div>
-                    <div class="flashcard-back">
-                        <p>Elastic Weight Consolidation. It adds a penalty term L_total = L_new + (λ/2)·ΣFᵢ·(θᵢ - θ*ᵢ)² that prevents important weights (measured by Fisher Information Fᵢ) from moving far from their pre-trained values, preventing catastrophic forgetting.</p>
-                    </div>
-                </div>
-
-                <div class="flashcard">
-                    <div class="flashcard-front">
-                        <h3>What is a Domain in transfer learning?</h3>
-                    </div>
-                    <div class="flashcard-back">
-                        <p>A domain D = {X, P(X)} consisting of a feature space X and a marginal distribution P(X) over those features. Domains differ when feature spaces or distributions differ.</p>
-                    </div>
-                </div>
-
-                <div class="flashcard">
-                    <div class="flashcard-front">
-                        <h3>Why use discriminative learning rates in fine-tuning?</h3>
-                    </div>
-                    <div class="flashcard-back">
-                        <p>Lower layers have generic features needing small adjustments (small LR). Upper layers have task-specific features needing larger adaptation (larger LR). ηₗ = η·ξ^(L-l) automatically allocates more movement to upper layers.</p>
-                    </div>
-                </div>
-
-                <div class="flashcard">
-                    <div class="flashcard-front">
-                        <h3>What percentage of parameters are typically trainable in feature extraction?</h3>
-                    </div>
-                    <div class="flashcard-back">
-                        <p>Usually 0.04-5% of total parameters. For example, with a 23.5M parameter backbone and 10K parameter head, only 0.04% are trainable. You inherit millions of frozen parameters for free.</p>
+                        Reusing knowledge learned from one problem (source task) to help solve a related problem (target task) faster, with less data, or with better performance.
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
                     </div>
                 </div>
             </div>
-        </section>
+
+            <div class="flashcard" data-progress-section="s-flash-2">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">What is Negative Transfer?</div>
+                    <div class="flashcard-back">
+                        When borrowed features from the source task actually mislead the target model, resulting in worse performance than training from scratch. Occurs when source and target domains are very different.
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" data-progress-section="s-flash-3">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">Why do lower layers transfer better than upper layers?</div>
+                    <div class="flashcard-back">
+                        Lower layers learn generic features (edges, textures) useful for any task. Upper layers learn task-specific features (faces, objects) that may not apply to a new task. Transferability decreases from generic to specific layers.
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" data-progress-section="s-flash-4">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">What is the key difference between Feature Extraction and Fine-Tuning?</div>
+                    <div class="flashcard-back">
+                        Feature extraction freezes all pre-trained layers and only trains a new head. Fine-tuning unfreezes some/all layers and continues training with a small learning rate. Feature extraction is cheaper but has lower ceiling; fine-tuning is more expensive but more flexible.
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" data-progress-section="s-flash-5">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">What is LoRA and why is it parameter-efficient?</div>
+                    <div class="flashcard-back">
+                        LoRA (Low-Rank Adaptation) decomposes weight updates as BA where B&isin;R^(d&times;r) and A&isin;R^(r&times;k) with r&lt;&lt;min(d,k). Only A and B are trained while original weights W&#8320; are frozen. This captures low-rank updates with ~2% of parameters.
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" data-progress-section="s-flash-6">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">What is Catastrophic Forgetting?</div>
+                    <div class="flashcard-back">
+                        When a neural network forgets previously learned information while learning new information. During fine-tuning with large LR, weights move far from pre-trained values, scrambling general features. Prevented by small LR, freezing lower layers, or EWC.
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" data-progress-section="s-flash-7">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">What does EWC stand for and what does it do?</div>
+                    <div class="flashcard-back">
+                        Elastic Weight Consolidation. It adds a penalty term L<sub>total</sub> = L<sub>new</sub> + (&lambda;/2)&middot;&Sigma;F&#7522;&middot;(&theta;&#7522; - &theta;*&#7522;)&sup2; that prevents important weights (measured by Fisher Information F&#7522;) from moving far from their pre-trained values, preventing catastrophic forgetting.
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" data-progress-section="s-flash-8">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">What is a Domain in transfer learning?</div>
+                    <div class="flashcard-back">
+                        A domain D = {X, P(X)} consisting of a feature space X and a marginal distribution P(X) over those features. Domains differ when feature spaces or distributions differ.
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" data-progress-section="s-flash-9">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">Why use discriminative learning rates in fine-tuning?</div>
+                    <div class="flashcard-back">
+                        Lower layers have generic features needing small adjustments (small LR). Upper layers have task-specific features needing larger adaptation (larger LR). &eta;&#8347; = &eta;&middot;&xi;^(L-l) automatically allocates more movement to upper layers.
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard" data-progress-section="s-flash-10">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">What percentage of parameters are typically trainable in feature extraction?</div>
+                    <div class="flashcard-back">
+                        Usually 0.04-5% of total parameters. For example, with a 23.5M parameter backbone and 10K parameter head, only 0.04% are trainable. You inherit millions of frozen parameters for free.
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
 
         <!-- QUIZ SECTION -->
-        <section id="section-quiz" class="content-section" data-progress-section>
-            <h2>Quiz</h2>
-            
-            <div class="quiz-container">
-                <div class="quiz-question">
-                    <h3>1. In transfer learning, why do lower layers transfer better than upper layers?</h3>
-                    <div class="quiz-options">
-                        <label><input type="radio" name="q1" value="a"> A. Lower layers have more parameters</label>
-                        <label><input type="radio" name="q1" value="b"> B. Lower layers learn generic features (edges, textures) useful for any task</label>
-                        <label><input type="radio" name="q1" value="c"> C. Lower layers are trained longer</label>
-                        <label><input type="radio" name="q1" value="d"> D. Lower layers have higher learning rates</label>
-                    </div>
-                    <div class="quiz-feedback" id="feedback-q1"></div>
-                </div>
+        <div id="section-quiz" data-progress-section="s-quiz">
+            <div class="section-header">
+                <span class="emoji">&#128220;</span>
+                <h2>Quiz</h2>
+            </div>
 
+            <div class="quiz-container" data-quiz-id="q1" data-progress-section="s-quiz-q1">
+                <h3>Question 1</h3>
                 <div class="quiz-question">
-                    <h3>2. What is negative transfer?</h3>
-                    <div class="quiz-options">
-                        <label><input type="radio" name="q2" value="a"> A. When transfer learning is too slow</label>
-                        <label><input type="radio" name="q2" value="b"> B. When borrowed features mislead the target model, worsening performance</label>
-                        <label><input type="radio" name="q2" value="c"> C. When the source model is too large</label>
-                        <label><input type="radio" name="q2" value="d"> D. When fine-tuning uses negative learning rates</label>
-                    </div>
-                    <div class="quiz-feedback" id="feedback-q2"></div>
-                </div>
-
-                <div class="quiz-question">
-                    <h3>3. In LoRA, what do matrices B and A represent?</h3>
-                    <div class="quiz-options">
-                        <label><input type="radio" name="q3" value="a"> A. Two different pre-trained models</label>
-                        <label><input type="radio" name="q3" value="b"> B. Low-rank decomposition of the weight update ΔW = BA</label>
-                        <label><input type="radio" name="q3" value="c"> C. Bias terms for the network</label>
-                        <label><input type="radio" name="q3" value="d"> D. Learning rate matrices</label>
-                    </div>
-                    <div class="quiz-feedback" id="feedback-q3"></div>
-                </div>
-
-                <div class="quiz-question">
-                    <h3>4. What does EWC use to measure parameter importance?</h3>
-                    <div class="quiz-options">
-                        <label><input type="radio" name="q4" value="a"> A. Gradient magnitude</label>
-                        <label><input type="radio" name="q4" value="b"> B. Fisher Information</label>
-                        <label><input type="radio" name="q4" value="c"> C. Learning rate</label>
-                        <label><input type="radio" name="q4" value="d"> D. Number of epochs trained</label>
-                    </div>
-                    <div class="quiz-feedback" id="feedback-q4"></div>
-                </div>
-
-                <div class="quiz-question">
-                    <h3>5. Why is a small learning rate crucial for fine-tuning?</h3>
-                    <div class="quiz-options">
-                        <label><input type="radio" name="q5" value="a"> A. Small LR trains faster</label>
-                        <label><input type="radio" name="q5" value="b"> B. Pre-trained weights are near a good minimum; large LR would overshoot and destroy learned features</label>
-                        <label><input type="radio" name="q5" value="c"> C. Small LR uses less memory</label>
-                        <label><input type="radio" name="q5" value="d"> D. Small LR prevents overfitting only</label>
-                    </div>
-                    <div class="quiz-feedback" id="feedback-q5"></div>
-                </div>
-
-                <div class="quiz-question">
-                    <h3>6. In the LLRD formula ηₗ = η_top · δ^(L-l), what happens when δ = 1.0?</h3>
-                    <div class="quiz-options">
-                        <label><input type="radio" name="q6" value="a"> A. All layers get zero learning rate</label>
-                        <label><input type="radio" name="q6" value="b"> B. All layers get the same learning rate (standard fine-tuning)</label>
-                        <label><input type="radio" name="q6" value="c"> C. Bottom layers get higher LR than top</label>
-                        <label><input type="radio" name="q6" value="d"> D. Training diverges</label>
-                    </div>
-                    <div class="quiz-feedback" id="feedback-q6"></div>
+                    <div class="q-num">Question 1 of 6</div>
+                    <div class="q-text">In transfer learning, why do lower layers transfer better than upper layers?</div>
+                    <div class="quiz-option" data-correct="false">A. Lower layers have more parameters</div>
+                    <div class="quiz-option" data-correct="true">B. Lower layers learn generic features (edges, textures) useful for any task</div>
+                    <div class="quiz-option" data-correct="false">C. Lower layers are trained longer</div>
+                    <div class="quiz-option" data-correct="false">D. Lower layers have higher learning rates</div>
+                    <div class="quiz-feedback">Lower layers learn generic features (edges, textures) useful for any task. Upper layers learn task-specific features (faces, objects) that may not transfer. Transferability decreases from generic to specific layers.</div>
                 </div>
             </div>
-        </section>
+
+            <div class="quiz-container" data-quiz-id="q2" data-progress-section="s-quiz-q2">
+                <h3>Question 2</h3>
+                <div class="quiz-question">
+                    <div class="q-num">Question 2 of 6</div>
+                    <div class="q-text">What is negative transfer?</div>
+                    <div class="quiz-option" data-correct="false">A. When transfer learning is too slow</div>
+                    <div class="quiz-option" data-correct="true">B. When borrowed features mislead the target model, worsening performance</div>
+                    <div class="quiz-option" data-correct="false">C. When the source model is too large</div>
+                    <div class="quiz-option" data-correct="false">D. When fine-tuning uses negative learning rates</div>
+                    <div class="quiz-feedback">Negative transfer occurs when source and target domains are too different, causing the borrowed features to mislead rather than help the target model. Performance drops below training from scratch.</div>
+                </div>
+            </div>
+
+            <div class="quiz-container" data-quiz-id="q3" data-progress-section="s-quiz-q3">
+                <h3>Question 3</h3>
+                <div class="quiz-question">
+                    <div class="q-num">Question 3 of 6</div>
+                    <div class="q-text">In LoRA, what do matrices B and A represent?</div>
+                    <div class="quiz-option" data-correct="false">A. Two different pre-trained models</div>
+                    <div class="quiz-option" data-correct="true">B. Low-rank decomposition of the weight update &Delta;W = BA</div>
+                    <div class="quiz-option" data-correct="false">C. Bias terms for the network</div>
+                    <div class="quiz-option" data-correct="false">D. Learning rate matrices</div>
+                    <div class="quiz-feedback">LoRA decomposes the weight update as &Delta;W = BA where B&isin;R^(d&times;r) and A&isin;R^(r&times;k) with r&lt;&lt;min(d,k). Only A and B are trained while original weights remain frozen.</div>
+                </div>
+            </div>
+
+            <div class="quiz-container" data-quiz-id="q4" data-progress-section="s-quiz-q4">
+                <h3>Question 4</h3>
+                <div class="quiz-question">
+                    <div class="q-num">Question 4 of 6</div>
+                    <div class="q-text">What does EWC use to measure parameter importance?</div>
+                    <div class="quiz-option" data-correct="false">A. Gradient magnitude</div>
+                    <div class="quiz-option" data-correct="true">B. Fisher Information</div>
+                    <div class="quiz-option" data-correct="false">C. Learning rate</div>
+                    <div class="quiz-option" data-correct="false">D. Number of epochs trained</div>
+                    <div class="quiz-feedback">EWC uses Fisher Information to measure how important each parameter is to the source task. Important parameters are penalized more heavily if they move far from their pre-trained values.</div>
+                </div>
+            </div>
+
+            <div class="quiz-container" data-quiz-id="q5" data-progress-section="s-quiz-q5">
+                <h3>Question 5</h3>
+                <div class="quiz-question">
+                    <div class="q-num">Question 5 of 6</div>
+                    <div class="q-text">Why is a small learning rate crucial for fine-tuning?</div>
+                    <div class="quiz-option" data-correct="false">A. Small LR trains faster</div>
+                    <div class="quiz-option" data-correct="true">B. Pre-trained weights are near a good minimum; large LR would overshoot and destroy learned features</div>
+                    <div class="quiz-option" data-correct="false">C. Small LR uses less memory</div>
+                    <div class="quiz-option" data-correct="false">D. Small LR prevents overfitting only</div>
+                    <div class="quiz-feedback">Pre-trained weights are already near a good minimum. A large learning rate would move weights far from this minimum, destroying the learned features and causing catastrophic forgetting.</div>
+                </div>
+            </div>
+
+            <div class="quiz-container" data-quiz-id="q6" data-progress-section="s-quiz-q6">
+                <h3>Question 6</h3>
+                <div class="quiz-question">
+                    <div class="q-num">Question 6 of 6</div>
+                    <div class="q-text">In the LLRD formula &eta;&#8347; = &eta;<sub>top</sub> &middot; &delta;^(L-l), what happens when &delta; = 1.0?</div>
+                    <div class="quiz-option" data-correct="false">A. All layers get zero learning rate</div>
+                    <div class="quiz-option" data-correct="true">B. All layers get the same learning rate (standard fine-tuning)</div>
+                    <div class="quiz-option" data-correct="false">C. Bottom layers get higher LR than top</div>
+                    <div class="quiz-option" data-correct="false">D. Training diverges</div>
+                    <div class="quiz-feedback">When &delta; = 1.0, the decay factor becomes 1, so every layer gets &eta;<sub>top</sub> &middot; 1 = &eta;<sub>top</sub>. This is equivalent to standard fine-tuning with a uniform learning rate across all layers.</div>
+                </div>
+            </div>
+
+        </div>
 
         <!-- FILL-IN-THE-BLANK SECTION -->
-        <section id="section-fill-blank" class="content-section" data-progress-section>
-            <h2>Fill-in-the-Blank</h2>
-            
-            <div class="fill-blank-container">
-                <div class="fill-blank-question">
-                    <h3>1. Transfer learning is most beneficial when ________ data is scarce and compute resources are limited.</h3>
-                    <input type="text" class="fill-blank-input" data-answer="labelled" placeholder="Type your answer...">
-                    <div class="fill-blank-feedback"></div>
-                </div>
-
-                <div class="fill-blank-question">
-                    <h3>2. In feature extraction, we freeze the backbone and only train a new ________.</h3>
-                    <input type="text" class="fill-blank-input" data-answer="head" placeholder="Type your answer...">
-                    <div class="fill-blank-feedback"></div>
-                </div>
-
-                <div class="fill-blank-question">
-                    <h3>3. LoRA decomposes weight updates as ΔW = ________, where B∈R^(d×r) and A∈R^(r×k).</h3>
-                    <input type="text" class="fill-blank-input" data-answer="BA" placeholder="Type your answer...">
-                    <div class="fill-blank-feedback"></div>
-                </div>
-
-                <div class="fill-blank-question">
-                    <h3>4. EWC prevents catastrophic forgetting by adding a penalty term based on ________ Information.</h3>
-                    <input type="text" class="fill-blank-input" data-answer="Fisher" placeholder="Type your answer...">
-                    <div class="fill-blank-feedback"></div>
-                </div>
-
-                <div class="fill-blank-question">
-                    <h3>5. The warmup phase causes the learning rate to increase ________ from 0 to η_max.</h3>
-                    <input type="text" class="fill-blank-input" data-answer="linearly" placeholder="Type your answer...">
-                    <div class="fill-blank-feedback"></div>
-                </div>
-
-                <div class="fill-blank-question">
-                    <h3>6. In LLRD, the decay factor δ determines how much ________ layers are protected from large updates.</h3>
-                    <input type="text" class="fill-blank-input" data-answer="lower" placeholder="Type your answer...">
-                    <div class="fill-blank-feedback"></div>
-                </div>
+        <div id="section-fill-blank" data-progress-section="s-fill">
+            <div class="section-header">
+                <span class="emoji">&#9997;</span>
+                <h2>Fill-in-the-Blank</h2>
             </div>
-        </section>
+
+            <div class="fill-blank-container" data-answer="labelled" data-alt-answers="labeled|label" data-fill-id="f1" data-progress-section="s-fill-f1">
+                <p><strong>1.</strong> Transfer learning is most beneficial when <strong>___</strong> data is scarce and compute resources are limited.</p>
+                <input type="text" class="fill-blank-input" placeholder="Type your answer">
+                <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+                <div class="fill-blank-feedback"></div>
+            </div>
+
+            <div class="fill-blank-container" data-answer="head" data-alt-answers="classification head|classifier" data-fill-id="f2" data-progress-section="s-fill-f2">
+                <p><strong>2.</strong> In feature extraction, we freeze the backbone and only train a new <strong>___</strong>.</p>
+                <input type="text" class="fill-blank-input" placeholder="Type your answer">
+                <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+                <div class="fill-blank-feedback"></div>
+            </div>
+
+            <div class="fill-blank-container" data-answer="BA" data-alt-answers="ba|B*A" data-fill-id="f3" data-progress-section="s-fill-f3">
+                <p><strong>3.</strong> LoRA decomposes weight updates as &Delta;W = <strong>___</strong>, where B&isin;R^(d&times;r) and A&isin;R^(r&times;k).</p>
+                <input type="text" class="fill-blank-input" placeholder="Type your answer">
+                <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+                <div class="fill-blank-feedback"></div>
+            </div>
+
+            <div class="fill-blank-container" data-answer="Fisher" data-alt-answers="fisher" data-fill-id="f4" data-progress-section="s-fill-f4">
+                <p><strong>4.</strong> EWC prevents catastrophic forgetting by adding a penalty term based on <strong>___</strong> Information.</p>
+                <input type="text" class="fill-blank-input" placeholder="Type your answer">
+                <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+                <div class="fill-blank-feedback"></div>
+            </div>
+
+            <div class="fill-blank-container" data-answer="linearly" data-alt-answers="linear" data-fill-id="f5" data-progress-section="s-fill-f5">
+                <p><strong>5.</strong> The warmup phase causes the learning rate to increase <strong>___</strong> from 0 to &eta;<sub>max</sub>.</p>
+                <input type="text" class="fill-blank-input" placeholder="Type your answer">
+                <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+                <div class="fill-blank-feedback"></div>
+            </div>
+
+            <div class="fill-blank-container" data-answer="lower" data-alt-answers="bottom|deeper|early" data-fill-id="f6" data-progress-section="s-fill-f6">
+                <p><strong>6.</strong> In LLRD, the decay factor &delta; determines how much <strong>___</strong> layers are protected from large updates.</p>
+                <input type="text" class="fill-blank-input" placeholder="Type your answer">
+                <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+                <div class="fill-blank-feedback"></div>
+            </div>
+
+        </div>
 
         <!-- SCENARIO SECTION -->
-        <section id="section-scenario" class="content-section" data-progress-section>
-            <h2>Scenario</h2>
-            
+        <div id="section-scenario" data-progress-section="s-scenario">
+            <div class="section-header">
+                <span class="emoji">&#128218;</span>
+                <h2>Scenario</h2>
+            </div>
+
             <div class="worked-example">
-                <h4>🏥 Scenario: Medical Image Classification</h4>
+                <h4>Scenario: Medical Image Classification</h4>
                 <p>You're a machine learning engineer at a hospital. Your task is to build a system that classifies chest X-rays into 3 categories: Normal, Pneumonia, and COVID-19.</p>
                 
                 <p><strong>Constraints:</strong></p>
                 <ul>
                     <li>You have only <strong>500 labelled X-rays</strong> (150 Normal, 200 Pneumonia, 150 COVID-19)</li>
-                    <li>You have access to a <strong>pre-trained ResNet-50</strong> (trained on ImageNet — natural images)</li>
+                    <li>You have access to a <strong>pre-trained ResNet-50</strong> (trained on ImageNet &mdash; natural images)</li>
                     <li>You have <strong>1 GPU</strong> with limited memory</li>
                     <li>You need the model deployed within <strong>2 weeks</strong></li>
                 </ul>
 
                 <h4>Decision Process:</h4>
                 <ol>
-                    <li><strong>Data size check:</strong> 500 examples → very small dataset → feature extraction or LoRA</li>
-                    <li><strong>Domain similarity:</strong> ImageNet (natural images) → X-rays (medical images) → somewhat different but visual features (edges, textures) transfer well</li>
-                    <li><strong>Compute constraint:</strong> Limited GPU → prefer parameter-efficient methods</li>
-                    <li><strong>Time constraint:</strong> 2 weeks → need fast iteration</li>
+                    <li><strong>Data size check:</strong> 500 examples &rarr; very small dataset &rarr; feature extraction or LoRA</li>
+                    <li><strong>Domain similarity:</strong> ImageNet (natural images) &rarr; X-rays (medical images) &rarr; somewhat different but visual features (edges, textures) transfer well</li>
+                    <li><strong>Compute constraint:</strong> Limited GPU &rarr; prefer parameter-efficient methods</li>
+                    <li><strong>Time constraint:</strong> 2 weeks &rarr; need fast iteration</li>
                 </ol>
 
                 <h4>Recommended Strategy:</h4>
@@ -1363,46 +1466,49 @@ Have pre-trained model on similar domain?
                 </ul>
 
                 <h4>Expected Outcome:</h4>
-                <p>With LoRA on 500 examples, you can likely achieve <strong>85-92% accuracy</strong> — remarkable for such a small dataset. Without transfer learning, a model trained from scratch on 500 examples would likely achieve only <strong>50-65%</strong> accuracy (barely above random for 3 classes).</p>
+                <p>With LoRA on 500 examples, you can likely achieve <strong>85-92% accuracy</strong> &mdash; remarkable for such a small dataset. Without transfer learning, a model trained from scratch on 500 examples would likely achieve only <strong>50-65%</strong> accuracy (barely above random for 3 classes).</p>
             </div>
 
             <div class="recap-box">
-                <h4>📝 Scenario Key Takeaways</h4>
+                <h4>Scenario Key Takeaways</h4>
                 <ul>
-                    <li>Small dataset (< 1000 examples) → feature extraction or LoRA</li>
-                    <li>Limited compute → parameter-efficient methods</li>
+                    <li>Small dataset (&lt; 1000 examples) &rarr; feature extraction or LoRA</li>
+                    <li>Limited compute &rarr; parameter-efficient methods</li>
                     <li>Always have a backup strategy (feature extraction is the safety net)</li>
                     <li>Transfer learning's value is most dramatic with small datasets</li>
                     <li>Monitor validation loss to detect overfitting early</li>
                 </ul>
             </div>
-        </section>
+        </div>
 
         <!-- FINAL RECAP -->
-        <section id="section-recap" class="content-section" data-progress-section>
-            <h2>Topic Recap</h2>
+        <div id="section-recap" data-progress-section="s-recap">
+            <div class="section-header">
+                <span class="emoji">&#128214;</span>
+                <h2>Topic Recap</h2>
+            </div>
             
             <div class="recap-box">
                 <h4>Key Concepts Covered</h4>
                 <ol>
                     <li><strong>Transfer Learning:</strong> Reusing knowledge from source to target task</li>
                     <li><strong>Feature Hierarchy:</strong> Lower layers = generic, upper layers = specific</li>
-                    <li><strong>Formal Definitions:</strong> Domain D = {X, P(X)}, Task T = {Y, f(·)}</li>
+                    <li><strong>Formal Definitions:</strong> Domain D = {X, P(X)}, Task T = {Y, f(.)}</li>
                     <li><strong>Two Core Strategies:</strong> Feature extraction (frozen) vs. Fine-tuning (adaptive)</li>
                     <li><strong>Catastrophic Forgetting:</strong> Major risk when fine-tuning with large LR</li>
                     <li><strong>LLRD:</strong> Layer-wise LR decay protects lower layers</li>
                     <li><strong>Warmup + Cosine:</strong> Standard LR schedule for fine-tuning</li>
                     <li><strong>LoRA:</strong> PEFT via low-rank decomposition of weight updates</li>
                     <li><strong>EWC:</strong> Elastic weight consolidation prevents forgetting via Fisher Information</li>
-                    <li><strong>Decision Workflow:</strong> Data size → domain similarity → choose strategy</li>
+                    <li><strong>Decision Workflow:</strong> Data size &rarr; domain similarity &rarr; choose strategy</li>
                 </ol>
             </div>
 
             <div class="takeaway-box">
-                <h4>💡 The Big Picture</h4>
-                <p>Transfer learning has made deep learning accessible to everyone. You don't need millions of data points or weeks of GPU time — a pre-trained model and a few hundred examples can achieve remarkable results. The key is understanding when and how to adapt: start simple, add complexity as needed, and always protect the general while adapting the specific.</p>
+                <h4>The Big Picture</h4>
+                <p>Transfer learning has made deep learning accessible to everyone. You don't need millions of data points or weeks of GPU time &mdash; a pre-trained model and a few hundred examples can achieve remarkable results. The key is understanding when and how to adapt: start simple, add complexity as needed, and always protect the general while adapting the specific.</p>
             </div>
-        </section>
+        </div>
     </main>
 
     <script src="script.js"></script>

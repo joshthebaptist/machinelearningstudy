@@ -8,34 +8,77 @@
 </head>
 <body>
 
-<nav class="top-nav">
-    <a href="index.html" class="home-link">← Back to Home</a>
-    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span class="icon">&#9728;</span> Toggle Theme</button>
-</nav>
-
-<div class="sidebar" id="sidebar">
-    <h2>Topic 7: Neural Network Foundations</h2>
-    <nav class="section-nav">
-        <a href="#section1">7.1 Why Neural Networks</a>
-        <a href="#section2">7.2 The Perceptron Recap</a>
-        <a href="#section3">7.3 The MLP</a>
-        <a href="#section4">7.4 Forward Pass</a>
-        <a href="#section5">7.5 Worked Example: Forward Pass</a>
-        <a href="#section6">7.6 Backpropagation</a>
-        <a href="#section7">7.7 Backprop Worked Example</a>
-        <a href="#section8">7.8 Weight Update Table</a>
-        <a href="#section9">7.9 The Backprop Recipe</a>
-        <a href="#section10">7.10 Common Mistakes</a>
-        <a href="#flashcards-section">Flashcards</a>
-        <a href="#quiz-section">Quiz</a>
-        <a href="#fill-blank-section">Fill in the Blanks</a>
-    </nav>
-    <div class="progress-container">
-        <div class="progress-label">Progress</div>
-        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-        <div class="progress-percent" id="progress-percent">0%</div>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <a href="index.html" class="logo">&#8592; TTTC2453 ML Hub</a>
+    <div class="nav-links">
+      <a href="index.html">All Topics</a>
     </div>
-</div>
+  </div>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle">
+    <span class="icon">&#9728;</span>
+    <span class="label-text">Toggle Theme</span>
+  </button>
+
+  <!-- Mobile Sidebar Toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-title">Sections</div>
+    <a class="nav-item active" data-section="section1" href="#section1">
+      <span class="nav-emoji">&#129504;</span> Why Neural Networks
+    </a>
+    <a class="nav-item" data-section="section2" href="#section2">
+      <span class="nav-emoji">&#9881;</span> Perceptron Recap
+    </a>
+    <a class="nav-item" data-section="section3" href="#section3">
+      <span class="nav-emoji">&#128295;</span> MLP
+    </a>
+    <a class="nav-item" data-section="section4" href="#section4">
+      <span class="nav-emoji">&#128640;</span> Forward Pass
+    </a>
+    <a class="nav-item" data-section="section5" href="#section5">
+      <span class="nav-emoji">&#128218;</span> Forward Example
+    </a>
+    <a class="nav-item" data-section="section6" href="#section6">
+      <span class="nav-emoji">&#128257;</span> Backprop
+    </a>
+    <a class="nav-item" data-section="section7" href="#section7">
+      <span class="nav-emoji">&#128202;</span> Backprop Example
+    </a>
+    <a class="nav-item" data-section="section8" href="#section8">
+      <span class="nav-emoji">&#128196;</span> Weight Updates
+    </a>
+    <a class="nav-item" data-section="section9" href="#section9">
+      <span class="nav-emoji">&#128203;</span> Backprop Recipe
+    </a>
+    <a class="nav-item" data-section="section10" href="#section10">
+      <span class="nav-emoji">&#128680;</span> Common Mistakes
+    </a>
+    <a class="nav-item" data-section="flashcards-section" href="#flashcards-section">
+      <span class="nav-emoji">&#128179;</span> Flashcards
+    </a>
+    <a class="nav-item" data-section="quiz-section" href="#quiz-section">
+      <span class="nav-emoji">&#128221;</span> Quiz
+    </a>
+    <a class="nav-item" data-section="fill-blank-section" href="#fill-blank-section">
+      <span class="nav-emoji">&#9997;</span> Fill in the Blank
+    </a>
+    <a class="nav-item" data-section="scenario-section" href="#scenario-section">
+      <span class="nav-emoji">&#128218;</span> Scenario
+    </a>
+
+    <div class="sidebar-progress">
+      <div class="progress-label">Topic Progress</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-pct" style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">0%</div>
+    </div>
+  </div>
 
 <main class="content">
 
@@ -772,392 +815,328 @@
 <!-- ============================================================ -->
 <!-- FLASHCARDS -->
 <!-- ============================================================ -->
-<section id="flashcards-section" data-progress-section>
-    <h2>Flashcards</h2>
-    <div class="flashcard-container" id="flashcard-container">
-        <div class="flashcard" data-card="0">
-            <div class="flashcard-front">
-                <strong>Neural Network</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
+<div id="flashcards-section" class="flashcard-container" data-progress-section="s-flashcards">
+    <div class="section-header">
+        <span class="emoji">&#128179;</span>
+        <h2>Flashcards</h2>
+    </div>
+
+    <div class="flashcard-controls">
+        <button class="btn btn-sm btn-secondary flash-prev">Previous</button>
+        <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
+        <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
+        <button class="btn btn-sm btn-secondary flash-next">Next</button>
+    </div>
+    <div class="flashcard-counter"></div>
+
+    <div class="flashcard" data-progress-section="s-flash-1">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Neural Network</div>
             <div class="flashcard-back">
                 A computational model inspired by biological neurons, composed of layers of interconnected nodes (neurons) that learn to map inputs to outputs by adjusting connection weights through training.
-            </div>
-        </div>
-        <div class="flashcard" data-card="1">
-            <div class="flashcard-front">
-                <strong>MLP (Multi-Layer Perceptron)</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
-            <div class="flashcard-back">
-                A neural network with an input layer, one or more hidden layers, and an output layer. All connections are fully connected (every neuron connects to every neuron in the next layer). Uses non-linear activation functions.
-            </div>
-        </div>
-        <div class="flashcard" data-card="2">
-            <div class="flashcard-front">
-                <strong>Forward Pass</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
-            <div class="flashcard-back">
-                The process of passing input data through the network from input to output, computing z = W·a + b and a = φ(z) at each layer, to produce a prediction ŷ.
-            </div>
-        </div>
-        <div class="flashcard" data-card="3">
-            <div class="flashcard-front">
-                <strong>Backpropagation</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
-            <div class="flashcard-back">
-                An algorithm that efficiently computes the gradient of the loss with respect to every weight by applying the chain rule, propagating error signals backward from output to input layers.
-            </div>
-        </div>
-        <div class="flashcard" data-card="4">
-            <div class="flashcard-front">
-                <strong>Chain Rule</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
-            <div class="flashcard-back">
-                A calculus rule: dL/dw = dL/da · da/dz · dz/dw. If a variable depends on intermediate variables, the derivative is the product of derivatives through each intermediate step. Foundation of backpropagation.
-            </div>
-        </div>
-        <div class="flashcard" data-card="5">
-            <div class="flashcard-front">
-                <strong>Activation Function</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
-            <div class="flashcard-back">
-                A non-linear function applied to the weighted sum z to produce the neuron's output a = φ(z). Introduces non-linearity enabling networks to learn complex patterns. Examples: sigmoid, ReLU, tanh.
-            </div>
-        </div>
-        <div class="flashcard" data-card="6">
-            <div class="flashcard-front">
-                <strong>Weights</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
-            <div class="flashcard-back">
-                Parameters that determine the strength of connection between neurons. Each weight multiplies its corresponding input before summation. Learned during training via gradient descent to minimize loss.
-            </div>
-        </div>
-        <div class="flashcard" data-card="7">
-            <div class="flashcard-front">
-                <strong>Bias</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
-            <div class="flashcard-back">
-                An additional parameter in each neuron added to the weighted sum: z = w·x + b. Allows the activation function to shift left/right, enabling the network to fit data that doesn't pass through the origin.
-            </div>
-        </div>
-        <div class="flashcard" data-card="8">
-            <div class="flashcard-front">
-                <strong>Hidden Layer</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
-            <div class="flashcard-back">
-                A layer of neurons between the input and output layers. Hidden layers transform inputs into increasingly abstract representations. The number and size of hidden layers define the network's capacity.
-            </div>
-        </div>
-        <div class="flashcard" data-card="9">
-            <div class="flashcard-front">
-                <strong>Epoch</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
-            <div class="flashcard-back">
-                One complete pass through the entire training dataset during training. Multiple epochs are needed for convergence. One epoch may involve many weight updates if using mini-batches.
-            </div>
-        </div>
-        <div class="flashcard" data-card="10">
-            <div class="flashcard-front">
-                <strong>Learning Rate (η)</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
-            <div class="flashcard-back">
-                A hyperparameter controlling the step size of weight updates: w ← w − η·∂L/∂w. Too large causes instability/divergence; too small causes slow convergence. Often denoted η or α.
-            </div>
-        </div>
-        <div class="flashcard" data-card="11">
-            <div class="flashcard-front">
-                <strong>Vanishing Gradient</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
-            <div class="flashcard-back">
-                A problem where gradients become extremely small as they propagate backward through many layers, causing early layers to learn very slowly or not at all. Common with sigmoid/tanh activations in deep networks. Solved partly by ReLU and techniques like batch normalization.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
             </div>
         </div>
     </div>
-</section>
+
+    <div class="flashcard" data-progress-section="s-flash-2">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">MLP (Multi-Layer Perceptron)</div>
+            <div class="flashcard-back">
+                A neural network with an input layer, one or more hidden layers, and an output layer. All connections are fully connected (every neuron connects to every neuron in the next layer). Uses non-linear activation functions.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-3">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Forward Pass</div>
+            <div class="flashcard-back">
+                The process of passing input data through the network from input to output, computing z = W·a + b and a = φ(z) at each layer, to produce a prediction ŷ.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-4">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Backpropagation</div>
+            <div class="flashcard-back">
+                An algorithm that efficiently computes the gradient of the loss with respect to every weight by applying the chain rule, propagating error signals backward from output to input layers.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-5">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Chain Rule</div>
+            <div class="flashcard-back">
+                A calculus rule: dL/dw = dL/da · da/dz · dz/dw. If a variable depends on intermediate variables, the derivative is the product of derivatives through each intermediate step. Foundation of backpropagation.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-6">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Activation Function</div>
+            <div class="flashcard-back">
+                A non-linear function applied to the weighted sum z to produce the neuron's output a = φ(z). Introduces non-linearity enabling networks to learn complex patterns. Examples: sigmoid, ReLU, tanh.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-7">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Weights</div>
+            <div class="flashcard-back">
+                Parameters that determine the strength of connection between neurons. Each weight multiplies its corresponding input before summation. Learned during training via gradient descent to minimize loss.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-8">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Bias</div>
+            <div class="flashcard-back">
+                An additional parameter in each neuron added to the weighted sum: z = w·x + b. Allows the activation function to shift left/right, enabling the network to fit data that doesn't pass through the origin.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-9">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Hidden Layer</div>
+            <div class="flashcard-back">
+                A layer of neurons between the input and output layers. Hidden layers transform inputs into increasingly abstract representations. The number and size of hidden layers define the network's capacity.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-10">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Epoch</div>
+            <div class="flashcard-back">
+                One complete pass through the entire training dataset during training. Multiple epochs are needed for convergence. One epoch may involve many weight updates if using mini-batches.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-11">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Learning Rate (&eta;)</div>
+            <div class="flashcard-back">
+                A hyperparameter controlling the step size of weight updates: w &larr; w &minus; &eta;&middot;&part;L/&part;w. Too large causes instability/divergence; too small causes slow convergence. Often denoted &eta; or &alpha;.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-12">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Vanishing Gradient</div>
+            <div class="flashcard-back">
+                A problem where gradients become extremely small as they propagate backward through many layers, causing early layers to learn very slowly or not at all. Common with sigmoid/tanh activations in deep networks. Solved partly by ReLU and techniques like batch normalization.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+            </div>
+        </div>
+    </div>
+
+</div>
 
 <!-- ============================================================ -->
 <!-- QUIZ SECTION -->
 <!-- ============================================================ -->
-<section id="quiz-section" data-progress-section>
-    <h2>Quiz</h2>
-
-    <div class="quiz-container" id="quiz-container">
-
-        <div class="quiz-question" data-question="0">
-            <p><strong>Q1.</strong> Why can't a linear model solve the XOR problem?</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q0" value="a"> It doesn't have enough parameters.</label>
-                <label><input type="radio" name="q0" value="b"> XOR requires a non-linear decision boundary, and linear models can only produce linear boundaries.</label>
-                <label><input type="radio" name="q0" value="c"> Linear models can only handle binary inputs.</label>
-                <label><input type="radio" name="q0" value="d"> The sigmoid function is needed for XOR.</label>
-            </div>
-            <div class="quiz-feedback" data-correct="b">
-                <p><strong>Correct!</strong> The XOR problem requires a non-linear decision boundary. No straight line can separate the 1s from the 0s in the XOR truth table.</p>
-                <p><strong>Incorrect.</strong> The correct answer is B. XOR requires a non-linear decision boundary, and linear models produce only straight-line boundaries.</p>
-            </div>
-        </div>
-
-        <div class="quiz-question" data-question="1">
-            <p><strong>Q2.</strong> In the notation w<sub>ij</sub><sup>(l)</sup>, what does the superscript (l) represent?</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q1" value="a"> The epoch number</label>
-                <label><input type="radio" name="q1" value="b"> The layer number</label>
-                <label><input type="radio" name="q1" value="c"> The batch number</label>
-                <label><input type="radio" name="q1" value="d"> The neuron index</label>
-            </div>
-            <div class="quiz-feedback" data-correct="b">
-                <p><strong>Correct!</strong> The superscript (l) denotes the layer number. w<sub>ij</sub><sup>(l)</sup> is the weight from neuron j in layer (l−1) to neuron i in layer l.</p>
-                <p><strong>Incorrect.</strong> The correct answer is B. The superscript (l) represents the layer number.</p>
-            </div>
-        </div>
-
-        <div class="quiz-question" data-question="2">
-            <p><strong>Q3.</strong> During the forward pass, why should you store both z (pre-activation) and a (post-activation)?</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q2" value="a"> To save memory for visualization purposes</label>
-                <label><input type="radio" name="q2" value="b"> Because backpropagation needs z to compute σ'(z) = a(1−a)</label>
-                <label><input type="radio" name="q2" value="c"> To enable the network to skip layers</label>
-                <label><input type="radio" name="q2" value="d"> Because the loss function requires both values</label>
-            </div>
-            <div class="quiz-feedback" data-correct="b">
-                <p><strong>Correct!</strong> Backpropagation needs the stored z values to compute activation derivatives σ'(z). Since σ'(z) = a(1−a), having stored a avoids recomputation.</p>
-                <p><strong>Incorrect.</strong> The correct answer is B. Backpropagation needs z to compute the activation derivative σ'(z) = a(1−a).</p>
-            </div>
-        </div>
-
-        <div class="quiz-question" data-question="3">
-            <p><strong>Q4.</strong> What happens if you initialize all weights in a hidden layer to the same value (e.g., all zeros)?</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q3" value="a"> The network trains faster because it's a good starting point</label>
-                <label><input type="radio" name="q3" value="b"> All neurons in that layer compute the same thing and receive the same gradients — the symmetry is never broken</label>
-                <label><input type="radio" name="q3" value="c"> The network immediately overfits</label>
-                <label><input type="radio" name="q3" value="d"> The activation function produces all zeros</label>
-            </div>
-            <div class="quiz-feedback" data-correct="b">
-                <p><strong>Correct!</strong> This is the symmetry problem. All neurons compute identical outputs and receive identical gradients, so they remain identical throughout training — wasting the layer's capacity.</p>
-                <p><strong>Incorrect.</strong> The correct answer is B. Equal weights mean all neurons compute the same thing and receive the same gradients — symmetry is never broken.</p>
-            </div>
-        </div>
-
-        <div class="quiz-question" data-question="4">
-            <p><strong>Q5.</strong> In the worked example, what is the gradient ∂L/∂w₁ (output weight from h₁ to output)?</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q4" value="a"> −0.00358</label>
-                <label><input type="radio" name="q4" value="b"> −0.0420</label>
-                <label><input type="radio" name="q4" value="c"> −0.0405</label>
-                <label><input type="radio" name="q4" value="d"> −0.0726</label>
-            </div>
-            <div class="quiz-feedback" data-correct="c">
-                <p><strong>Correct!</strong> ∂L/∂w₁ = δ<sub>out</sub> × h₁ = −0.0726 × 0.5585 = −0.0405.</p>
-                <p><strong>Incorrect.</strong> The correct answer is C: −0.0405. This equals δ<sub>out</sub> × h₁ = −0.0726 × 0.5585.</p>
-            </div>
-        </div>
-
-        <div class="quiz-question" data-question="5">
-            <p><strong>Q6.</strong> What is the sigmoid derivative σ'(z) in terms of σ(z)?</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q5" value="a"> σ(z) + (1 − σ(z))</label>
-                <label><input type="radio" name="q5" value="b"> 1 / σ(z)</label>
-                <label><input type="radio" name="q5" value="c"> σ(z) × (1 − σ(z))</label>
-                <label><input type="radio" name="q5" value="d"> −σ(z)²</label>
-            </div>
-            <div class="quiz-feedback" data-correct="c">
-                <p><strong>Correct!</strong> σ'(z) = σ(z)(1 − σ(z)). This elegant property means you can compute the derivative using only the already-computed forward pass value.</p>
-                <p><strong>Incorrect.</strong> The correct answer is C: σ'(z) = σ(z) × (1 − σ(z)).</p>
-            </div>
-        </div>
-
-        <div class="quiz-question" data-question="6">
-            <p><strong>Q7.</strong> After one gradient descent step in our worked example (η=0.5), what happened to the loss?</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q6" value="a"> It increased from 0.05412 to 0.06100</label>
-                <label><input type="radio" name="q6" value="b"> It stayed the same at 0.05412</label>
-                <label><input type="radio" name="q6" value="c"> It decreased from 0.05412 to approximately 0.04987</label>
-                <label><input type="radio" name="q6" value="d"> It dropped to exactly 0</label>
-            </div>
-            <div class="quiz-feedback" data-correct="c">
-                <p><strong>Correct!</strong> After updating all weights with η=0.5, the new forward pass produced ŷ≈0.6842 and loss≈0.04987, a decrease from 0.05412.</p>
-                <p><strong>Incorrect.</strong> The correct answer is C. The loss decreased from 0.05412 to approximately 0.04987.</p>
-            </div>
-        </div>
-
+<div id="quiz-section" data-progress-section="s-quiz">
+    <div class="section-header">
+        <span class="emoji">&#128220;</span>
+        <h2>Quiz</h2>
     </div>
-</section>
+
+    <div class="quiz-container" data-quiz-id="q1" data-progress-section="s-quiz-q1">
+        <h3>Question 1</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 1 of 7</div>
+            <div class="q-text">Why can't a linear model solve the XOR problem?</div>
+            <div class="quiz-option" data-correct="false">A. It doesn't have enough parameters.</div>
+            <div class="quiz-option" data-correct="true">B. XOR requires a non-linear decision boundary, and linear models can only produce linear boundaries.</div>
+            <div class="quiz-option" data-correct="false">C. Linear models can only handle binary inputs.</div>
+            <div class="quiz-option" data-correct="false">D. The sigmoid function is needed for XOR.</div>
+            <div class="quiz-feedback">The XOR problem requires a non-linear decision boundary. No straight line can separate the 1s from the 0s in the XOR truth table. Linear models produce only straight-line boundaries.</div>
+        </div>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q2" data-progress-section="s-quiz-q2">
+        <h3>Question 2</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 2 of 7</div>
+            <div class="q-text">In the notation w<sub>ij</sub><sup>(l)</sup>, what does the superscript (l) represent?</div>
+            <div class="quiz-option" data-correct="false">A. The epoch number</div>
+            <div class="quiz-option" data-correct="true">B. The layer number</div>
+            <div class="quiz-option" data-correct="false">C. The batch number</div>
+            <div class="quiz-option" data-correct="false">D. The neuron index</div>
+            <div class="quiz-feedback">The superscript (l) denotes the layer number. w<sub>ij</sub><sup>(l)</sup> is the weight from neuron j in layer (l&minus;1) to neuron i in layer l.</div>
+        </div>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q3" data-progress-section="s-quiz-q3">
+        <h3>Question 3</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 3 of 7</div>
+            <div class="q-text">During the forward pass, why should you store both z (pre-activation) and a (post-activation)?</div>
+            <div class="quiz-option" data-correct="false">A. To save memory for visualization purposes</div>
+            <div class="quiz-option" data-correct="true">B. Because backpropagation needs z to compute &sigma;'(z) = a(1&minus;a)</div>
+            <div class="quiz-option" data-correct="false">C. To enable the network to skip layers</div>
+            <div class="quiz-option" data-correct="false">D. Because the loss function requires both values</div>
+            <div class="quiz-feedback">Backpropagation needs the stored z values to compute activation derivatives &sigma;'(z). Since &sigma;'(z) = a(1&minus;a), having stored a avoids recomputation.</div>
+        </div>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q4" data-progress-section="s-quiz-q4">
+        <h3>Question 4</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 4 of 7</div>
+            <div class="q-text">What happens if you initialize all weights in a hidden layer to the same value (e.g., all zeros)?</div>
+            <div class="quiz-option" data-correct="false">A. The network trains faster because it's a good starting point</div>
+            <div class="quiz-option" data-correct="true">B. All neurons in that layer compute the same thing and receive the same gradients &mdash; the symmetry is never broken</div>
+            <div class="quiz-option" data-correct="false">C. The network immediately overfits</div>
+            <div class="quiz-option" data-correct="false">D. The activation function produces all zeros</div>
+            <div class="quiz-feedback">This is the symmetry problem. All neurons compute identical outputs and receive identical gradients, so they remain identical throughout training &mdash; wasting the layer's capacity.</div>
+        </div>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q5" data-progress-section="s-quiz-q5">
+        <h3>Question 5</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 5 of 7</div>
+            <div class="q-text">In the worked example, what is the gradient &part;L/&part;w&#8321; (output weight from h&#8321; to output)?</div>
+            <div class="quiz-option" data-correct="false">A. &minus;0.00358</div>
+            <div class="quiz-option" data-correct="false">B. &minus;0.0420</div>
+            <div class="quiz-option" data-correct="true">C. &minus;0.0405</div>
+            <div class="quiz-option" data-correct="false">D. &minus;0.0726</div>
+            <div class="quiz-feedback">&part;L/&part;w&#8321; = &delta;<sub>out</sub> &times; h&#8321; = &minus;0.0726 &times; 0.5585 = &minus;0.0405.</div>
+        </div>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q6" data-progress-section="s-quiz-q6">
+        <h3>Question 6</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 6 of 7</div>
+            <div class="q-text">What is the sigmoid derivative &sigma;'(z) in terms of &sigma;(z)?</div>
+            <div class="quiz-option" data-correct="false">A. &sigma;(z) + (1 &minus; &sigma;(z))</div>
+            <div class="quiz-option" data-correct="false">B. 1 / &sigma;(z)</div>
+            <div class="quiz-option" data-correct="true">C. &sigma;(z) &times; (1 &minus; &sigma;(z))</div>
+            <div class="quiz-option" data-correct="false">D. &minus;&sigma;(z)&sup2;</div>
+            <div class="quiz-feedback">&sigma;'(z) = &sigma;(z)(1 &minus; &sigma;(z)). This elegant property means you can compute the derivative using only the already-computed forward pass value.</div>
+        </div>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q7" data-progress-section="s-quiz-q7">
+        <h3>Question 7</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 7 of 7</div>
+            <div class="q-text">After one gradient descent step in our worked example (&eta;=0.5), what happened to the loss?</div>
+            <div class="quiz-option" data-correct="false">A. It increased from 0.05412 to 0.06100</div>
+            <div class="quiz-option" data-correct="false">B. It stayed the same at 0.05412</div>
+            <div class="quiz-option" data-correct="true">C. It decreased from 0.05412 to approximately 0.04987</div>
+            <div class="quiz-option" data-correct="false">D. It dropped to exactly 0</div>
+            <div class="quiz-feedback">After updating all weights with &eta;=0.5, the new forward pass produced &#375;&approx;0.6842 and loss&approx;0.04987, a decrease from 0.05412.</div>
+        </div>
+    </div>
+
+</div>
 
 <!-- ============================================================ -->
 <!-- FILL IN THE BLANKS -->
 <!-- ============================================================ -->
-<section id="fill-blank-section" data-progress-section>
-    <h2>Fill in the Blanks</h2>
-
-    <div class="fill-blank-container" id="fill-blank-container">
-
-        <div class="fill-blank-question" data-question="0">
-            <p><strong>1.</strong> The weighted sum at a neuron is computed as z = w₁x₁ + w₂x₂ + b, where b is the __________.</p>
-            <input type="text" class="fill-blank-input" data-answer="bias" placeholder="Type your answer...">
-            <div class="fill-blank-feedback">
-                <span class="correct-text">Correct! The bias allows the activation function to shift, enabling the network to fit data not centered at the origin.</span>
-                <span class="incorrect-text">Incorrect. The answer is "bias". The bias is an extra parameter added to the weighted sum.</span>
-            </div>
-        </div>
-
-        <div class="fill-blank-question" data-question="1">
-            <p><strong>2.</strong> In backpropagation, the __________ rule allows us to compute the derivative of the loss with respect to weights by multiplying intermediate derivatives.</p>
-            <input type="text" class="fill-blank-input" data-answer="chain" placeholder="Type your answer...">
-            <div class="fill-blank-feedback">
-                <span class="correct-text">Correct! The chain rule (dL/dw = dL/da · da/dz · dz/dw) is the mathematical foundation of backpropagation.</span>
-                <span class="incorrect-text">Incorrect. The answer is "chain". The chain rule of calculus enables computing derivatives through compositions of functions.</span>
-            </div>
-        </div>
-
-        <div class="fill-blank-question" data-question="2">
-            <p><strong>3.</strong> A neural network with __________ hidden layer(s) can approximate any continuous function, according to the Universal Approximation Theorem.</p>
-            <input type="text" class="fill-blank-input" data-answer="one" placeholder="Type your answer...">
-            <div class="fill-blank-feedback">
-                <span class="correct-text">Correct! A single hidden layer with sufficient neurons can approximate any continuous function on a compact set.</span>
-                <span class="incorrect-text">Incorrect. The answer is "one" (or "a single"). The Universal Approximation Theorem guarantees this for one hidden layer with enough neurons.</span>
-            </div>
-        </div>
-
-        <div class="fill-blank-question" data-question="3">
-            <p><strong>4.</strong> The sigmoid derivative can be computed as σ'(z) = σ(z) × (1 − __________).</p>
-            <input type="text" class="fill-blank-input" data-answer="sigma(z)" placeholder="Type your answer...">
-            <div class="fill-blank-feedback">
-                <span class="correct-text">Correct! σ'(z) = σ(z)(1 − σ(z)). This elegant property lets us compute the derivative from the forward pass output.</span>
-                <span class="incorrect-text">Incorrect. The answer is "σ(z)". The formula is σ'(z) = σ(z) × (1 − σ(z)).</span>
-            </div>
-        </div>
-
-        <div class="fill-blank-question" data-question="4">
-            <p><strong>5.</strong> If you have 1000 training samples and a batch size of 200, one __________ consists of 5 weight updates.</p>
-            <input type="text" class="fill-blank-input" data-answer="epoch" placeholder="Type your answer...">
-            <div class="fill-blank-feedback">
-                <span class="correct-text">Correct! One epoch = one complete pass through all 1000 samples. With batch size 200, that's 1000/200 = 5 batches = 5 weight updates per epoch.</span>
-                <span class="incorrect-text">Incorrect. The answer is "epoch". One epoch processes all 1000 samples, which means 1000/200 = 5 batches.</span>
-            </div>
-        </div>
-
+<div id="fill-blank-section" data-progress-section="s-fill">
+    <div class="section-header">
+        <span class="emoji">&#9997;</span>
+        <h2>Fill in the Blanks</h2>
     </div>
-</section>
+
+    <div class="fill-blank-container" data-answer="bias" data-alt-answers="" data-fill-id="f1" data-progress-section="s-fill-f1">
+        <p><strong>1.</strong> The weighted sum at a neuron is computed as z = w&#8321;x&#8321; + w&#8322;x&#8322; + b, where b is the <strong>___</strong>.</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+    </div>
+
+    <div class="fill-blank-container" data-answer="chain" data-alt-answers="" data-fill-id="f2" data-progress-section="s-fill-f2">
+        <p><strong>2.</strong> In backpropagation, the <strong>___</strong> rule allows us to compute the derivative of the loss with respect to weights by multiplying intermediate derivatives.</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+    </div>
+
+    <div class="fill-blank-container" data-answer="one" data-alt-answers="1|single|a single" data-fill-id="f3" data-progress-section="s-fill-f3">
+        <p><strong>3.</strong> A neural network with <strong>___</strong> hidden layer(s) can approximate any continuous function, according to the Universal Approximation Theorem.</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+    </div>
+
+    <div class="fill-blank-container" data-answer="sigma(z)" data-alt-answers="&sigma;(z)|sigma z|σ(z)" data-fill-id="f4" data-progress-section="s-fill-f4">
+        <p><strong>4.</strong> The sigmoid derivative can be computed as &sigma;'(z) = &sigma;(z) &times; (1 &minus; <strong>___</strong>).</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+    </div>
+
+    <div class="fill-blank-container" data-answer="epoch" data-alt-answers="" data-fill-id="f5" data-progress-section="s-fill-f5">
+        <p><strong>5.</strong> If you have 1000 training samples and a batch size of 200, one <strong>___</strong> consists of 5 weight updates.</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+    </div>
+
+</div>
 
 <!-- ============================================================ -->
 <!-- SCENARIO-BASED QUESTION -->
 <!-- ============================================================ -->
-<section id="scenario-section" data-progress-section>
-    <h2>Scenario-Based Question</h2>
-
-    <div class="quiz-container">
-
-        <div class="quiz-question" data-question="scenario1">
-            <p><strong>Scenario:</strong> You've trained a neural network for 50 epochs. The training loss has dropped to 0.001 (excellent), but the validation loss has been increasing since epoch 20 and is now at 0.15. Your colleague says, "The model is working great — the loss is basically zero!"</p>
-            <p><strong>What is wrong with this conclusion, and what should you do?</strong></p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q-scenario1" value="a"> The colleague is right — 0.001 loss is excellent and you should deploy the model.</label>
-                <label><input type="radio" name="q-scenario1" value="b"> The model is overfitting — it memorized the training data but can't generalize. You should stop training earlier (around epoch 20), add regularization, or get more training data.</label>
-                <label><input type="radio" name="q-scenario1" value="c"> The learning rate is too high, causing the validation loss to oscillate.</label>
-                <label><input type="radio" name="q-scenario1" value="d"> You need to increase the number of hidden layers.</label>
-            </div>
-            <div class="quiz-feedback" data-correct="b">
-                <p><strong>Correct!</strong> This is a classic overfitting scenario. Training loss is very low (model memorized training data) but validation loss is increasing (model fails on unseen data). Solutions: early stopping, regularization (L2, dropout), more data, or simpler architecture.</p>
-                <p><strong>Incorrect.</strong> The correct answer is B. The diverging training and validation losses indicate overfitting. The model memorized training data but can't generalize. Solutions include early stopping, regularization, or more data.</p>
-            </div>
-        </div>
-
+<div id="scenario-section" data-progress-section="s-scenario">
+    <div class="section-header">
+        <span class="emoji">&#128218;</span>
+        <h2>Scenario-Based Question</h2>
     </div>
-</section>
+
+    <div class="quiz-container" data-quiz-id="scenario1" data-progress-section="s-scenario-q1">
+        <div class="quiz-question">
+            <div class="q-text"><strong>Scenario:</strong> You've trained a neural network for 50 epochs. The training loss has dropped to 0.001 (excellent), but the validation loss has been increasing since epoch 20 and is now at 0.15. Your colleague says, "The model is working great — the loss is basically zero!"</div>
+            <div class="q-text"><strong>What is wrong with this conclusion, and what should you do?</strong></div>
+            <div class="quiz-option" data-correct="false">A. The colleague is right — 0.001 loss is excellent and you should deploy the model.</div>
+            <div class="quiz-option" data-correct="true">B. The model is overfitting — it memorized the training data but can't generalize. You should stop training earlier (around epoch 20), add regularization, or get more training data.</div>
+            <div class="quiz-option" data-correct="false">C. The learning rate is too high, causing the validation loss to oscillate.</div>
+            <div class="quiz-option" data-correct="false">D. You need to increase the number of hidden layers.</div>
+            <div class="quiz-feedback">This is a classic overfitting scenario. Training loss is very low (model memorized training data) but validation loss is increasing (model fails on unseen data). Solutions: early stopping, regularization (L2, dropout), more data, or simpler architecture.</div>
+        </div>
+    </div>
+
+</div>
 
 </main>
 
 <script src="script.js"></script>
-
-<script>
-// Flashcard functionality
-document.querySelectorAll('.flashcard').forEach(card => {
-    card.addEventListener('click', function() {
-        this.classList.toggle('flipped');
-    });
-});
-
-// Quiz functionality
-document.querySelectorAll('.quiz-question').forEach(question => {
-    const options = question.querySelectorAll('input[type="radio"]');
-    const feedback = question.querySelector('.quiz-feedback');
-    const correctAnswer = feedback.dataset.correct;
-
-    options.forEach(option => {
-        option.addEventListener('change', function() {
-            const allFeedbacks = question.querySelectorAll('.quiz-feedback p');
-            allFeedbacks.forEach(f => f.style.display = 'none');
-
-            if (this.value === correctAnswer) {
-                feedback.querySelector('p:first-child').style.display = 'block';
-                feedback.querySelector('p:last-child').style.display = 'none';
-                feedback.style.display = 'block';
-                feedback.style.borderColor = '#27ae60';
-                feedback.style.backgroundColor = '#d4edda';
-            } else {
-                feedback.querySelector('p:first-child').style.display = 'none';
-                feedback.querySelector('p:last-child').style.display = 'block';
-                feedback.style.display = 'block';
-                feedback.style.borderColor = '#e74c3c';
-                feedback.style.backgroundColor = '#f8d7da';
-            }
-        });
-    });
-});
-
-// Fill in the blank functionality
-document.querySelectorAll('.fill-blank-input').forEach(input => {
-    input.addEventListener('blur', function() {
-        const correctAnswer = this.dataset.answer.toLowerCase().trim();
-        const userAnswer = this.value.toLowerCase().trim();
-        const feedback = this.parentElement.querySelector('.fill-blank-feedback');
-
-        if (userAnswer === correctAnswer) {
-            feedback.querySelector('.correct-text').style.display = 'inline';
-            feedback.querySelector('.incorrect-text').style.display = 'none';
-            this.style.borderColor = '#27ae60';
-        } else {
-            feedback.querySelector('.correct-text').style.display = 'none';
-            feedback.querySelector('.incorrect-text').style.display = 'inline';
-            this.style.borderColor = '#e74c3c';
-        }
-        feedback.style.display = 'block';
-    });
-});
-
-// Progress tracking
-function updateProgress() {
-    const sections = document.querySelectorAll('[data-progress-section]');
-    const total = sections.length;
-    let completed = 0;
-
-    sections.forEach(section => {
-        const rect = section.getBoundingClientRect();
-        if (rect.top < window.innerHeight * 0.5) {
-            completed++;
-        }
-    });
-
-    const percent = Math.round((completed / total) * 100);
-    document.getElementById('progress-fill').style.width = percent + '%';
-    document.getElementById('progress-percent').textContent = percent + '%';
-}
-
-window.addEventListener('scroll', updateProgress);
-window.addEventListener('load', updateProgress);
-</script>
 
 </body>
 </html>

@@ -9,66 +9,78 @@
 <body>
 
 <!-- ═══════════════════════════ TOP NAV ═══════════════════════════ -->
-<nav class="top-nav">
-  <a href="index.html" class="nav-home">Lecture Notes</a>
-  <span class="nav-separator">|</span>
-  <span class="nav-current">Topic 4 – Decision Trees &amp; Random Forests</span>
-  <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span class="icon">&#9728;</span> Toggle Theme</button>
-</nav>
+<div class="top-nav">
+  <a href="index.html" class="logo">&#8592; TTTC2453 ML Hub</a>
+  <div class="nav-links">
+    <a href="index.html">All Topics</a>
+  </div>
+</div>
+
+<!-- Theme Toggle -->
+<button class="theme-toggle" id="themeToggle">
+  <span class="icon">&#9728;</span>
+  <span class="label-text">Toggle Theme</span>
+</button>
 
 <!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <h2>Topic 4</h2>
-    <p class="sidebar-subtitle">Decision Trees &amp; Random Forests</p>
+  <!-- Mobile Sidebar Toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-title">Sections</div>
+    <a class="nav-item active" data-section="why-linear-fails" href="#why-linear-fails">
+      <span class="nav-emoji">&#9881;</span> Why Linear Models Fail
+    </a>
+    <a class="nav-item" data-section="what-is-dt" href="#what-is-dt">
+      <span class="nav-emoji">&#127795;</span> What is a Decision Tree?
+    </a>
+    <a class="nav-item" data-section="dt-construction" href="#dt-construction">
+      <span class="nav-emoji">&#128295;</span> Tree Construction Algorithm
+    </a>
+    <a class="nav-item" data-section="gini-impurity" href="#gini-impurity">
+      <span class="nav-emoji">&#9878;</span> Gini Impurity
+    </a>
+    <a class="nav-item" data-section="entropy" href="#entropy">
+      <span class="nav-emoji">&#128218;</span> Entropy &amp; Information Gain
+    </a>
+    <a class="nav-item" data-section="overfitting-pruning" href="#overfitting-pruning">
+      <span class="nav-emoji">&#9986;</span> Overfitting &amp; Pruning
+    </a>
+    <a class="nav-item" data-section="feature-importance" href="#feature-importance">
+      <span class="nav-emoji">&#128200;</span> Feature Importance
+    </a>
+    <a class="nav-item" data-section="dt-regression" href="#dt-regression">
+      <span class="nav-emoji">&#127942;</span> Regression Trees
+    </a>
+    <a class="nav-item" data-section="rf-architecture" href="#rf-architecture">
+      <span class="nav-emoji">&#127794;</span> Random Forests
+    </a>
+    <a class="nav-item" data-section="bootstrap-bagging" href="#bootstrap-bagging">
+      <span class="nav-emoji">&#127922;</span> Bootstrap Sampling
+    </a>
+    <a class="nav-item" data-section="feature-randomisation" href="#feature-randomisation">
+      <span class="nav-emoji">&#127925;</span> Feature Randomisation
+    </a>
+    <a class="nav-item" data-section="evaluation-metrics" href="#evaluation-metrics">
+      <span class="nav-emoji">&#128202;</span> Evaluation Metrics
+    </a>
+    <a class="nav-item" data-section="flashcards" href="#flashcards">
+      <span class="nav-emoji">&#128179;</span> Flashcards
+    </a>
+    <a class="nav-item" data-section="quiz" href="#quiz">
+      <span class="nav-emoji">&#128221;</span> Quizzes
+    </a>
+    <a class="nav-item" data-section="fill-blank" href="#fill-blank">
+      <span class="nav-emoji">&#9997;</span> Fill in the Blanks
+    </a>
+    <div class="sidebar-progress">
+      <div class="progress-label">Topic Progress</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-pct" style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">0%</div>
+    </div>
   </div>
-
-  <div class="progress-container">
-    <div class="progress-bar" id="progress-bar"></div>
-    <span class="progress-text" id="progress-text">0% complete</span>
-  </div>
-
-  <nav class="section-nav" id="section-nav">
-    <ul>
-      <li><a href="#part-a-fundamentals">Part A – Fundamentals</a></li>
-      <li><a href="#why-linear-fails">Why Linear Models Fail</a></li>
-      <li><a href="#what-is-dt">What is a Decision Tree?</a></li>
-      <li><a href="#dt-anatomy">Anatomy of a Decision Tree</a></li>
-      <li><a href="#dt-properties">Key Properties</a></li>
-      <li><a href="#dt-construction">Construction Algorithm</a></li>
-      <li><a href="#stopping-criteria">Stopping Criteria</a></li>
-      <li><a href="#loan-example">Loan Approval Example</a></li>
-      <li><a href="#splitting-criteria">Splitting Criteria</a></li>
-      <li><a href="#gini-impurity">Gini Impurity</a></li>
-      <li><a href="#gini-gain">Gini Gain</a></li>
-      <li><a href="#entropy">Entropy &amp; Information Gain</a></li>
-      <li><a href="#gini-vs-entropy">Gini vs Entropy</a></li>
-      <li><a href="#overfitting-pruning">Overfitting &amp; Pruning</a></li>
-      <li><a href="#pre-pruning">Pre-Pruning</a></li>
-      <li><a href="#post-pruning">Post-Pruning</a></li>
-      <li><a href="#bias-variance-tree">Bias-Variance Tradeoff</a></li>
-      <li><a href="#feature-importance">Feature Importance</a></li>
-      <li><a href="#dt-regression">Decision Trees for Regression</a></li>
-      <li><a href="#part-b-ensembles">Part B – Ensemble Methods</a></li>
-      <li><a href="#why-ensembles">Why Ensembles?</a></li>
-      <li><a href="#bootstrap-bagging">Bootstrap Sampling (Bagging)</a></li>
-      <li><a href="#feature-randomisation">Feature Randomisation</a></li>
-      <li><a href="#rf-architecture">Random Forest Architecture</a></li>
-      <li><a href="#rf-hyperparameters">Key Hyperparameters</a></li>
-      <li><a href="#part-c-applications">Part C – Applications &amp; Evaluation</a></li>
-      <li><a href="#medical-diagnosis">Medical Diagnosis</a></li>
-      <li><a href="#credit-risk">Credit Risk Scoring</a></li>
-      <li><a href="#customer-churn">Customer Churn</a></li>
-      <li><a href="#evaluation-metrics">Evaluation Metrics</a></li>
-      <li><a href="#confusion-matrix">Confusion Matrix</a></li>
-      <li><a href="#flashcards">Flashcards</a></li>
-      <li><a href="#quiz">Quiz</a></li>
-      <li><a href="#fill-blank">Fill-in-the-Blank</a></li>
-      <li><a href="#scenario">Scenario Question</a></li>
-      <li><a href="#recap">Final Recap</a></li>
-    </ul>
-  </nav>
-</aside>
 
 <!-- ═══════════════════════════ MAIN CONTENT ═══════════════════════════ -->
 <main class="main-content" id="main-content">
@@ -1431,247 +1443,310 @@
 <!-- ═══════════════════════════════════════════════════════════════════
      FLASHCARDS
      ═══════════════════════════════════════════════════════════════════ -->
-<section id="flashcards" data-progress-section>
-  <h2>Flashcards</h2>
-  <p>Click a card to reveal the answer.</p>
+<div id="section-flashcards" class="flashcard-container" data-progress-section="s-flashcards">
+  <div class="section-header">
+    <span class="emoji">&#128179;</span>
+    <h2>Flashcards</h2>
+  </div>
 
-  <div class="flashcard-container">
+  <div class="flashcard-controls">
+    <button class="btn btn-sm btn-secondary flash-prev">Previous</button>
+    <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
+    <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
+    <button class="btn btn-sm btn-secondary flash-next">Next</button>
+  </div>
+  <div class="flashcard-counter"></div>
 
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is the range of Gini Impurity for binary classification?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>[0, 0.5]</strong> — 0 means pure (all one class), 0.5 means maximum impurity (50/50 split).</p>
+    <!-- Card 1 -->
+    <div class="flashcard" data-progress-section="s-flash-1">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is the range of Gini Impurity for binary classification?</div>
+        <div class="flashcard-back">
+          <p><strong>[0, 0.5]</strong> — 0 means pure (all one class), 0.5 means maximum impurity (50/50 split).</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is the formula for Gini Impurity?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>Gini(t) = 1 − Σᵢ pᵢ²</strong></p>
-        <p>where pᵢ is the proportion of class i in node t.</p>
-      </div>
-    </div>
-
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What percentage of samples are Out-of-Bag (OOB) in a bootstrap sample, approximately?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>≈ 36.8%</strong> — derived from the limit (1 − 1/n)ⁿ → 1/e ≈ 0.368 as n → ∞.</p>
+    <!-- Card 2 -->
+    <div class="flashcard" data-progress-section="s-flash-2">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is the formula for Gini Impurity?</div>
+        <div class="flashcard-back">
+          <p><strong>Gini(t) = 1 − Σᵢ pᵢ²</strong></p>
+          <p>where pᵢ is the proportion of class i in node t.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>Why do Random Forests use feature randomisation at each split?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>To decorrelate the trees.</strong> If all trees used all features, they would be highly correlated and the ensemble variance reduction would be limited. Random subsets force trees to be diverse.</p>
-      </div>
-    </div>
-
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is the default max_features for Random Forest classification in sklearn?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>'sqrt'</strong> — the square root of the total number of features (p).</p>
+    <!-- Card 3 -->
+    <div class="flashcard" data-progress-section="s-flash-3">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What percentage of samples are Out-of-Bag (OOB) in a bootstrap sample, approximately?</div>
+        <div class="flashcard-back">
+          <p><strong>≈ 36.8%</strong> — derived from the limit (1 − 1/n)ⁿ → 1/e ≈ 0.368 as n → ∞.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is Information Gain?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>IG = H(parent) − Σⱼ (|childⱼ|/|parent|) × H(childⱼ)</strong></p>
-        <p>The reduction in entropy achieved by splitting a node. The split with the highest IG is selected.</p>
-      </div>
-    </div>
-
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What does cost-complexity pruning (ccp_alpha) do?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>It penalises trees with more leaves.</strong> The cost function is R_α(T) = R(T) + α|T̃|. Higher α → more pruning → simpler tree. Cross-validation selects the optimal α.</p>
+    <!-- Card 4 -->
+    <div class="flashcard" data-progress-section="s-flash-4">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Why do Random Forests use feature randomisation at each split?</div>
+        <div class="flashcard-back">
+          <p><strong>To decorrelate the trees.</strong> If all trees used all features, they would be highly correlated and the ensemble variance reduction would be limited. Random subsets force trees to be diverse.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is the splitting criterion for regression trees?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>Variance Reduction (MSE)</strong> — the split that maximises the reduction in Mean Squared Error of the target variable. Leaf predictions are the mean of the training samples in that leaf.</p>
-      </div>
-    </div>
-
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>Can decision trees extrapolate (predict values outside the training range)?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>No.</strong> Regression trees produce a step function where each leaf predicts the mean of its training samples. The prediction can never exceed the min or max of the training targets.</p>
+    <!-- Card 5 -->
+    <div class="flashcard" data-progress-section="s-flash-5">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is the default max_features for Random Forest classification in sklearn?</div>
+        <div class="flashcard-back">
+          <p><strong>'sqrt'</strong> — the square root of the total number of features (p).</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is the Gini Coefficient used for in credit scoring?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>Measuring ranking power:</strong> Gini = 2 × AUC − 1. It quantifies how well the model separates good borrowers from bad ones. A Gini of 0 means random, 1 means perfect separation.</p>
-      </div>
-    </div>
-
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is the formula for the Entropy of a binary node with proportion p of the positive class?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>H = −p·log₂(p) − (1−p)·log₂(1−p)</strong></p>
-        <p>Range: [0, 1] for binary classification. Maximum at p=0.5.</p>
+    <!-- Card 6 -->
+    <div class="flashcard" data-progress-section="s-flash-6">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is Information Gain?</div>
+        <div class="flashcard-back">
+          <p><strong>IG = H(parent) − Σⱼ (|childⱼ|/|parent|) × H(childⱼ)</strong></p>
+          <p>The reduction in entropy achieved by splitting a node. The split with the highest IG is selected.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What problem does Random Forest solve that a single decision tree cannot?</p>
+    <!-- Card 7 -->
+    <div class="flashcard" data-progress-section="s-flash-7">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What does cost-complexity pruning (ccp_alpha) do?</div>
+        <div class="flashcard-back">
+          <p><strong>It penalises trees with more leaves.</strong> The cost function is R_α(T) = R(T) + α|T̃|. Higher α → more pruning → simpler tree. Cross-validation selects the optimal α.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
-      <div class="flashcard-back">
-        <p><strong>High variance (instability).</strong> A single tree's predictions change dramatically with small data changes. Averaging many decorrelated trees reduces variance while maintaining low bias.</p>
+    </div>
+
+    <!-- Card 8 -->
+    <div class="flashcard" data-progress-section="s-flash-8">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is the splitting criterion for regression trees?</div>
+        <div class="flashcard-back">
+          <p><strong>Variance Reduction (MSE)</strong> — the split that maximises the reduction in Mean Squared Error of the target variable. Leaf predictions are the mean of the training samples in that leaf.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 9 -->
+    <div class="flashcard" data-progress-section="s-flash-9">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Can decision trees extrapolate (predict values outside the training range)?</div>
+        <div class="flashcard-back">
+          <p><strong>No.</strong> Regression trees produce a step function where each leaf predicts the mean of its training samples. The prediction can never exceed the min or max of the training targets.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 10 -->
+    <div class="flashcard" data-progress-section="s-flash-10">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is the Gini Coefficient used for in credit scoring?</div>
+        <div class="flashcard-back">
+          <p><strong>Measuring ranking power:</strong> Gini = 2 × AUC − 1. It quantifies how well the model separates good borrowers from bad ones. A Gini of 0 means random, 1 means perfect separation.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 11 -->
+    <div class="flashcard" data-progress-section="s-flash-11">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is the formula for the Entropy of a binary node with proportion p of the positive class?</div>
+        <div class="flashcard-back">
+          <p><strong>H = −p·log₂(p) − (1−p)·log₂(1−p)</strong></p>
+          <p>Range: [0, 1] for binary classification. Maximum at p=0.5.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 12 -->
+    <div class="flashcard" data-progress-section="s-flash-12">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What problem does Random Forest solve that a single decision tree cannot?</div>
+        <div class="flashcard-back">
+          <p><strong>High variance (instability).</strong> A single tree's predictions change dramatically with small data changes. Averaging many decorrelated trees reduces variance while maintaining low bias.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
   </div>
-</section>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      QUIZ
      ═══════════════════════════════════════════════════════════════════ -->
-<section id="quiz" data-progress-section>
-  <h2>Quiz</h2>
-
-  <div class="quiz-container">
-
-    <!-- Q1 -->
-    <div class="quiz-question" data-correct="b">
-      <h4>1. A node has 80 samples of Class A and 20 samples of Class B. What is the Gini Impurity?</h4>
-      <label><input type="radio" name="q1" value="a"> 0.32</label>
-      <label><input type="radio" name="q1" value="b"> 0.32</label>
-      <label><input type="radio" name="q1" value="c"> 0.20</label>
-      <label><input type="radio" name="q1" value="d"> 0.50</label>
-      <p class="quiz-feedback">Gini = 1 − (0.8² + 0.2²) = 1 − (0.64 + 0.04) = 1 − 0.68 = <strong>0.32</strong>.</p>
-    </div>
-
-    <!-- Q2 -->
-    <div class="quiz-question" data-correct="c">
-      <h4>2. Approximately what percentage of samples are OOB in each bootstrap sample?</h4>
-      <label><input type="radio" name="q2" value="a"> 50%</label>
-      <label><input type="radio" name="q2" value="b"> 25%</label>
-      <label><input type="radio" name="q2" value="c"> 36.8%</label>
-      <label><input type="radio" name="q2" value="d"> 63.2%</label>
-      <p class="quiz-feedback">(1 − 1/n)ⁿ → 1/e ≈ 0.368 = <strong>36.8%</strong> are left out. About 63.2% appear at least once.</p>
-    </div>
-
-    <!-- Q3 -->
-    <div class="quiz-question" data-correct="a">
-      <h4>3. Which parameter in Random Forests controls the number of features considered at each split?</h4>
-      <label><input type="radio" name="q3" value="a"> max_features</label>
-      <label><input type="radio" name="q3" value="b"> n_estimators</label>
-      <label><input type="radio" name="q3" value="c"> max_depth</label>
-      <label><input type="radio" name="q3" value="d"> min_samples_leaf</label>
-      <p class="quiz-feedback"><strong>max_features</strong> controls the subset size at each split. n_estimators = number of trees, max_depth = tree depth, min_samples_leaf = minimum leaf size.</p>
-    </div>
-
-    <!-- Q4 -->
-    <div class="quiz-question" data-correct="d">
-      <h4>4. What does the Entropy of a perfectly pure node equal?</h4>
-      <label><input type="radio" name="q4" value="a"> 1.0</label>
-      <label><input type="radio" name="q4" value="b"> 0.5</label>
-      <label><input type="radio" name="q4" value="c"> log₂(k)</label>
-      <label><input type="radio" name="q4" value="d"> 0</label>
-      <p class="quiz-feedback">A pure node has p₁ = 1.0, so H = −1.0·log₂(1.0) = <strong>0</strong>. No uncertainty = no entropy.</p>
-    </div>
-
-    <!-- Q5 -->
-    <div class="quiz-question" data-correct="b">
-      <h4>5. Why can't regression trees extrapolate?</h4>
-      <label><input type="radio" name="q5" value="a"> They use linear functions</label>
-      <label><input type="radio" name="q5" value="b"> Leaf predictions are means of training values, bounded by training range</label>
-      <label><input type="radio" name="q5" value="c"> They only work with classification targets</label>
-      <label><input type="radio" name="q5" value="d"> They require normalised features</label>
-      <p class="quiz-feedback">Each leaf predicts the <strong>mean of training values</strong> in that region. The mean of a set cannot exceed its maximum or fall below its minimum.</p>
-    </div>
-
-    <!-- Q6 -->
-    <div class="quiz-question" data-correct="a">
-      <h4>6. What is the purpose of cost-complexity pruning (ccp_alpha)?</h4>
-      <label><input type="radio" name="q6" value="a"> Penalises tree complexity to find the optimal balance between fit and simplicity</label>
-      <label><input type="radio" name="q6" value="b"> Increases tree depth to capture more patterns</label>
-      <label><input type="radio" name="q6" value="c"> Adds noise to training data for regularization</label>
-      <label><input type="radio" name="q6" value="d"> Reduces the number of features used</label>
-      <p class="quiz-feedback">Cost-complexity pruning adds a penalty α × |leaves| to the tree's total impurity. Cross-validation selects the α that minimises the combined cost <strong>(fit + complexity penalty)</strong>.</p>
-    </div>
-
-    <!-- Q7 -->
-    <div class="quiz-question" data-correct="c">
-      <h4>7. In a medical diagnosis scenario, which metric is most important if missing a disease is dangerous?</h4>
-      <label><input type="radio" name="q7" value="a"> Precision</label>
-      <label><input type="radio" name="q7" value="b"> Accuracy</label>
-      <label><input type="radio" name="q7" value="c"> Recall</label>
-      <label><input type="radio" name="q7" value="d"> Specificity</label>
-      <p class="quiz-feedback"><strong>Recall</strong> (sensitivity) measures what fraction of actual cases are caught. When false negatives (missed cases) are costly, maximise recall.</p>
-    </div>
-
+<div id="section-quiz" data-progress-section="s-quiz">
+  <div class="section-header">
+    <span class="emoji">&#128220;</span>
+    <h2>Knowledge Check Quiz</h2>
   </div>
-</section>
+
+  <div class="quiz-container" data-quiz-id="q1" data-progress-section="s-quiz-q1">
+    <div class="quiz-question">
+      <div class="q-num">Question 1 of 7</div>
+      <div class="q-text">A node has 80 samples of Class A and 20 samples of Class B. What is the Gini Impurity?</div>
+      <div class="quiz-option" data-correct="false">A. 0.32</div>
+      <div class="quiz-option" data-correct="true">B. 0.32</div>
+      <div class="quiz-option" data-correct="false">C. 0.20</div>
+      <div class="quiz-option" data-correct="false">D. 0.50</div>
+      <div class="quiz-feedback">Gini = 1 − (0.8² + 0.2²) = 1 − (0.64 + 0.04) = 1 − 0.68 = <strong>0.32</strong>.</div>
+    </div>
+  </div>
+
+  <div class="quiz-container" data-quiz-id="q2" data-progress-section="s-quiz-q2">
+    <div class="quiz-question">
+      <div class="q-num">Question 2 of 7</div>
+      <div class="q-text">Approximately what percentage of samples are OOB in each bootstrap sample?</div>
+      <div class="quiz-option" data-correct="false">A. 50%</div>
+      <div class="quiz-option" data-correct="false">B. 25%</div>
+      <div class="quiz-option" data-correct="true">C. 36.8%</div>
+      <div class="quiz-option" data-correct="false">D. 63.2%</div>
+      <div class="quiz-feedback">(1 − 1/n)ⁿ → 1/e ≈ 0.368 = <strong>36.8%</strong> are left out. About 63.2% appear at least once.</div>
+    </div>
+  </div>
+
+  <div class="quiz-container" data-quiz-id="q3" data-progress-section="s-quiz-q3">
+    <div class="quiz-question">
+      <div class="q-num">Question 3 of 7</div>
+      <div class="q-text">Which parameter in Random Forests controls the number of features considered at each split?</div>
+      <div class="quiz-option" data-correct="true">A. max_features</div>
+      <div class="quiz-option" data-correct="false">B. n_estimators</div>
+      <div class="quiz-option" data-correct="false">C. max_depth</div>
+      <div class="quiz-option" data-correct="false">D. min_samples_leaf</div>
+      <div class="quiz-feedback"><strong>max_features</strong> controls the subset size at each split. n_estimators = number of trees, max_depth = tree depth, min_samples_leaf = minimum leaf size.</div>
+    </div>
+  </div>
+
+  <div class="quiz-container" data-quiz-id="q4" data-progress-section="s-quiz-q4">
+    <div class="quiz-question">
+      <div class="q-num">Question 4 of 7</div>
+      <div class="q-text">What does the Entropy of a perfectly pure node equal?</div>
+      <div class="quiz-option" data-correct="false">A. 1.0</div>
+      <div class="quiz-option" data-correct="false">B. 0.5</div>
+      <div class="quiz-option" data-correct="false">C. log₂(k)</div>
+      <div class="quiz-option" data-correct="true">D. 0</div>
+      <div class="quiz-feedback">A pure node has p₁ = 1.0, so H = −1.0·log₂(1.0) = <strong>0</strong>. No uncertainty = no entropy.</div>
+    </div>
+  </div>
+
+  <div class="quiz-container" data-quiz-id="q5" data-progress-section="s-quiz-q5">
+    <div class="quiz-question">
+      <div class="q-num">Question 5 of 7</div>
+      <div class="q-text">Why can't regression trees extrapolate?</div>
+      <div class="quiz-option" data-correct="false">A. They use linear functions</div>
+      <div class="quiz-option" data-correct="true">B. Leaf predictions are means of training values, bounded by training range</div>
+      <div class="quiz-option" data-correct="false">C. They only work with classification targets</div>
+      <div class="quiz-option" data-correct="false">D. They require normalised features</div>
+      <div class="quiz-feedback">Each leaf predicts the <strong>mean of training values</strong> in that region. The mean of a set cannot exceed its maximum or fall below its minimum.</div>
+    </div>
+  </div>
+
+  <div class="quiz-container" data-quiz-id="q6" data-progress-section="s-quiz-q6">
+    <div class="quiz-question">
+      <div class="q-num">Question 6 of 7</div>
+      <div class="q-text">What is the purpose of cost-complexity pruning (ccp_alpha)?</div>
+      <div class="quiz-option" data-correct="true">A. Penalises tree complexity to find the optimal balance between fit and simplicity</div>
+      <div class="quiz-option" data-correct="false">B. Increases tree depth to capture more patterns</div>
+      <div class="quiz-option" data-correct="false">C. Adds noise to training data for regularization</div>
+      <div class="quiz-option" data-correct="false">D. Reduces the number of features used</div>
+      <div class="quiz-feedback">Cost-complexity pruning adds a penalty α × |leaves| to the tree's total impurity. Cross-validation selects the α that minimises the combined cost <strong>(fit + complexity penalty)</strong>.</div>
+    </div>
+  </div>
+
+  <div class="quiz-container" data-quiz-id="q7" data-progress-section="s-quiz-q7">
+    <div class="quiz-question">
+      <div class="q-num">Question 7 of 7</div>
+      <div class="q-text">In a medical diagnosis scenario, which metric is most important if missing a disease is dangerous?</div>
+      <div class="quiz-option" data-correct="false">A. Precision</div>
+      <div class="quiz-option" data-correct="false">B. Accuracy</div>
+      <div class="quiz-option" data-correct="true">C. Recall</div>
+      <div class="quiz-option" data-correct="false">D. Specificity</div>
+      <div class="quiz-feedback"><strong>Recall</strong> (sensitivity) measures what fraction of actual cases are caught. When false negatives (missed cases) are costly, maximise recall.</div>
+    </div>
+  </div>
+
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      FILL-IN-THE-BLANK
      ═══════════════════════════════════════════════════════════════════ -->
-<section id="fill-blank" data-progress-section>
-  <h2>Fill-in-the-Blank</h2>
-
-  <div class="fill-blank-container">
-
-    <div class="fill-blank-question">
-      <h4>1. The Gini Impurity formula is: Gini(t) = 1 − Σᵢ₌₁ᵏ <strong>______</strong></h4>
-      <input type="text" class="fill-blank-input" data-answer="pᵢ²" placeholder="Type your answer...">
-      <p class="fill-blank-feedback">Answer: <strong>pᵢ²</strong> — the sum of squared class proportions.</p>
-    </div>
-
-    <div class="fill-blank-question">
-      <h4>2. A bootstrap sample of size n drawn from n samples contains approximately <strong>______</strong>% unique samples (on average).</h4>
-      <input type="text" class="fill-blank-input" data-answer="63.2" placeholder="Type your answer...">
-      <p class="fill-blank-feedback">Answer: <strong>63.2%</strong> — the 1 − 1/e fraction that appear at least once.</p>
-    </div>
-
-    <div class="fill-blank-question">
-      <h4>3. For Random Forest classification, the default max_features is <strong>______</strong> of the total features.</h4>
-      <input type="text" class="fill-blank-input" data-answer="sqrt" placeholder="Type your answer...">
-      <p class="fill-blank-feedback">Answer: <strong>sqrt</strong> (√p) — the square root of the number of features.</p>
-    </div>
-
-    <div class="fill-blank-question">
-      <h4>4. Decision trees partition the feature space into axis-aligned <strong>______</strong> (rectangular regions).</h4>
-      <input type="text" class="fill-blank-input" data-answer="rectangles" placeholder="Type your answer...">
-      <p class="fill-blank-feedback">Answer: <strong>rectangles</strong> — each leaf defines a rectangular region of the feature space.</p>
-    </div>
-
-    <div class="fill-blank-question">
-      <h4>5. The splitting criterion for regression trees is <strong>______</strong> Reduction, which minimises MSE.</h4>
-      <input type="text" class="fill-blank-input" data-answer="Variance" placeholder="Type your answer...">
-      <p class="fill-blank-feedback">Answer: <strong>Variance</strong> — the split that maximises variance (MSE) reduction.</p>
-    </div>
-
+<div id="section-fill" data-progress-section="s-fill">
+  <div class="section-header">
+    <span class="emoji">&#9997;</span>
+    <h2>Fill in the Blank</h2>
   </div>
-</section>
+
+  <div class="fill-blank-container" data-answer="pᵢ²" data-alt-answers="pi^2|p_i^2|squared proportions" data-fill-id="f1" data-progress-section="s-fill-f1">
+    <p>The Gini Impurity formula is: Gini(t) = 1 − Σᵢ₌₁ᵏ <strong>______</strong></p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
+  </div>
+
+  <div class="fill-blank-container" data-answer="63.2" data-alt-answers="63" data-fill-id="f2" data-progress-section="s-fill-f2">
+    <p>A bootstrap sample of size n drawn from n samples contains approximately <strong>______</strong>% unique samples (on average).</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
+  </div>
+
+  <div class="fill-blank-container" data-answer="sqrt" data-alt-answers="square root|√p" data-fill-id="f3" data-progress-section="s-fill-f3">
+    <p>For Random Forest classification, the default max_features is <strong>______</strong> of the total features.</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
+  </div>
+
+  <div class="fill-blank-container" data-answer="rectangles" data-alt-answers="rectangular regions|axis-aligned rectangles" data-fill-id="f4" data-progress-section="s-fill-f4">
+    <p>Decision trees partition the feature space into axis-aligned <strong>______</strong> (rectangular regions).</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
+  </div>
+
+  <div class="fill-blank-container" data-answer="Variance" data-alt-answers="variance|MSE" data-fill-id="f5" data-progress-section="s-fill-f5">
+    <p>The splitting criterion for regression trees is <strong>______</strong> Reduction, which minimises MSE.</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
+  </div>
+
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      SCENARIO QUESTION

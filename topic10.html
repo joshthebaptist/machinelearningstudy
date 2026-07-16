@@ -8,42 +8,77 @@
 </head>
 <body>
 
-<!-- Top Navigation -->
-<nav class="top-nav" id="topNav">
-  <a href="index.html" class="nav-home">Lecture Notes</a>
-  <span class="nav-separator">|</span>
-  <span class="nav-topic">Topic 10: RNN &amp; LSTM</span>
-  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">Dark</button>
-</nav>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <a href="index.html" class="logo">&#8592; TTTC2453 ML Hub</a>
+    <div class="nav-links">
+      <a href="index.html">All Topics</a>
+    </div>
+  </div>
 
-<!-- Progress Bar -->
-<div class="progress-bar-container" id="progressBarContainer">
-  <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
-  <span class="progress-text" id="progressText">0%</span>
-</div>
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle">
+    <span class="icon">&#9728;</span>
+    <span class="label-text">Toggle Theme</span>
+  </button>
 
-<!-- Sidebar -->
-<aside class="sidebar" id="sidebar">
-  <nav class="sidebar-nav">
-    <h3>Topic 10: RNN &amp; LSTM</h3>
-    <ul id="sidebarNav">
-      <li><a href="#section1" class="sidebar-link active" data-section="1">1. Why Sequences Matter</a></li>
-      <li><a href="#section2" class="sidebar-link" data-section="2">2. Why FFNs Fail</a></li>
-      <li><a href="#section3" class="sidebar-link" data-section="3">3. The Recurrent Cell</a></li>
-      <li><a href="#section4" class="sidebar-link" data-section="4">4. Sequence Task Shapes</a></li>
-      <li><a href="#section5" class="sidebar-link" data-section="5">5. RNN Forward Pass</a></li>
-      <li><a href="#section6" class="sidebar-link" data-section="6">6. RNN Worked Example</a></li>
-      <li><a href="#section7" class="sidebar-link" data-section="7">7. Vanishing Gradients</a></li>
-      <li><a href="#section8" class="sidebar-link" data-section="8">8. LSTM Overview</a></li>
-      <li><a href="#section9" class="sidebar-link" data-section="9">9. LSTM Gate Equations</a></li>
-      <li><a href="#section10" class="sidebar-link" data-section="10">10. LSTM Worked Example</a></li>
-      <li><a href="#section11" class="sidebar-link" data-section="11">11. RNN vs LSTM vs GRU</a></li>
-      <li><a href="#section12" class="sidebar-link" data-section="12">12. Flashcards</a></li>
-      <li><a href="#section13" class="sidebar-link" data-section="13">13. Quiz</a></li>
-      <li><a href="#section14" class="sidebar-link" data-section="14">14. Fill in the Blanks</a></li>
-    </ul>
-  </nav>
-</aside>
+  <!-- Mobile Sidebar Toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-title">Sections</div>
+    <a class="nav-item active" data-section="section1" href="#section1">
+      <span class="nav-emoji">&#128176;</span> Why Sequences
+    </a>
+    <a class="nav-item" data-section="section2" href="#section2">
+      <span class="nav-emoji">&#128565;</span> Why FFNs Fail
+    </a>
+    <a class="nav-item" data-section="section3" href="#section3">
+      <span class="nav-emoji">&#129504;</span> Recurrent Cell
+    </a>
+    <a class="nav-item" data-section="section4" href="#section4">
+      <span class="nav-emoji">&#128203;</span> Sequence Task Shapes
+    </a>
+    <a class="nav-item" data-section="section5" href="#section5">
+      <span class="nav-emoji">&#128640;</span> RNN Forward Pass
+    </a>
+    <a class="nav-item" data-section="section6" href="#section6">
+      <span class="nav-emoji">&#128218;</span> RNN Worked Example
+    </a>
+    <a class="nav-item" data-section="section7" href="#section7">
+      <span class="nav-emoji">&#128064;</span> Vanishing Gradients
+    </a>
+    <a class="nav-item" data-section="section8" href="#section8">
+      <span class="nav-emoji">&#128293;</span> LSTM Overview
+    </a>
+    <a class="nav-item" data-section="section9" href="#section9">
+      <span class="nav-emoji">&#128209;</span> LSTM Gate Equations
+    </a>
+    <a class="nav-item" data-section="section10" href="#section10">
+      <span class="nav-emoji">&#128202;</span> LSTM Worked Example
+    </a>
+    <a class="nav-item" data-section="section11" href="#section11">
+      <span class="nav-emoji">&#128260;</span> RNN vs LSTM vs GRU
+    </a>
+    <a class="nav-item" data-section="flashcards-section" href="#flashcards-section">
+      <span class="nav-emoji">&#128179;</span> Flashcards
+    </a>
+    <a class="nav-item" data-section="quiz-section" href="#quiz-section">
+      <span class="nav-emoji">&#128221;</span> Quiz
+    </a>
+    <a class="nav-item" data-section="fill-blank-section" href="#fill-blank-section">
+      <span class="nav-emoji">&#9997;</span> Fill in the Blank
+    </a>
+
+    <div class="sidebar-progress">
+      <div class="progress-label">Topic Progress</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-pct" style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">0%</div>
+    </div>
+  </div>
 
 <!-- Main Content -->
 <main class="main-content" id="mainContent">
@@ -705,293 +740,294 @@
 </section>
 
 <!-- ==================== SECTION 12: FLASHCARDS ==================== -->
-<section class="content-section" id="section12" data-progress-section="12">
-  <h2>12. Flashcards</h2>
+<div id="flashcards-section" class="flashcard-container" data-progress-section="s-flashcards">
+    <div class="section-header">
+      <span class="emoji">&#128179;</span>
+      <h2>Flashcards</h2>
+    </div>
 
-  <div class="flashcard-container" id="flashcardContainer12">
+    <div class="flashcard-controls">
+      <button class="btn btn-sm btn-secondary flash-prev">Previous</button>
+      <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
+      <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
+      <button class="btn btn-sm btn-secondary flash-next">Next</button>
+    </div>
+    <div class="flashcard-counter"></div>
 
-    <div class="flashcard" data-flashcard>
-      <div class="flashcard-front">
-        <h4>RNN</h4>
-        <p>What is a Recurrent Neural Network?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>A neural network with <strong>feedback loops</strong> that allow it to maintain a hidden state across time steps. It processes sequences one element at a time, updating its memory at each step using shared weights.</p>
+    <div class="flashcard" data-progress-section="s-flash-1">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">RNN</div>
+        <div class="flashcard-back">
+          A neural network with <strong>feedback loops</strong> that allow it to maintain a hidden state across time steps. It processes sequences one element at a time, updating its memory at each step using shared weights.
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
-    <div class="flashcard" data-flashcard>
-      <div class="flashcard-front">
-        <h4>LSTM</h4>
-        <p>What is a Long Short-Term Memory network?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>A gated recurrent architecture with a dedicated <strong>cell state</strong> (conveyor belt) that allows gradients to flow across many time steps without vanishing. Uses forget, input, and output gates to control information flow.</p>
-      </div>
-    </div>
-
-    <div class="flashcard" data-flashcard>
-      <div class="flashcard-front">
-        <h4>Hidden State</h4>
-        <p>What is the hidden state in an RNN?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>The running summary vector <span class="formula">h<sub>t</sub></span> that encodes all information the network has processed so far. It is updated at each time step and passed to the next step as the network's memory.</p>
+    <div class="flashcard" data-progress-section="s-flash-2">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">LSTM</div>
+        <div class="flashcard-back">
+          A gated recurrent architecture with a dedicated <strong>cell state</strong> (conveyor belt) that allows gradients to flow across many time steps without vanishing. Uses forget, input, and output gates to control information flow.
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
-    <div class="flashcard" data-flashcard>
-      <div class="flashcard-front">
-        <h4>Vanishing Gradient</h4>
-        <p>What is the vanishing gradient problem in RNNs?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>During backpropagation through time, gradients are multiplied by matrices with eigenvalues &lt; 1 at each step, causing them to <strong>shrink exponentially</strong>. This makes it impossible for vanilla RNNs to learn long-range dependencies.</p>
-      </div>
-    </div>
-
-    <div class="flashcard" data-flashcard>
-      <div class="flashcard-front">
-        <h4>BPTT</h4>
-        <p>What is Backpropagation Through Time?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>An extension of backpropagation for recurrent networks. The RNN is <strong>unrolled</strong> into a deep feed-forward network (one layer per time step), and the chain rule is applied through the entire unrolled graph to compute gradients.</p>
+    <div class="flashcard" data-progress-section="s-flash-3">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Hidden State</div>
+        <div class="flashcard-back">
+          The running summary vector h<sub>t</sub> that encodes all information the network has processed so far. It is updated at each time step and passed to the next step as the network's memory.
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
-    <div class="flashcard" data-flashcard>
-      <div class="flashcard-front">
-        <h4>Forget Gate</h4>
-        <p>What does the forget gate do in an LSTM?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>It decides <strong>how much of the old cell state to keep</strong>. Computed as f<sub>t</sub> = σ(W<sub>f</sub> · [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>f</sub>). Values near 1 retain old memory; values near 0 erase it.</p>
-      </div>
-    </div>
-
-    <div class="flashcard" data-flashcard>
-      <div class="flashcard-front">
-        <h4>Input Gate</h4>
-        <p>What does the input gate do in an LSTM?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>It decides <strong>how much new information to write into the cell state</strong>. Computed as i<sub>t</sub> = σ(W<sub>i</sub> · [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>i</sub>). Works with the candidate vector Ĉ<sub>t</sub> to determine what gets added.</p>
+    <div class="flashcard" data-progress-section="s-flash-4">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Vanishing Gradient</div>
+        <div class="flashcard-back">
+          During backpropagation through time, gradients are multiplied by matrices with eigenvalues &lt; 1 at each step, causing them to <strong>shrink exponentially</strong>. This makes it impossible for vanilla RNNs to learn long-range dependencies.
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
-    <div class="flashcard" data-flashcard>
-      <div class="flashcard-front">
-        <h4>Output Gate</h4>
-        <p>What does the output gate do in an LSTM?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>It decides <strong>how much of the cell state to expose</strong> as the hidden state output. Computed as o<sub>t</sub> = σ(W<sub>o</sub> · [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>o</sub>). The cell state is first squashed through tanh, then filtered by the output gate.</p>
-      </div>
-    </div>
-
-    <div class="flashcard" data-flashcard>
-      <div class="flashcard-front">
-        <h4>Cell State</h4>
-        <p>What is the cell state in an LSTM?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>A separate memory vector C<sub>t</sub> that runs through time like a <strong>conveyor belt</strong>. Updated additively (not through repeated tanh), which allows gradients to flow across many steps with minimal decay.</p>
+    <div class="flashcard" data-progress-section="s-flash-5">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">BPTT</div>
+        <div class="flashcard-back">
+          An extension of backpropagation for recurrent networks. The RNN is <strong>unrolled</strong> into a deep feed-forward network (one layer per time step), and the chain rule is applied through the entire unrolled graph to compute gradients.
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
-    <div class="flashcard" data-flashcard>
-      <div class="flashcard-front">
-        <h4>Sequence Task</h4>
-        <p>What are the four main shapes of sequence tasks?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>Many-to-one</strong> (sentiment analysis), <strong>One-to-many</strong> (image captioning), <strong>Many-to-many equal</strong> (POS tagging), <strong>Many-to-many unequal</strong> (machine translation via encoder-decoder).</p>
-      </div>
-    </div>
-
-    <div class="flashcard" data-flashcard>
-      <div class="flashcard-front">
-        <h4>GRU</h4>
-        <p>What is a Gated Recurrent Unit?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>A simplified recurrent architecture with only <strong>two gates</strong> (reset and update) and a single state (h<sub>t</sub>). Fewer parameters than LSTM but comparably effective for many tasks. Introduced by Cho et al. in 2014.</p>
+    <div class="flashcard" data-progress-section="s-flash-6">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Forget Gate</div>
+        <div class="flashcard-back">
+          It decides <strong>how much of the old cell state to keep</strong>. Computed as f<sub>t</sub> = &sigma;(W<sub>f</sub> &middot; [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>f</sub>). Values near 1 retain old memory; values near 0 erase it.
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
-    <div class="flashcard" data-flashcard>
-      <div class="flashcard-front">
-        <h4>tanh</h4>
-        <p>Why is tanh used in RNNs and LSTMs?</p>
+    <div class="flashcard" data-progress-section="s-flash-7">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Input Gate</div>
+        <div class="flashcard-back">
+          It decides <strong>how much new information to write into the cell state</strong>. Computed as i<sub>t</sub> = &sigma;(W<sub>i</sub> &middot; [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>i</sub>). Works with the candidate vector &#346;<sub>t</sub> to determine what gets added.
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
-      <div class="flashcard-back">
-        <p>tanh squashes values to the range <strong>(−1, +1)</strong>, keeping hidden states and cell states bounded. Unlike sigmoid (0 to 1), tanh is centered at zero, which helps with learning dynamics. It introduces non-linearity needed for the network to learn complex patterns.</p>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-8">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Output Gate</div>
+        <div class="flashcard-back">
+          It decides <strong>how much of the cell state to expose</strong> as the hidden state output. Computed as o<sub>t</sub> = &sigma;(W<sub>o</sub> &middot; [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>o</sub>). The cell state is first squashed through tanh, then filtered by the output gate.
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-9">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Cell State</div>
+        <div class="flashcard-back">
+          A separate memory vector C<sub>t</sub> that runs through time like a <strong>conveyor belt</strong>. Updated additively (not through repeated tanh), which allows gradients to flow across many steps with minimal decay.
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-10">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Sequence Task</div>
+        <div class="flashcard-back">
+          <strong>Many-to-one</strong> (sentiment analysis), <strong>One-to-many</strong> (image captioning), <strong>Many-to-many equal</strong> (POS tagging), <strong>Many-to-many unequal</strong> (machine translation via encoder-decoder).
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-11">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">GRU</div>
+        <div class="flashcard-back">
+          A simplified recurrent architecture with only <strong>two gates</strong> (reset and update) and a single state (h<sub>t</sub>). Fewer parameters than LSTM but comparably effective for many tasks. Introduced by Cho et al. in 2014.
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="flashcard" data-progress-section="s-flash-12">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">tanh</div>
+        <div class="flashcard-back">
+          tanh squashes values to the range <strong>(&minus;1, +1)</strong>, keeping hidden states and cell states bounded. Unlike sigmoid (0 to 1), tanh is centered at zero, which helps with learning dynamics. It introduces non-linearity needed for the network to learn complex patterns.
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
   </div>
-</section>
 
 <!-- ==================== SECTION 13: QUIZ ==================== -->
-<section class="content-section" id="section13" data-progress-section="13">
-  <h2>13. Quiz</h2>
+<div id="quiz-section" data-progress-section="s-quiz">
+    <div class="section-header">
+      <span class="emoji">&#128220;</span>
+      <h2>Quiz</h2>
+    </div>
 
-  <div class="quiz-container" id="quizContainer13">
-
-    <div class="quiz-question" data-quiz-question="1">
-      <h4>Q1. Why can't a standard feed-forward network handle variable-length sequences?</h4>
-      <div class="quiz-options">
-        <button class="quiz-option" data-quiz-option="a">A) It uses ReLU activation</button>
-        <button class="quiz-option" data-quiz-option="b">B) It requires a fixed number of input neurons</button>
-        <button class="quiz-option" data-quiz-option="c">C) It cannot use dropout</button>
-        <button class="quiz-option" data-quiz-option="d">D) It is too shallow</button>
-      </div>
-      <div class="quiz-feedback" data-quiz-feedback="1" style="display:none;">
-        <p><strong>Correct: B)</strong> Feed-forward networks have a fixed architecture with a predetermined number of input neurons. Sequences vary in length (e.g., sentences of 3 vs. 30 words), and there is no way to change the input layer size dynamically.</p>
+    <div class="quiz-container" data-quiz-id="q1" data-progress-section="s-quiz-q1">
+      <h3>Question 1</h3>
+      <div class="quiz-question">
+        <div class="q-num">Question 1 of 7</div>
+        <div class="q-text">Why can't a standard feed-forward network handle variable-length sequences?</div>
+        <div class="quiz-option" data-correct="false">A. It uses ReLU activation</div>
+        <div class="quiz-option" data-correct="true">B. It requires a fixed number of input neurons</div>
+        <div class="quiz-option" data-correct="false">C. It cannot use dropout</div>
+        <div class="quiz-option" data-correct="false">D. It is too shallow</div>
+        <div class="quiz-feedback">Feed-forward networks have a fixed architecture with a predetermined number of input neurons. Sequences vary in length (e.g., sentences of 3 vs. 30 words), and there is no way to change the input layer size dynamically.</div>
       </div>
     </div>
 
-    <div class="quiz-question" data-quiz-question="2">
-      <h4>Q2. In an RNN, what role does the hidden state h<sub>t</sub> play?</h4>
-      <div class="quiz-options">
-        <button class="quiz-option" data-quiz-option="a">A) It stores the learning rate</button>
-        <button class="quiz-option" data-quiz-option="b">B) It is a running summary of all past inputs</button>
-        <button class="quiz-option" data-quiz-option="c">C) It holds the gradient values</button>
-        <button class="quiz-option" data-quiz-option="d">D) It determines the batch size</button>
-      </div>
-      <div class="quiz-feedback" data-quiz-feedback="2" style="display:none;">
-        <p><strong>Correct: B)</strong> The hidden state h<sub>t</sub> is the network's memory — a compressed representation of all inputs seen up to time step <em>t</em>. It is updated at each step and passed forward to the next time step.</p>
-      </div>
-    </div>
-
-    <div class="quiz-question" data-quiz-question="3">
-      <h4>Q3. What is the primary advantage of LSTM over vanilla RNN?</h4>
-      <div class="quiz-options">
-        <button class="quiz-option" data-quiz-option="a">A) It has fewer parameters</button>
-        <button class="quiz-option" data-quiz-option="b">B) It runs faster on CPU</button>
-        <button class="quiz-option" data-quiz-option="c">C) The cell state allows gradients to flow across many steps without vanishing</button>
-        <button class="quiz-option" data-quiz-option="d">D) It doesn't need training</button>
-      </div>
-      <div class="quiz-feedback" data-quiz-feedback="3" style="display:none;">
-        <p><strong>Correct: C)</strong> The LSTM's cell state is updated additively (C<sub>t</sub> = f·C<sub>t-1</sub> + i·Ĉ), allowing gradients to flow through the forget gate with minimal degradation. This enables learning dependencies spanning hundreds of time steps.</p>
+    <div class="quiz-container" data-quiz-id="q2" data-progress-section="s-quiz-q2">
+      <h3>Question 2</h3>
+      <div class="quiz-question">
+        <div class="q-num">Question 2 of 7</div>
+        <div class="q-text">In an RNN, what role does the hidden state h<sub>t</sub> play?</div>
+        <div class="quiz-option" data-correct="false">A. It stores the learning rate</div>
+        <div class="quiz-option" data-correct="true">B. It is a running summary of all past inputs</div>
+        <div class="quiz-option" data-correct="false">C. It holds the gradient values</div>
+        <div class="quiz-option" data-correct="false">D. It determines the batch size</div>
+        <div class="quiz-feedback">The hidden state h<sub>t</sub> is the network's memory &mdash; a compressed representation of all inputs seen up to time step t. It is updated at each step and passed forward to the next time step.</div>
       </div>
     </div>
 
-    <div class="quiz-question" data-quiz-question="4">
-      <h4>Q4. What does the forget gate in an LSTM control?</h4>
-      <div class="quiz-options">
-        <button class="quiz-option" data-quiz-option="a">A) How much of the old cell state to keep</button>
-        <button class="quiz-option" data-quiz-option="b">B) The learning rate schedule</button>
-        <button class="quiz-option" data-quiz-option="c">C) How many layers the network has</button>
-        <button class="quiz-option" data-quiz-option="d">D) The batch normalization parameters</button>
-      </div>
-      <div class="quiz-feedback" data-quiz-feedback="4" style="display:none;">
-        <p><strong>Correct: A)</strong> The forget gate f<sub>t</sub> = σ(W<sub>f</sub>·[h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>f</sub>) produces values between 0 and 1 that determine how much of the previous cell state C<sub>t-1</sub> to retain. Values near 1 keep old memory; near 0 erase it.</p>
-      </div>
-    </div>
-
-    <div class="quiz-question" data-quiz-question="5">
-      <h4>Q5. Which architecture is used for machine translation (English → French of different length)?</h4>
-      <div class="quiz-options">
-        <button class="quiz-option" data-quiz-option="a">A) Many-to-one RNN</button>
-        <button class="quiz-option" data-quiz-option="b">B) One-to-many RNN</button>
-        <button class="quiz-option" data-quiz-option="c">C) Many-to-many (equal length) RNN</button>
-        <button class="quiz-option" data-quiz-option="d">D) Encoder-decoder (many-to-many unequal) RNN</button>
-      </div>
-      <div class="quiz-feedback" data-quiz-feedback="5" style="display:none;">
-        <p><strong>Correct: D)</strong> Machine translation requires an <strong>encoder-decoder</strong> architecture because the input and output sequences typically have different lengths. The encoder reads the source sentence, and the decoder generates the target sentence word by word.</p>
+    <div class="quiz-container" data-quiz-id="q3" data-progress-section="s-quiz-q3">
+      <h3>Question 3</h3>
+      <div class="quiz-question">
+        <div class="q-num">Question 3 of 7</div>
+        <div class="q-text">What is the primary advantage of LSTM over vanilla RNN?</div>
+        <div class="quiz-option" data-correct="false">A. It has fewer parameters</div>
+        <div class="quiz-option" data-correct="false">B. It runs faster on CPU</div>
+        <div class="quiz-option" data-correct="true">C. The cell state allows gradients to flow across many steps without vanishing</div>
+        <div class="quiz-option" data-correct="false">D. It doesn't need training</div>
+        <div class="quiz-feedback">The LSTM's cell state is updated additively (C<sub>t</sub> = f&middot;C<sub>t-1</sub> + i&middot;&#346;), allowing gradients to flow through the forget gate with minimal degradation. This enables learning dependencies spanning hundreds of time steps.</div>
       </div>
     </div>
 
-    <div class="quiz-question" data-quiz-question="6">
-      <h4>Q6. In the vanilla RNN equation h<sub>t</sub> = tanh(W<sub>xh</sub>·x<sub>t</sub> + W<sub>hh</sub>·h<sub>t-1</sub> + b<sub>h</sub>), what does W<sub>hh</sub> control?</h4>
-      <div class="quiz-options">
-        <button class="quiz-option" data-quiz-option="a">A) How the current input affects the hidden state</button>
-        <button class="quiz-option" data-quiz-option="b">B) How the previous hidden state influences the new hidden state</button>
-        <button class="quiz-option" data-quiz-option="c">C) How the hidden state maps to the output</button>
-        <button class="quiz-option" data-quiz-option="d">D) The bias term</button>
-      </div>
-      <div class="quiz-feedback" data-quiz-feedback="6" style="display:none;">
-        <p><strong>Correct: B)</strong> W<sub>hh</sub> is the weight matrix that connects the previous hidden state h<sub>t-1</sub> to the current hidden state h<sub>t</sub>. It controls how the network's memory from the previous step influences its new memory. The eigenvalues of W<sub>hh</sub> are central to the vanishing/exploding gradient problem.</p>
+    <div class="quiz-container" data-quiz-id="q4" data-progress-section="s-quiz-q4">
+      <h3>Question 4</h3>
+      <div class="quiz-question">
+        <div class="q-num">Question 4 of 7</div>
+        <div class="q-text">What does the forget gate in an LSTM control?</div>
+        <div class="quiz-option" data-correct="true">A. How much of the old cell state to keep</div>
+        <div class="quiz-option" data-correct="false">B. The learning rate schedule</div>
+        <div class="quiz-option" data-correct="false">C. How many layers the network has</div>
+        <div class="quiz-option" data-correct="false">D. The batch normalization parameters</div>
+        <div class="quiz-feedback">The forget gate f<sub>t</sub> = &sigma;(W<sub>f</sub>&middot;[h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>f</sub>) produces values between 0 and 1 that determine how much of the previous cell state C<sub>t-1</sub> to retain. Values near 1 keep old memory; near 0 erase it.</div>
       </div>
     </div>
 
-    <div class="quiz-question" data-quiz-question="7">
-      <h4>Q7. Why does the gradient vanish in vanilla RNNs but not (as easily) in LSTMs?</h4>
-      <div class="quiz-options">
-        <button class="quiz-option" data-quiz-option="a">A) LSTMs use a larger learning rate</button>
-        <button class="quiz-option" data-quiz-option="b">B) LSTMs use dropout instead of backpropagation</button>
-        <button class="quiz-option" data-quiz-option="c">C) The LSTM cell state is updated additively, so gradients flow through the forget gate without repeated tanh squashing</button>
-        <button class="quiz-option" data-quiz-option="d">D) LSTMs don't use gradients at all</button>
+    <div class="quiz-container" data-quiz-id="q5" data-progress-section="s-quiz-q5">
+      <h3>Question 5</h3>
+      <div class="quiz-question">
+        <div class="q-num">Question 5 of 7</div>
+        <div class="q-text">Which architecture is used for machine translation (English &rarr; French of different length)?</div>
+        <div class="quiz-option" data-correct="false">A. Many-to-one RNN</div>
+        <div class="quiz-option" data-correct="false">B. One-to-many RNN</div>
+        <div class="quiz-option" data-correct="false">C. Many-to-many (equal length) RNN</div>
+        <div class="quiz-option" data-correct="true">D. Encoder-decoder (many-to-many unequal) RNN</div>
+        <div class="quiz-feedback">Machine translation requires an <strong>encoder-decoder</strong> architecture because the input and output sequences typically have different lengths. The encoder reads the source sentence, and the decoder generates the target sentence word by word.</div>
       </div>
-      <div class="quiz-feedback" data-quiz-feedback="7" style="display:none;">
-        <p><strong>Correct: C)</strong> In vanilla RNNs, gradients pass through tanh derivatives (values < 1) at every step, causing exponential shrinkage. In LSTMs, the cell state gradient is ∂C<sub>t</sub>/∂C<sub>t-1</sub> = f<sub>t</sub> (the forget gate), which can be close to 1, allowing gradients to flow long distances.</p>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q6" data-progress-section="s-quiz-q6">
+      <h3>Question 6</h3>
+      <div class="quiz-question">
+        <div class="q-num">Question 6 of 7</div>
+        <div class="q-text">In the vanilla RNN equation h<sub>t</sub> = tanh(W<sub>xh</sub>&middot;x<sub>t</sub> + W<sub>hh</sub>&middot;h<sub>t-1</sub> + b<sub>h</sub>), what does W<sub>hh</sub> control?</div>
+        <div class="quiz-option" data-correct="false">A. How the current input affects the hidden state</div>
+        <div class="quiz-option" data-correct="true">B. How the previous hidden state influences the new hidden state</div>
+        <div class="quiz-option" data-correct="false">C. How the hidden state maps to the output</div>
+        <div class="quiz-option" data-correct="false">D. The bias term</div>
+        <div class="quiz-feedback">W<sub>hh</sub> is the weight matrix that connects the previous hidden state h<sub>t-1</sub> to the current hidden state h<sub>t</sub>. It controls how the network's memory from the previous step influences its new memory.</div>
+      </div>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q7" data-progress-section="s-quiz-q7">
+      <h3>Question 7</h3>
+      <div class="quiz-question">
+        <div class="q-num">Question 7 of 7</div>
+        <div class="q-text">Why does the gradient vanish in vanilla RNNs but not (as easily) in LSTMs?</div>
+        <div class="quiz-option" data-correct="false">A. LSTMs use a larger learning rate</div>
+        <div class="quiz-option" data-correct="false">B. LSTMs use dropout instead of backpropagation</div>
+        <div class="quiz-option" data-correct="true">C. The LSTM cell state is updated additively, so gradients flow through the forget gate without repeated tanh squashing</div>
+        <div class="quiz-option" data-correct="false">D. LSTMs don't use gradients at all</div>
+        <div class="quiz-feedback">In vanilla RNNs, gradients pass through tanh derivatives (values &lt; 1) at every step, causing exponential shrinkage. In LSTMs, the cell state gradient is &part;C<sub>t</sub>/&part;C<sub>t-1</sub> = f<sub>t</sub> (the forget gate), which can be close to 1, allowing gradients to flow long distances.</div>
       </div>
     </div>
 
   </div>
-</section>
 
 <!-- ==================== SECTION 14: FILL IN THE BLANKS ==================== -->
-<section class="content-section" id="section14" data-progress-section="14">
-  <h2>14. Fill in the Blanks</h2>
-
-  <div class="fill-blank-container" id="fillBlankContainer14">
-
-    <div class="fill-blank-question" data-fill-question="1">
-      <p><strong>1.</strong> In an RNN, the hidden state <span class="formula">h<sub>t</sub></span> is computed using the current input <span class="formula">x<sub>t</sub></span> and the previous ________.</p>
-      <div class="fill-blank-input">
-        <input type="text" class="fill-blank-field" data-fill-answer="hidden state" placeholder="Type your answer..." data-fill-correct="false">
-        <button class="fill-blank-check" data-fill-check="1">Check</button>
-      </div>
-      <div class="fill-blank-feedback" data-fill-feedback="1" style="display:none;">
-        <p><strong>Correct answer: hidden state</strong> (h<sub>t-1</sub>). The hidden state is the network's memory, carrying information from all previous time steps forward to the current step.</p>
-      </div>
+<div id="fill-blank-section" data-progress-section="s-fill">
+    <div class="section-header">
+      <span class="emoji">&#9997;</span>
+      <h2>Fill in the Blanks</h2>
     </div>
 
-    <div class="fill-blank-question" data-fill-question="2">
-      <p><strong>2.</strong> The vanishing gradient problem occurs because gradients are multiplied by matrices with eigenvalues less than ________ at each backward step through time.</p>
-      <div class="fill-blank-input">
-        <input type="text" class="fill-blank-field" data-fill-answer="1" placeholder="Type your answer..." data-fill-correct="false">
-        <button class="fill-blank-check" data-fill-check="2">Check</button>
-      </div>
-      <div class="fill-blank-feedback" data-fill-feedback="2" style="display:none;">
-        <p><strong>Correct answer: 1</strong>. When eigenvalues are less than 1, repeated multiplication causes the gradient to shrink exponentially toward zero. For example, 0.9²⁰ ≈ 0.12.</p>
-      </div>
+    <div class="fill-blank-container" data-answer="hidden state" data-alt-answers="h|hidden" data-fill-id="f1" data-progress-section="s-fill-f1">
+      <p><strong>1.</strong> In an RNN, the hidden state h<sub>t</sub> is computed using the current input x<sub>t</sub> and the previous <strong>___</strong>.</p>
+      <input type="text" class="fill-blank-input" placeholder="Type your answer">
+      <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+      <div class="fill-blank-feedback"></div>
     </div>
 
-    <div class="fill-blank-question" data-fill-question="3">
-      <p><strong>3.</strong> An LSTM has three gates: the forget gate, the input gate, and the ________ gate.</p>
-      <div class="fill-blank-input">
-        <input type="text" class="fill-blank-field" data-fill-answer="output" placeholder="Type your answer..." data-fill-correct="false">
-        <button class="fill-blank-check" data-fill-check="3">Check</button>
-      </div>
-      <div class="fill-blank-feedback" data-fill-feedback="3" style="display:none;">
-        <p><strong>Correct answer: output</strong>. The output gate controls how much of the cell state is exposed as the hidden state output: h<sub>t</sub> = o<sub>t</sub> ⊙ tanh(C<sub>t</sub>).</p>
-      </div>
+    <div class="fill-blank-container" data-answer="1" data-alt-answers="one" data-fill-id="f2" data-progress-section="s-fill-f2">
+      <p><strong>2.</strong> The vanishing gradient problem occurs because gradients are multiplied by matrices with eigenvalues less than <strong>___</strong> at each backward step through time.</p>
+      <input type="text" class="fill-blank-input" placeholder="Type your answer">
+      <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+      <div class="fill-blank-feedback"></div>
     </div>
 
-    <div class="fill-blank-question" data-fill-question="4">
-      <p><strong>4.</strong> The LSTM cell state is updated using ________ operations (addition), not repeated squashing through tanh, which is why gradients can flow across many time steps.</p>
-      <div class="fill-blank-input">
-        <input type="text" class="fill-blank-field" data-fill-answer="additive" placeholder="Type your answer..." data-fill-correct="false">
-        <button class="fill-blank-check" data-fill-check="4">Check</button>
-      </div>
-      <div class="fill-blank-feedback" data-fill-feedback="4" style="display:none;">
-        <p><strong>Correct answer: additive</strong>. The cell state update C<sub>t</sub> = f<sub>t</sub>⊙C<sub>t-1</sub> + i<sub>t</sub>⊙Ĉ<sub>t</sub> is additive, meaning the gradient ∂C<sub>t</sub>/∂C<sub>t-1</sub> is simply the forget gate — not a product of repeated tanh derivatives.</p>
-      </div>
+    <div class="fill-blank-container" data-answer="output" data-alt-answers="" data-fill-id="f3" data-progress-section="s-fill-f3">
+      <p><strong>3.</strong> An LSTM has three gates: the forget gate, the input gate, and the <strong>___</strong> gate.</p>
+      <input type="text" class="fill-blank-input" placeholder="Type your answer">
+      <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+      <div class="fill-blank-feedback"></div>
     </div>
 
-    <div class="fill-blank-question" data-fill-question="5">
-      <p><strong>5.</strong> A task where a model reads a sequence of words and outputs a single sentiment score is an example of a ________-to-one architecture.</p>
-      <div class="fill-blank-input">
-        <input type="text" class="fill-blank-field" data-fill-answer="many" placeholder="Type your answer..." data-fill-correct="false">
-        <button class="fill-blank-check" data-fill-check="5">Check</button>
-      </div>
-      <div class="fill-blank-feedback" data-fill-feedback="5" style="display:none;">
-        <p><strong>Correct answer: many</strong>. Many-to-one: multiple input elements (words in a sentence) produce a single output (sentiment score). The final hidden state h<sub>T</sub> is used as the summary.</p>
-      </div>
+    <div class="fill-blank-container" data-answer="additive" data-alt-answers="" data-fill-id="f4" data-progress-section="s-fill-f4">
+      <p><strong>4.</strong> The LSTM cell state is updated using <strong>___</strong> operations (addition), not repeated squashing through tanh, which is why gradients can flow across many time steps.</p>
+      <input type="text" class="fill-blank-input" placeholder="Type your answer">
+      <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+      <div class="fill-blank-feedback"></div>
+    </div>
+
+    <div class="fill-blank-container" data-answer="many" data-alt-answers="" data-fill-id="f5" data-progress-section="s-fill-f5">
+      <p><strong>5.</strong> A task where a model reads a sequence of words and outputs a single sentiment score is an example of a <strong>___</strong>-to-one architecture.</p>
+      <input type="text" class="fill-blank-input" placeholder="Type your answer">
+      <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+      <div class="fill-blank-feedback"></div>
     </div>
 
   </div>
@@ -1008,131 +1044,9 @@
       </div>
     </details>
   </div>
-</section>
 
 </main>
 
 <script src="script.js"></script>
-<script>
-// Collapsible sections
-document.querySelectorAll('.collapsible summary').forEach(function(summary) {
-  summary.addEventListener('click', function() {
-    this.parentElement.classList.toggle('open');
-  });
-});
-
-// Flashcard flipping
-document.querySelectorAll('[data-flashcard]').forEach(function(card) {
-  card.addEventListener('click', function() {
-    this.classList.toggle('flipped');
-  });
-});
-
-// Quiz logic
-document.querySelectorAll('.quiz-option').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    var question = this.closest('[data-quiz-question]');
-    var qNum = question.getAttribute('data-quiz-question');
-    var options = question.querySelectorAll('.quiz-option');
-    var feedback = question.querySelector('[data-quiz-feedback]');
-
-    // Determine correct answer (index 1 = option b for Q1, index 1 = b for Q2, etc.)
-    var correctMap = {1:'b', 2:'b', 3:'c', 4:'a', 5:'d', 6:'b', 7:'c'};
-    var correctAnswer = correctMap[qNum];
-    var selected = this.getAttribute('data-quiz-option');
-
-    options.forEach(function(o) { o.disabled = true; });
-
-    if (selected === correctAnswer) {
-      this.classList.add('correct');
-    } else {
-      this.classList.add('incorrect');
-      // highlight the correct one
-      options.forEach(function(o) {
-        if (o.getAttribute('data-quiz-option') === correctAnswer) {
-          o.classList.add('correct');
-        }
-      });
-    }
-    feedback.style.display = 'block';
-  });
-});
-
-// Fill in the blanks
-document.querySelectorAll('.fill-blank-check').forEach(function(btn) {
-  btn.addEventListener('click', function() {
-    var q = this.closest('[data-fill-question]');
-    var qNum = q.getAttribute('data-fill-question');
-    var input = q.querySelector('.fill-blank-field');
-    var feedback = q.querySelector('[data-fill-feedback]');
-    var answer = input.getAttribute('data-fill-answer').toLowerCase().trim();
-    var userAnswer = input.value.toLowerCase().trim();
-
-    if (userAnswer === answer) {
-      input.classList.add('correct');
-      input.classList.remove('incorrect');
-      feedback.innerHTML = '<p style="color:var(--success);"><strong>Correct!</strong> ' + feedback.innerHTML.replace(/<[^>]*>/g, '').substring(0) + '</p>';
-    } else {
-      input.classList.add('incorrect');
-      input.classList.remove('correct');
-    }
-    feedback.style.display = 'block';
-  });
-});
-
-// Progress tracking
-(function() {
-  var sections = document.querySelectorAll('[data-progress-section]');
-  var progressBar = document.getElementById('progressBar');
-  var progressText = document.getElementById('progressText');
-  var sidebarLinks = document.querySelectorAll('.sidebar-link');
-  var totalSections = sections.length;
-
-  function updateProgress() {
-    var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    var windowHeight = window.innerHeight;
-    var docHeight = document.documentElement.scrollHeight;
-    var scrolled = scrollTop / (docHeight - windowHeight);
-    var pct = Math.min(100, Math.round(scrolled * 100));
-    progressBar.style.width = pct + '%';
-    progressText.textContent = pct + '%';
-
-    // Determine active section
-    var activeIndex = 0;
-    sections.forEach(function(sec, i) {
-      var rect = sec.getBoundingClientRect();
-      if (rect.top <= windowHeight * 0.4) {
-        activeIndex = i;
-      }
-    });
-
-    sidebarLinks.forEach(function(link) {
-      link.classList.remove('active');
-    });
-    if (sidebarLinks[activeIndex]) {
-      sidebarLinks[activeIndex].classList.add('active');
-    }
-  }
-
-  window.addEventListener('scroll', updateProgress);
-  updateProgress();
-})();
-
-// Theme toggle
-(function() {
-  var toggle = document.getElementById('themeToggle');
-  var body = document.body;
-  toggle.addEventListener('click', function() {
-    if (body.getAttribute('data-theme') === 'dark') {
-      body.removeAttribute('data-theme');
-      toggle.textContent = 'Dark';
-    } else {
-      body.setAttribute('data-theme', 'dark');
-      toggle.textContent = 'Light';
-    }
-  });
-})();
-</script>
-
 </body>
 </html>

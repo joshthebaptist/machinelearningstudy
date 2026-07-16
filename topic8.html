@@ -8,38 +8,86 @@
 </head>
 <body>
 
-<nav class="top-nav">
-    <a href="index.html" class="home-link">← Back to Home</a>
-    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span class="icon">&#9728;</span> Toggle Theme</button>
-</nav>
-
-<div class="sidebar" id="sidebar">
-    <h2>Topic 8: Deep Neural Architectures</h2>
-    <nav class="section-nav">
-        <a href="#section1">8.1 Bridge from Week 7</a>
-        <a href="#section2">8.2 The Collapse Problem</a>
-        <a href="#section3">8.3 Vanishing Gradients</a>
-        <a href="#section4">8.4 ReLU Activation</a>
-        <a href="#section5">8.5 Dying ReLU Problem</a>
-        <a href="#section6">8.6 Softmax for Multi-Class</a>
-        <a href="#section7">8.7 Softmax + CCE Loss</a>
-        <a href="#section8">8.8 Decision Guide Table</a>
-        <a href="#section9">8.9 Overfitting in Deep Networks</a>
-        <a href="#section10">8.10 Regularisation Techniques</a>
-        <a href="#section11">8.11 Combining Regularisers</a>
-        <a href="#section12">8.12 Design Checklist</a>
-        <a href="#section13">8.13 Common Pitfalls</a>
-        <a href="#flashcards-section">Flashcards</a>
-        <a href="#quiz-section">Quiz</a>
-        <a href="#fill-blank-section">Fill in the Blanks</a>
-        <a href="#scenario-section">Scenario</a>
-    </nav>
-    <div class="progress-container">
-        <div class="progress-label">Progress</div>
-        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
-        <div class="progress-percent" id="progress-percent">0%</div>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <a href="index.html" class="logo">&#8592; TTTC2453 ML Hub</a>
+    <div class="nav-links">
+      <a href="index.html">All Topics</a>
     </div>
-</div>
+  </div>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle">
+    <span class="icon">&#9728;</span>
+    <span class="label-text">Toggle Theme</span>
+  </button>
+
+  <!-- Mobile Sidebar Toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-title">Sections</div>
+    <a class="nav-item active" data-section="section1" href="#section1">
+      <span class="nav-emoji">&#128279;</span> Bridge from Week 7
+    </a>
+    <a class="nav-item" data-section="section2" href="#section2">
+      <span class="nav-emoji">&#128165;</span> Collapse Problem
+    </a>
+    <a class="nav-item" data-section="section3" href="#section3">
+      <span class="nav-emoji">&#128064;</span> Vanishing Gradients
+    </a>
+    <a class="nav-item" data-section="section4" href="#section4">
+      <span class="nav-emoji">&#9889;</span> ReLU
+    </a>
+    <a class="nav-item" data-section="section5" href="#section5">
+      <span class="nav-emoji">&#128128;</span> Dying ReLU
+    </a>
+    <a class="nav-item" data-section="section6" href="#section6">
+      <span class="nav-emoji">&#127919;</span> Softmax
+    </a>
+    <a class="nav-item" data-section="section7" href="#section7">
+      <span class="nav-emoji">&#127918;</span> Softmax + CCE
+    </a>
+    <a class="nav-item" data-section="section8" href="#section8">
+      <span class="nav-emoji">&#128203;</span> Decision Guide
+    </a>
+    <a class="nav-item" data-section="section9" href="#section9">
+      <span class="nav-emoji">&#128176;</span> Overfitting
+    </a>
+    <a class="nav-item" data-section="section10" href="#section10">
+      <span class="nav-emoji">&#128737;</span> Regularisation
+    </a>
+    <a class="nav-item" data-section="section11" href="#section11">
+      <span class="nav-emoji">&#128260;</span> Combining Regularisers
+    </a>
+    <a class="nav-item" data-section="section12" href="#section12">
+      <span class="nav-emoji">&#9989;</span> Design Checklist
+    </a>
+    <a class="nav-item" data-section="section13" href="#section13">
+      <span class="nav-emoji">&#128680;</span> Common Pitfalls
+    </a>
+    <a class="nav-item" data-section="flashcards-section" href="#flashcards-section">
+      <span class="nav-emoji">&#128179;</span> Flashcards
+    </a>
+    <a class="nav-item" data-section="quiz-section" href="#quiz-section">
+      <span class="nav-emoji">&#128221;</span> Quiz
+    </a>
+    <a class="nav-item" data-section="fill-blank-section" href="#fill-blank-section">
+      <span class="nav-emoji">&#9997;</span> Fill in the Blank
+    </a>
+    <a class="nav-item" data-section="scenario-section" href="#scenario-section">
+      <span class="nav-emoji">&#128218;</span> Scenario
+    </a>
+
+    <div class="sidebar-progress">
+      <div class="progress-label">Topic Progress</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-pct" style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">0%</div>
+    </div>
+  </div>
 
 <main class="content">
 
@@ -1011,455 +1059,367 @@
 <!-- ============================================================ -->
 <!-- FLASHCARDS -->
 <!-- ============================================================ -->
-<section id="flashcards-section" data-progress-section>
-    <h2>Flashcards</h2>
+<div id="flashcards-section" class="flashcard-container" data-progress-section="s-flashcards">
+    <div class="section-header">
+        <span class="emoji">&#128179;</span>
+        <h2>Flashcards</h2>
+    </div>
 
-    <div class="flashcard-container">
+    <div class="flashcard-controls">
+        <button class="btn btn-sm btn-secondary flash-prev">Previous</button>
+        <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
+        <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
+        <button class="btn btn-sm btn-secondary flash-next">Next</button>
+    </div>
+    <div class="flashcard-counter"></div>
 
-        <div class="flashcard-controls">
-            <button class="btn btn-sm btn-secondary flash-prev">← Previous</button>
-            <button class="btn btn-sm btn-secondary flash-next">Next →</button>
-            <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
-            <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
-        </div>
-        <div class="flashcard-counter"></div>
-
-        <div class="flashcard" data-card="0">
-            <div class="flashcard-front">
-                <strong>What happens to a deep network without activation functions?</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
+    <div class="flashcard" data-progress-section="s-flash-1">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">What happens to a deep network without activation functions?</div>
             <div class="flashcard-back">
-                It collapses to a single linear transformation: ŷ = W'x + b'. No matter how many layers you stack, the composition of linear functions is still linear. Activations are the ONLY source of expressive power.
+                It collapses to a single linear transformation: &#375; = W'x + b'. No matter how many layers you stack, the composition of linear functions is still linear. Activations are the ONLY source of expressive power.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
             </div>
         </div>
+    </div>
 
-        <div class="flashcard" data-card="1">
-            <div class="flashcard-front">
-                <strong>What is the maximum value of the sigmoid derivative σ'(z)?</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
+    <div class="flashcard" data-progress-section="s-flash-2">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">What is the maximum value of the sigmoid derivative &sigma;'(z)?</div>
             <div class="flashcard-back">
-                0.25 (at z = 0). For all other values, σ'(z) < 0.25. This means gradients shrink by at least 75% at each sigmoid layer, causing vanishing gradients in deep networks.
+                0.25 (at z = 0). For all other values, &sigma;'(z) &lt; 0.25. This means gradients shrink by at least 75% at each sigmoid layer, causing vanishing gradients in deep networks.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
             </div>
         </div>
+    </div>
 
-        <div class="flashcard" data-card="2">
-            <div class="flashcard-front">
-                <strong>Define ReLU and its derivative.</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
+    <div class="flashcard" data-progress-section="s-flash-3">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Define ReLU and its derivative.</div>
             <div class="flashcard-back">
-                ReLU(z) = max(0, z). Derivative: 1 if z > 0, 0 if z < 0, undefined (use 0) at z = 0. Gradient = 1 for active neurons means no vanishing — the key advantage over sigmoid.
+                ReLU(z) = max(0, z). Derivative: 1 if z &gt; 0, 0 if z &lt; 0, undefined (use 0) at z = 0. Gradient = 1 for active neurons means no vanishing &mdash; the key advantage over sigmoid.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
             </div>
         </div>
+    </div>
 
-        <div class="flashcard" data-card="3">
-            <div class="flashcard-front">
-                <strong>What is the "dying ReLU" problem?</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
+    <div class="flashcard" data-progress-section="s-flash-4">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">What is the "dying ReLU" problem?</div>
             <div class="flashcard-back">
-                When a ReLU neuron's weighted sum is negative for ALL training examples, it outputs 0 and has gradient 0 — so its weights never update. The neuron is permanently dead. Caused by large negative biases, high learning rates, or poor initialisation.
+                When a ReLU neuron's weighted sum is negative for ALL training examples, it outputs 0 and has gradient 0 &mdash; so its weights never update. The neuron is permanently dead. Caused by large negative biases, high learning rates, or poor initialisation.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
             </div>
         </div>
+    </div>
 
-        <div class="flashcard" data-card="4">
-            <div class="flashcard-front">
-                <strong>Write the softmax formula and state its key properties.</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
+    <div class="flashcard" data-progress-section="s-flash-5">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Write the softmax formula and state its key properties.</div>
             <div class="flashcard-back">
-                softmax(z<sub>k</sub>) = e<sup>z<sub>k</sub></sup> / Σ<sub>j</sub> e<sup>z<sub>j</sub></sup>. Properties: (1) outputs sum to 1 (valid probability distribution), (2) all outputs in (0,1), (3) translation invariant (softmax(z+c) = softmax(z)), (4) differentiable. Use for multi-class output layers only.
+                softmax(z<sub>k</sub>) = e<sup>z<sub>k</sub></sup> / &Sigma;<sub>j</sub> e<sup>z<sub>j</sub></sup>. Properties: (1) outputs sum to 1 (valid probability distribution), (2) all outputs in (0,1), (3) translation invariant (softmax(z+c) = softmax(z)), (4) differentiable. Use for multi-class output layers only.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
             </div>
         </div>
+    </div>
 
-        <div class="flashcard" data-card="5">
-            <div class="flashcard-front">
-                <strong>What is categorical cross-entropy (CCE) loss?</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
+    <div class="flashcard" data-progress-section="s-flash-6">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">What is categorical cross-entropy (CCE) loss?</div>
             <div class="flashcard-back">
-                CCE = −Σ<sub>k</sub> y<sub>k</sub> · log(p<sub>k</sub>) = −log(p<sub>true class</sub>). Measures how wrong the predicted probability for the true class is. Paired with softmax output. Combined gradient: ∂L/∂z<sub>k</sub> = p<sub>k</sub> − y<sub>k</sub>.
+                CCE = &minus;&Sigma;<sub>k</sub> y<sub>k</sub> &middot; log(p<sub>k</sub>) = &minus;log(p<sub>true class</sub>). Measures how wrong the predicted probability for the true class is. Paired with softmax output. Combined gradient: &part;L/&part;z<sub>k</sub> = p<sub>k</sub> &minus; y<sub>k</sub>.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
             </div>
         </div>
+    </div>
 
-        <div class="flashcard" data-card="6">
-            <div class="flashcard-front">
-                <strong>Which activation/loss pair is correct for binary classification?</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
+    <div class="flashcard" data-progress-section="s-flash-7">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Which activation/loss pair is correct for binary classification?</div>
             <div class="flashcard-back">
-                Sigmoid output (1 neuron) + Binary Cross-Entropy (BCE) loss. The sigmoid maps the logit to (0,1), and BCE measures the deviation from the binary label. Don't use softmax for binary — it's equivalent but wasteful.
+                Sigmoid output (1 neuron) + Binary Cross-Entropy (BCE) loss. The sigmoid maps the logit to (0,1), and BCE measures the deviation from the binary label. Don't use softmax for binary &mdash; it's equivalent but wasteful.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
             </div>
         </div>
+    </div>
 
-        <div class="flashcard" data-card="7">
-            <div class="flashcard-front">
-                <strong>How does dropout prevent overfitting?</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
+    <div class="flashcard" data-progress-section="s-flash-8">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">How does dropout prevent overfitting?</div>
             <div class="flashcard-back">
-                Two mechanisms: (1) Prevents co-adaptation — neurons can't rely on specific other neurons always being active, so each learns more robust features. (2) Implicit ensemble — each training step uses a different sub-network, approximating the average of 2<sup>N</sup> models at test time.
+                Two mechanisms: (1) Prevents co-adaptation &mdash; neurons can't rely on specific other neurons always being active, so each learns more robust features. (2) Implicit ensemble &mdash; each training step uses a different sub-network, approximating the average of 2<sup>N</sup> models at test time.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
             </div>
         </div>
+    </div>
 
-        <div class="flashcard" data-card="8">
-            <div class="flashcard-front">
-                <strong>What is the difference between L1 and L2 regularisation?</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
+    <div class="flashcard" data-progress-section="s-flash-9">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">What is the difference between L1 and L2 regularisation?</div>
             <div class="flashcard-back">
-                L2 (Ridge): penalty = λΣw², shrinks weights toward 0 but rarely to exactly 0. Keeps all features. L1 (Lasso): penalty = λΣ|w|, pushes many weights to exactly 0, performing feature selection. L1 produces sparse models; L2 produces small but non-zero weights.
+                L2 (Ridge): penalty = &lambda;&Sigma;w&sup2;, shrinks weights toward 0 but rarely to exactly 0. Keeps all features. L1 (Lasso): penalty = &lambda;&Sigma;|w|, pushes many weights to exactly 0, performing feature selection. L1 produces sparse models; L2 produces small but non-zero weights.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
             </div>
         </div>
+    </div>
 
-        <div class="flashcard" data-card="9">
-            <div class="flashcard-front">
-                <strong>Why is batch normalisation helpful?</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
+    <div class="flashcard" data-progress-section="s-flash-10">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Why is batch normalisation helpful?</div>
             <div class="flashcard-back">
-                Batch norm: (1) Reduces internal covariate shift — stabilises the distribution of inputs to each layer. (2) Smooths the loss landscape — allows higher learning rates and faster convergence. (3) Provides mild regularisation — batch statistics add noise during training.
+                Batch norm: (1) Reduces internal covariate shift &mdash; stabilises the distribution of inputs to each layer. (2) Smooths the loss landscape &mdash; allows higher learning rates and faster convergence. (3) Provides mild regularisation &mdash; batch statistics add noise during training.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
             </div>
         </div>
+    </div>
 
-        <div class="flashcard" data-card="10">
-            <div class="flashcard-front">
-                <strong>Which weight initialisation should you use with ReLU?</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
+    <div class="flashcard" data-progress-section="s-flash-11">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">Which weight initialisation should you use with ReLU?</div>
             <div class="flashcard-back">
-                He initialisation: W ~ N(0, √(2/n<sub>in</sub>)). The factor of 2 compensates for ReLU zeroing out ~50% of neurons, preserving activation variance through layers. Use Xavier/Glorot init for tanh or sigmoid activations instead.
+                He initialisation: W ~ N(0, &radic;(2/n<sub>in</sub>)). The factor of 2 compensates for ReLU zeroing out ~50% of neurons, preserving activation variance through layers. Use Xavier/Glorot init for tanh or sigmoid activations instead.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
             </div>
         </div>
+    </div>
 
-        <div class="flashcard" data-card="11">
-            <div class="flashcard-front">
-                <strong>What are the signs of overfitting in a neural network?</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
+    <div class="flashcard" data-progress-section="s-flash-12">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">What are the signs of overfitting in a neural network?</div>
             <div class="flashcard-back">
                 (1) Training loss decreases while validation loss increases. (2) Large gap between training and validation accuracy. (3) Large weight magnitudes. (4) Confident wrong predictions (high probability for incorrect class). The diverging loss curves are the most reliable indicator.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
             </div>
         </div>
+    </div>
 
-        <div class="flashcard" data-card="12">
-            <div class="flashcard-front">
-                <strong>What is the translation invariance property of softmax?</strong>
-                <p class="flashcard-hint">Click to reveal</p>
-            </div>
+    <div class="flashcard" data-progress-section="s-flash-13">
+        <div class="flashcard-inner">
+            <div class="flashcard-front">What is the translation invariance property of softmax?</div>
             <div class="flashcard-back">
                 softmax(z + c) = softmax(z) for any constant c. Adding the same value to all logits doesn't change the output probabilities. This is why we can subtract max(z) before computing softmax for numerical stability without affecting the result.
+                <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
             </div>
         </div>
-
     </div>
-</section>
+
+</div>
 
 <!-- ============================================================ -->
 <!-- QUIZ SECTION -->
 <!-- ============================================================ -->
-<section id="quiz-section" data-progress-section>
-    <h2>Quiz</h2>
-
-    <div class="quiz-container" id="quiz-container">
-
-        <div class="quiz-question" data-question="0">
-            <p><strong>Q1.</strong> A 5-layer network with sigmoid activations in every hidden layer has a maximum possible gradient scale of approximately:</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q0" value="a"> 0.25</label>
-                <label><input type="radio" name="q0" value="b"> 0.00098</label>
-                <label><input type="radio" name="q0" value="c"> 1.0</label>
-                <label><input type="radio" name="q0" value="d"> 0.0625</label>
-            </div>
-            <div class="quiz-feedback" data-correct="b">
-                <p><strong>Correct!</strong> Maximum gradient scale = (0.25)⁵ = 0.000976 ≈ 0.00098. Each sigmoid layer contributes at most 0.25 to the product, so 5 layers shrink the gradient by a factor of ~1000.</p>
-                <p><strong>Incorrect.</strong> The correct answer is B: ≈ 0.00098. The gradient through L sigmoid layers is bounded by (0.25)^L. For L=5: (0.25)⁵ ≈ 0.00098.</p>
-            </div>
-        </div>
-
-        <div class="quiz-question" data-question="1">
-            <p><strong>Q2.</strong> What is ReLU(z) when z = −3.5?</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q1" value="a"> −3.5</label>
-                <label><input type="radio" name="q1" value="b"> 3.5</label>
-                <label><input type="radio" name="q1" value="c"> 0</label>
-                <label><input type="radio" name="q1" value="d"> 1</label>
-            </div>
-            <div class="quiz-feedback" data-correct="c">
-                <p><strong>Correct!</strong> ReLU(z) = max(0, z). Since −3.5 < 0, ReLU(−3.5) = 0. The gradient is also 0 for this input.</p>
-                <p><strong>Incorrect.</strong> The correct answer is C: 0. ReLU outputs 0 for any negative input. ReLU(z) = max(0, z) = 0 when z < 0.</p>
-            </div>
-        </div>
-
-        <div class="quiz-question" data-question="2">
-            <p><strong>Q3.</strong> Which of the following is TRUE about softmax outputs?</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q2" value="a"> Outputs can be negative</label>
-                <label><input type="radio" name="q2" value="b"> Outputs sum to K (number of classes)</label>
-                <label><input type="radio" name="q2" value="c"> Outputs always sum to 1</label>
-                <label><input type="radio" name="q2" value="d"> Outputs are independent of each other</label>
-            </div>
-            <div class="quiz-feedback" data-correct="c">
-                <p><strong>Correct!</strong> Softmax outputs always sum to exactly 1, forming a valid probability distribution. Each output is in (0, 1), and the sum is exactly 1 by construction (each output is e<sup>z<sub>k</sub></sup> / Σe<sup>z<sub>j</sub></sup>).</p>
-                <p><strong>Incorrect.</strong> The correct answer is C. Softmax outputs always sum to 1. They are always positive (in (0,1)) and form a valid probability distribution.</p>
-            </div>
-        </div>
-
-        <div class="quiz-question" data-question="3">
-            <p><strong>Q4.</strong> You have a dataset with 5 classes where each sample can belong to multiple classes simultaneously. Which output configuration should you use?</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q3" value="a"> 1 sigmoid output</label>
-                <label><input type="radio" name="q3" value="b"> 5 softmax outputs with CCE loss</label>
-                <label><input type="radio" name="q3" value="c"> 5 independent sigmoid outputs with BCE per output</label>
-                <label><input type="radio" name="q3" value="d"> 1 linear output with MSE loss</label>
-            </div>
-            <div class="quiz-feedback" data-correct="c">
-                <p><strong>Correct!</strong> Multi-label classification requires independent sigmoid outputs (one per class) with BCE applied to each output. Softmax forces competition between classes (outputs sum to 1), which is wrong for multi-label where multiple classes can be simultaneously active.</p>
-                <p><strong>Incorrect.</strong> The correct answer is C. For multi-label (multiple classes can be correct simultaneously), use K independent sigmoids with BCE per output. Softmax is only for mutually exclusive classes.</p>
-            </div>
-        </div>
-
-        <div class="quiz-question" data-question="4">
-            <p><strong>Q5.</strong> Dropout is applied during which phase(s)?</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q4" value="a"> Training only</label>
-                <label><input type="radio" name="q4" value="b"> Inference only</label>
-                <label><input type="radio" name="q4" value="c"> Both training and inference</label>
-                <label><input type="radio" name="q4" value="d"> Neither — dropout is a data preprocessing step</label>
-            </div>
-            <div class="quiz-feedback" data-correct="a">
-                <p><strong>Correct!</strong> Dropout is active ONLY during training. During inference/testing, all neurons are active (with outputs scaled by 1−p if needed). Forgetting to disable dropout during inference is a common bug that causes random, degraded predictions.</p>
-                <p><strong>Incorrect.</strong> The correct answer is A: training only. Dropout randomly zeros neurons during training to prevent co-adaptation. During inference, all neurons are active.</p>
-            </div>
-        </div>
-
-        <div class="quiz-question" data-question="5">
-            <p><strong>Q6.</strong> What is the gradient of the softmax + CCE loss combination with respect to the logit z<sub>k</sub>?</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q5" value="a"> y<sub>k</sub> − p<sub>k</sub></label>
-                <label><input type="radio" name="q5" value="b"> p<sub>k</sub> − y<sub>k</sub></label>
-                <label><input type="radio" name="q5" value="c"> p<sub>k</sub> · (1 − p<sub>k</sub>)</label>
-                <label><input type="radio" name="q5" value="d"> y<sub>k</sub> · log(p<sub>k</sub>)</label>
-            </div>
-            <div class="quiz-feedback" data-correct="b">
-                <p><strong>Correct!</strong> The gradient of softmax + CCE is ∂L/∂z<sub>k</sub> = p<sub>k</sub> − y<sub>k</sub>. This elegant result means the gradient is simply the prediction error — positive if the model overestimated, negative if it underestimated.</p>
-                <p><strong>Incorrect.</strong> The correct answer is B: p<sub>k</sub> − y<sub>k</sub>. The combined gradient of softmax output with CCE loss simplifies to the predicted probability minus the true label.</p>
-            </div>
-        </div>
-
-        <div class="quiz-question" data-question="6">
-            <p><strong>Q7.</strong> Which weight initialisation should be used for a hidden layer with ReLU activation and 256 input features?</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q6" value="a"> Xavier/Glorot: W ~ N(0, 1/256)</label>
-                <label><input type="radio" name="q6" value="b"> He: W ~ N(0, √(2/256))</label>
-                <label><input type="radio" name="q6" value="c"> All zeros</label>
-                <label><input type="radio" name="q6" value="d"> All ones</label>
-            </div>
-            <div class="quiz-feedback" data-correct="b">
-                <p><strong>Correct!</strong> He initialisation: W ~ N(0, √(2/n<sub>in</sub>)) = N(0, √(2/256)). The √(2/n<sub>in</sub>) compensates for ReLU zeroing out ~50% of activations, preserving variance through the layer.</p>
-                <p><strong>Incorrect.</strong> The correct answer is B: He init, W ~ N(0, √(2/256)). He initialisation is specifically designed for ReLU activations to preserve activation variance.</p>
-            </div>
-        </div>
-
-        <div class="quiz-question" data-question="7">
-            <p><strong>Q8.</strong> Your model achieves 99.5% training accuracy but only 62% validation accuracy. What is most likely happening?</p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q7" value="a"> The model is underfitting</label>
-                <label><input type="radio" name="q7" value="b"> The model is overfitting — it memorised the training data</label>
-                <label><input type="radio" name="q7" value="c"> The learning rate is too high</label>
-                <label><input type="radio" name="q7" value="d"> The model needs more hidden layers</label>
-            </div>
-            <div class="quiz-feedback" data-correct="b">
-                <p><strong>Correct!</strong> A large gap between training accuracy (99.5%) and validation accuracy (62%) is a textbook sign of overfitting. The model has memorised the training data but can't generalise to unseen data. Solutions: add regularisation (dropout, L2), get more data, or simplify the architecture.</p>
-                <p><strong>Incorrect.</strong> The correct answer is B: overfitting. The 37.5 percentage point gap between train and validation accuracy indicates the model memorised training data rather than learning generalisable patterns.</p>
-            </div>
-        </div>
-
+<div id="quiz-section" data-progress-section="s-quiz">
+    <div class="section-header">
+        <span class="emoji">&#128220;</span>
+        <h2>Quiz</h2>
     </div>
-</section>
+
+    <div class="quiz-container" data-quiz-id="q1" data-progress-section="s-quiz-q1">
+        <h3>Question 1</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 1 of 8</div>
+            <div class="q-text">A 5-layer network with sigmoid activations in every hidden layer has a maximum possible gradient scale of approximately:</div>
+            <div class="quiz-option" data-correct="false">A. 0.25</div>
+            <div class="quiz-option" data-correct="true">B. 0.00098</div>
+            <div class="quiz-option" data-correct="false">C. 1.0</div>
+            <div class="quiz-option" data-correct="false">D. 0.0625</div>
+            <div class="quiz-feedback">Maximum gradient scale = (0.25)&sup5; = 0.000976 &asymp; 0.00098. Each sigmoid layer contributes at most 0.25 to the product, so 5 layers shrink the gradient by a factor of ~1000.</div>
+        </div>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q2" data-progress-section="s-quiz-q2">
+        <h3>Question 2</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 2 of 8</div>
+            <div class="q-text">What is ReLU(z) when z = &minus;3.5?</div>
+            <div class="quiz-option" data-correct="false">A. &minus;3.5</div>
+            <div class="quiz-option" data-correct="false">B. 3.5</div>
+            <div class="quiz-option" data-correct="true">C. 0</div>
+            <div class="quiz-option" data-correct="false">D. 1</div>
+            <div class="quiz-feedback">ReLU(z) = max(0, z). Since &minus;3.5 &lt; 0, ReLU(&minus;3.5) = 0. The gradient is also 0 for this input.</div>
+        </div>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q3" data-progress-section="s-quiz-q3">
+        <h3>Question 3</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 3 of 8</div>
+            <div class="q-text">Which of the following is TRUE about softmax outputs?</div>
+            <div class="quiz-option" data-correct="false">A. Outputs can be negative</div>
+            <div class="quiz-option" data-correct="false">B. Outputs sum to K (number of classes)</div>
+            <div class="quiz-option" data-correct="true">C. Outputs always sum to 1</div>
+            <div class="quiz-option" data-correct="false">D. Outputs are independent of each other</div>
+            <div class="quiz-feedback">Softmax outputs always sum to exactly 1, forming a valid probability distribution. Each output is in (0, 1), and the sum is exactly 1 by construction.</div>
+        </div>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q4" data-progress-section="s-quiz-q4">
+        <h3>Question 4</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 4 of 8</div>
+            <div class="q-text">You have a dataset with 5 classes where each sample can belong to multiple classes simultaneously. Which output configuration should you use?</div>
+            <div class="quiz-option" data-correct="false">A. 1 sigmoid output</div>
+            <div class="quiz-option" data-correct="false">B. 5 softmax outputs with CCE loss</div>
+            <div class="quiz-option" data-correct="true">C. 5 independent sigmoid outputs with BCE per output</div>
+            <div class="quiz-option" data-correct="false">D. 1 linear output with MSE loss</div>
+            <div class="quiz-feedback">Multi-label classification requires independent sigmoid outputs (one per class) with BCE applied to each output. Softmax forces competition between classes (outputs sum to 1), which is wrong for multi-label where multiple classes can be simultaneously active.</div>
+        </div>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q5" data-progress-section="s-quiz-q5">
+        <h3>Question 5</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 5 of 8</div>
+            <div class="q-text">Dropout is applied during which phase(s)?</div>
+            <div class="quiz-option" data-correct="true">A. Training only</div>
+            <div class="quiz-option" data-correct="false">B. Inference only</div>
+            <div class="quiz-option" data-correct="false">C. Both training and inference</div>
+            <div class="quiz-option" data-correct="false">D. Neither &mdash; dropout is a data preprocessing step</div>
+            <div class="quiz-feedback">Dropout is active ONLY during training. During inference/testing, all neurons are active (with outputs scaled by 1&minus;p if needed). Forgetting to disable dropout during inference is a common bug that causes random, degraded predictions.</div>
+        </div>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q6" data-progress-section="s-quiz-q6">
+        <h3>Question 6</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 6 of 8</div>
+            <div class="q-text">What is the gradient of the softmax + CCE loss combination with respect to the logit z<sub>k</sub>?</div>
+            <div class="quiz-option" data-correct="false">A. y<sub>k</sub> &minus; p<sub>k</sub></div>
+            <div class="quiz-option" data-correct="true">B. p<sub>k</sub> &minus; y<sub>k</sub></div>
+            <div class="quiz-option" data-correct="false">C. p<sub>k</sub> &middot; (1 &minus; p<sub>k</sub>)</div>
+            <div class="quiz-option" data-correct="false">D. y<sub>k</sub> &middot; log(p<sub>k</sub>)</div>
+            <div class="quiz-feedback">The gradient of softmax + CCE is &part;L/&part;z<sub>k</sub> = p<sub>k</sub> &minus; y<sub>k</sub>. This elegant result means the gradient is simply the prediction error &mdash; positive if the model overestimated, negative if it underestimated.</div>
+        </div>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q7" data-progress-section="s-quiz-q7">
+        <h3>Question 7</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 7 of 8</div>
+            <div class="q-text">Which weight initialisation should be used for a hidden layer with ReLU activation and 256 input features?</div>
+            <div class="quiz-option" data-correct="false">A. Xavier/Glorot: W ~ N(0, 1/256)</div>
+            <div class="quiz-option" data-correct="true">B. He: W ~ N(0, &radic;(2/256))</div>
+            <div class="quiz-option" data-correct="false">C. All zeros</div>
+            <div class="quiz-option" data-correct="false">D. All ones</div>
+            <div class="quiz-feedback">He initialisation: W ~ N(0, &radic;(2/n<sub>in</sub>)) = N(0, &radic;(2/256)). The &radic;(2/n<sub>in</sub>) compensates for ReLU zeroing out ~50% of activations, preserving variance through the layer.</div>
+        </div>
+    </div>
+
+    <div class="quiz-container" data-quiz-id="q8" data-progress-section="s-quiz-q8">
+        <h3>Question 8</h3>
+        <div class="quiz-question">
+            <div class="q-num">Question 8 of 8</div>
+            <div class="q-text">Your model achieves 99.5% training accuracy but only 62% validation accuracy. What is most likely happening?</div>
+            <div class="quiz-option" data-correct="false">A. The model is underfitting</div>
+            <div class="quiz-option" data-correct="true">B. The model is overfitting &mdash; it memorised the training data</div>
+            <div class="quiz-option" data-correct="false">C. The learning rate is too high</div>
+            <div class="quiz-option" data-correct="false">D. The model needs more hidden layers</div>
+            <div class="quiz-feedback">A large gap between training accuracy (99.5%) and validation accuracy (62%) is a textbook sign of overfitting. The model has memorised the training data but can't generalise to unseen data. Solutions: add regularisation (dropout, L2), get more data, or simplify the architecture.</div>
+        </div>
+    </div>
+
+</div>
 
 <!-- ============================================================ -->
 <!-- FILL IN THE BLANKS -->
 <!-- ============================================================ -->
-<section id="fill-blank-section" data-progress-section>
-    <h2>Fill in the Blanks</h2>
-
-    <div class="fill-blank-container" id="fill-blank-container">
-
-        <div class="fill-blank-question" data-question="0">
-            <p><strong>1.</strong> Without activation functions, a deep network with L layers collapses to a single __________ transformation: ŷ = W'x + b'.</p>
-            <input type="text" class="fill-blank-input" data-answer="linear" placeholder="Type your answer...">
-            <div class="fill-blank-feedback">
-                <span class="correct-text">Correct! The composition of linear functions is still linear, regardless of how many layers you stack.</span>
-                <span class="incorrect-text">Incorrect. The answer is "linear". Without non-linear activations, a deep network collapses to a single linear transformation.</span>
-            </div>
-        </div>
-
-        <div class="fill-blank-question" data-question="1">
-            <p><strong>2.</strong> ReLU(z) = max(0, z). The gradient of ReLU is __________ when z &gt; 0.</p>
-            <input type="text" class="fill-blank-input" data-answer="1" placeholder="Type your answer...">
-            <div class="fill-blank-feedback">
-                <span class="correct-text">Correct! ReLU'(z) = 1 for z > 0. This constant gradient of 1 is why ReLU doesn't suffer from vanishing gradients in the positive region.</span>
-                <span class="incorrect-text">Incorrect. The answer is "1". The ReLU derivative is 1 for z > 0 and 0 for z < 0.</span>
-            </div>
-        </div>
-
-        <div class="fill-blank-question" data-question="2">
-            <p><strong>3.</strong> The softmax function converts K raw logits into a valid __________ distribution where all outputs sum to 1.</p>
-            <input type="text" class="fill-blank-input" data-answer="probability" placeholder="Type your answer...">
-            <div class="fill-blank-feedback">
-                <span class="correct-text">Correct! Softmax produces a valid probability distribution: all values in (0,1) and summing to exactly 1.</span>
-                <span class="incorrect-text">Incorrect. The answer is "probability". Softmax outputs form a valid probability distribution.</span>
-            </div>
-        </div>
-
-        <div class="fill-blank-question" data-question="3">
-            <p><strong>4.</strong> Dropout randomly sets a fraction p of neurons to zero during __________ only; during inference, all neurons are active.</p>
-            <input type="text" class="fill-blank-input" data-answer="training" placeholder="Type your answer...">
-            <div class="fill-blank-feedback">
-                <span class="correct-text">Correct! Dropout is only active during training. During inference/evaluation, all neurons are active (with appropriate scaling).</span>
-                <span class="incorrect-text">Incorrect. The answer is "training". Dropout is applied only during training, never during inference.</span>
-            </div>
-        </div>
-
-        <div class="fill-blank-question" data-question="4">
-            <p><strong>5.</strong> The categorical cross-entropy loss simplifies to CCE = −log(p<sub>__________ class</sub>), where only the true class contributes.</p>
-            <input type="text" class="fill-blank-input" data-answer="true" placeholder="Type your answer...">
-            <div class="fill-blank-feedback">
-                <span class="correct-text">Correct! CCE = −Σ y_k · log(p_k). Since y_k = 1 only for the true class and 0 otherwise, it simplifies to −log(p_true).</span>
-                <span class="incorrect-text">Incorrect. The answer is "true". CCE = −log(p_true class) because the one-hot encoding means only the true class has y_k = 1.</span>
-            </div>
-        </div>
-
-        <div class="fill-blank-question" data-question="5">
-            <p><strong>6.</strong> For a ReLU hidden layer with n<sub>in</sub> = 128 input features, He initialisation sets weights from W ~ N(0, __________).</p>
-            <input type="text" class="fill-blank-input" data-answer="sqrt(2/128)" placeholder="Type your answer...">
-            <div class="fill-blank-feedback">
-                <span class="correct-text">Correct! He initialisation: W ~ N(0, √(2/n_in)) = N(0, √(2/128)). The √2 compensates for ReLU zeroing out half the activations.</span>
-                <span class="incorrect-text">Incorrect. The answer is "sqrt(2/128)" or √(2/128). He initialisation uses std = √(2/n_in) for ReLU layers.</span>
-            </div>
-        </div>
-
+<div id="fill-blank-section" data-progress-section="s-fill">
+    <div class="section-header">
+        <span class="emoji">&#9997;</span>
+        <h2>Fill in the Blanks</h2>
     </div>
-</section>
+
+    <div class="fill-blank-container" data-answer="linear" data-alt-answers="" data-fill-id="f1" data-progress-section="s-fill-f1">
+        <p><strong>1.</strong> Without activation functions, a deep network with L layers collapses to a single <strong>___</strong> transformation: &#375; = W'x + b'.</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+    </div>
+
+    <div class="fill-blank-container" data-answer="1" data-alt-answers="one" data-fill-id="f2" data-progress-section="s-fill-f2">
+        <p><strong>2.</strong> ReLU(z) = max(0, z). The gradient of ReLU is <strong>___</strong> when z &gt; 0.</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+    </div>
+
+    <div class="fill-blank-container" data-answer="probability" data-alt-answers="" data-fill-id="f3" data-progress-section="s-fill-f3">
+        <p><strong>3.</strong> The softmax function converts K raw logits into a valid <strong>___</strong> distribution where all outputs sum to 1.</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+    </div>
+
+    <div class="fill-blank-container" data-answer="training" data-alt-answers="" data-fill-id="f4" data-progress-section="s-fill-f4">
+        <p><strong>4.</strong> Dropout randomly sets a fraction p of neurons to zero during <strong>___</strong> only; during inference, all neurons are active.</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+    </div>
+
+    <div class="fill-blank-container" data-answer="true" data-alt-answers="" data-fill-id="f5" data-progress-section="s-fill-f5">
+        <p><strong>5.</strong> The categorical cross-entropy loss simplifies to CCE = &minus;log(p<sub><strong>___</strong> class</sub>), where only the true class contributes.</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+    </div>
+
+    <div class="fill-blank-container" data-answer="sqrt(2/128)" data-alt-answers="&radic;(2/128)|root(2/128)" data-fill-id="f6" data-progress-section="s-fill-f6">
+        <p><strong>6.</strong> For a ReLU hidden layer with n<sub>in</sub> = 128 input features, He initialisation sets weights from W ~ N(0, <strong>___</strong>).</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+    </div>
+
+</div>
 
 <!-- ============================================================ -->
 <!-- SCENARIO-BASED QUESTION -->
 <!-- ============================================================ -->
-<section id="scenario-section" data-progress-section>
-    <h2>Scenario-Based Question</h2>
+<div id="scenario-section" data-progress-section="s-scenario">
+    <div class="section-header">
+        <span class="emoji">&#128218;</span>
+        <h2>Scenario-Based Question</h2>
+    </div>
 
-    <div class="quiz-container">
-
-        <div class="quiz-question" data-question="scenario1">
-            <p><strong>Scenario:</strong> You're building a neural network to classify images into 10 types of clothing (t-shirt, trouser, pullover, dress, coat, sandal, shirt, sneaker, bag, ankle boot). You design the network as follows:</p>
+    <div class="quiz-container" data-quiz-id="scenario1" data-progress-section="s-scenario-q1">
+        <div class="quiz-question">
+            <div class="q-text"><strong>Scenario:</strong> You're building a neural network to classify images into 10 types of clothing (t-shirt, trouser, pullover, dress, coat, sandal, shirt, sneaker, bag, ankle boot). You design the network as follows:</div>
             <ul>
-                <li>Input: 784 features (28×28 pixels)</li>
+                <li>Input: 784 features (28&times;28 pixels)</li>
                 <li>Hidden layer 1: 256 neurons, sigmoid activation</li>
                 <li>Hidden layer 2: 128 neurons, sigmoid activation</li>
                 <li>Output layer: 10 neurons, sigmoid activation</li>
                 <li>Loss: Mean Squared Error (MSE)</li>
                 <li>No dropout, no batch norm, no weight decay</li>
             </ul>
-            <p><strong>Identify ALL problems with this design and explain how to fix each one.</strong></p>
-            <div class="quiz-options">
-                <label><input type="radio" name="q-scenario1" value="a"> The only problem is using sigmoid in the output layer — change it to softmax.</label>
-                <label><input type="radio" name="q-scenario1" value="b"> There are multiple problems: (1) Sigmoid in hidden layers causes vanishing gradients — use ReLU. (2) Sigmoid output for 10-class mutually exclusive task — use softmax. (3) MSE loss for classification — use CCE. (4) No regularisation — add dropout, batch norm, early stopping.</label>
-                <label><input type="radio" name="q-scenario1" value="c"> The network architecture is fine; you just need more training epochs.</label>
-                <label><input type="radio" name="q-scenario1" value="d"> The problem is that 256 neurons is too many — reduce to 32.</label>
-            </div>
-            <div class="quiz-feedback" data-correct="b">
-                <p><strong>Correct!</strong> This design has four major issues: (1) Sigmoid in hidden layers → vanishing gradients for this depth. Fix: use ReLU. (2) Sigmoid output for 10-class mutually exclusive task → outputs don't sum to 1, not a valid probability distribution. Fix: use softmax. (3) MSE loss for classification → inappropriate; gradients are less informative for classification. Fix: use CCE. (4) No regularisation → high risk of overfitting. Fix: add dropout, batch norm, early stopping, and L2 weight decay.</p>
-                <p><strong>Incorrect.</strong> The correct answer is B. There are multiple fundamental problems: sigmoid hidden layers (vanishing gradients), sigmoid output (should be softmax for multi-class), MSE loss (should be CCE for classification), and no regularisation (high overfitting risk).</p>
-            </div>
+            <div class="q-text"><strong>Identify ALL problems with this design and explain how to fix each one.</strong></div>
+            <div class="quiz-option" data-correct="false">A. The only problem is using sigmoid in the output layer &mdash; change it to softmax.</div>
+            <div class="quiz-option" data-correct="true">B. There are multiple problems: (1) Sigmoid in hidden layers causes vanishing gradients &mdash; use ReLU. (2) Sigmoid output for 10-class mutually exclusive task &mdash; use softmax. (3) MSE loss for classification &mdash; use CCE. (4) No regularisation &mdash; add dropout, batch norm, early stopping.</div>
+            <div class="quiz-option" data-correct="false">C. The network architecture is fine; you just need more training epochs.</div>
+            <div class="quiz-option" data-correct="false">D. The problem is that 256 neurons is too many &mdash; reduce to 32.</div>
+            <div class="quiz-feedback">This design has four major issues: (1) Sigmoid in hidden layers &rarr; vanishing gradients for this depth. Fix: use ReLU. (2) Sigmoid output for 10-class mutually exclusive task &rarr; outputs don't sum to 1, not a valid probability distribution. Fix: use softmax. (3) MSE loss for classification &rarr; inappropriate; gradients are less informative for classification. Fix: use CCE. (4) No regularisation &rarr; high risk of overfitting. Fix: add dropout, batch norm, early stopping, and L2 weight decay.</div>
         </div>
-
     </div>
-</section>
+
+</div>
 
 </main>
 
 <script src="script.js"></script>
-
-<script>
-// Flashcard functionality
-document.querySelectorAll('.flashcard').forEach(card => {
-    card.addEventListener('click', function() {
-        this.classList.toggle('flipped');
-    });
-});
-
-// Quiz functionality
-document.querySelectorAll('.quiz-question').forEach(question => {
-    const options = question.querySelectorAll('input[type="radio"]');
-    const feedback = question.querySelector('.quiz-feedback');
-    const correctAnswer = feedback.dataset.correct;
-
-    options.forEach(option => {
-        option.addEventListener('change', function() {
-            const allFeedbacks = question.querySelectorAll('.quiz-feedback p');
-            allFeedbacks.forEach(f => f.style.display = 'none');
-
-            if (this.value === correctAnswer) {
-                feedback.querySelector('p:first-child').style.display = 'block';
-                feedback.querySelector('p:last-child').style.display = 'none';
-                feedback.style.display = 'block';
-                feedback.style.borderColor = '#27ae60';
-                feedback.style.backgroundColor = '#d4edda';
-            } else {
-                feedback.querySelector('p:first-child').style.display = 'none';
-                feedback.querySelector('p:last-child').style.display = 'block';
-                feedback.style.display = 'block';
-                feedback.style.borderColor = '#e74c3c';
-                feedback.style.backgroundColor = '#f8d7da';
-            }
-        });
-    });
-});
-
-// Fill in the blank functionality
-document.querySelectorAll('.fill-blank-input').forEach(input => {
-    input.addEventListener('blur', function() {
-        const correctAnswer = this.dataset.answer.toLowerCase().trim();
-        const userAnswer = this.value.toLowerCase().trim();
-        const feedback = this.parentElement.querySelector('.fill-blank-feedback');
-
-        if (userAnswer === correctAnswer) {
-            feedback.querySelector('.correct-text').style.display = 'inline';
-            feedback.querySelector('.incorrect-text').style.display = 'none';
-            this.style.borderColor = '#27ae60';
-        } else {
-            feedback.querySelector('.correct-text').style.display = 'none';
-            feedback.querySelector('.incorrect-text').style.display = 'inline';
-            this.style.borderColor = '#e74c3c';
-        }
-        feedback.style.display = 'block';
-    });
-});
-
-// Progress tracking
-function updateProgress() {
-    const sections = document.querySelectorAll('[data-progress-section]');
-    const total = sections.length;
-    let completed = 0;
-
-    sections.forEach(section => {
-        const rect = section.getBoundingClientRect();
-        if (rect.top < window.innerHeight * 0.5) {
-            completed++;
-        }
-    });
-
-    const percent = Math.round((completed / total) * 100);
-    document.getElementById('progress-fill').style.width = percent + '%';
-    document.getElementById('progress-percent').textContent = percent + '%';
-}
-
-window.addEventListener('scroll', updateProgress);
-window.addEventListener('load', updateProgress);
-</script>
 
 </body>
 </html>

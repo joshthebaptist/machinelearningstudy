@@ -7,35 +7,75 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav class="top-nav">
-        <a href="index.html" class="nav-home">Home</a>
-        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">Dark</button>
-    </nav>
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <a href="index.html" class="logo">&#8592; TTTC2453 ML Hub</a>
+    <div class="nav-links">
+      <a href="index.html">All Topics</a>
+    </div>
+  </div>
 
-    <aside class="sidebar" id="sidebar">
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
-            <span class="progress-text" id="progressText">0%</span>
-        </div>
-        <nav class="section-nav">
-            <ul>
-                <li><a href="#section1">1. Why Logistic Regression</a></li>
-                <li><a href="#section2">2. The Sigmoid Function</a></li>
-                <li><a href="#section3">3. Sigmoid Derivative</a></li>
-                <li><a href="#section4">4. Odds and Logit</a></li>
-                <li><a href="#section5">5. Why Not MSE</a></li>
-                <li><a href="#section6">6. BCE Derivation</a></li>
-                <li><a href="#section7">7. BCE Intuition</a></li>
-                <li><a href="#section8">8. Gradient of BCE &amp; Update Rule</a></li>
-                <li><a href="#section9">9. Overfitting &amp; Regularisation</a></li>
-                <li><a href="#section10">10. Multi-Class Extension</a></li>
-                <li><a href="#section11">11. Common Mistakes</a></li>
-                <li><a href="#flashcards-section">Flashcards</a></li>
-                <li><a href="#quiz-section">Quizzes</a></li>
-                <li><a href="#fill-blank-section">Fill in the Blanks</a></li>
-            </ul>
-        </nav>
-    </aside>
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle">
+    <span class="icon">&#9728;</span>
+    <span class="label-text">Toggle Theme</span>
+  </button>
+
+  <!-- Mobile Sidebar Toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-title">Sections</div>
+    <a class="nav-item active" data-section="section1" href="#section1">
+      <span class="nav-emoji">&#128260;</span> Why Logistic Regression
+    </a>
+    <a class="nav-item" data-section="section2" href="#section2">
+      <span class="nav-emoji">&#128273;</span> The Sigmoid Function
+    </a>
+    <a class="nav-item" data-section="section3" href="#section3">
+      <span class="nav-emoji">&#128200;</span> Sigmoid Derivative
+    </a>
+    <a class="nav-item" data-section="section4" href="#section4">
+      <span class="nav-emoji">&#128209;</span> Odds and Logit
+    </a>
+    <a class="nav-item" data-section="section5" href="#section5">
+      <span class="nav-emoji">&#10060;</span> Why Not MSE
+    </a>
+    <a class="nav-item" data-section="section6" href="#section6">
+      <span class="nav-emoji">&#128218;</span> BCE Derivation
+    </a>
+    <a class="nav-item" data-section="section7" href="#section7">
+      <span class="nav-emoji">&#128161;</span> BCE Intuition
+    </a>
+    <a class="nav-item" data-section="section8" href="#section8">
+      <span class="nav-emoji">&#128257;</span> Gradient &amp; Update Rule
+    </a>
+    <a class="nav-item" data-section="section9" href="#section9">
+      <span class="nav-emoji">&#128737;</span> Overfitting &amp; Regularisation
+    </a>
+    <a class="nav-item" data-section="section10" href="#section10">
+      <span class="nav-emoji">&#128230;</span> Multi-Class Extension
+    </a>
+    <a class="nav-item" data-section="section11" href="#section11">
+      <span class="nav-emoji">&#128680;</span> Common Mistakes
+    </a>
+    <a class="nav-item" data-section="flashcards-section" href="#flashcards-section">
+      <span class="nav-emoji">&#128179;</span> Flashcards
+    </a>
+    <a class="nav-item" data-section="quiz-section" href="#quiz-section">
+      <span class="nav-emoji">&#128221;</span> Quizzes
+    </a>
+    <a class="nav-item" data-section="fill-blank-section" href="#fill-blank-section">
+      <span class="nav-emoji">&#9997;</span> Fill in the Blanks
+    </a>
+    <div class="sidebar-progress">
+      <div class="progress-label">Topic Progress</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-pct" style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">0%</div>
+    </div>
+  </div>
 
     <main class="main-content">
 
@@ -952,345 +992,352 @@
         </section>
 
         <!-- ===== FLASHCARDS ===== -->
-        <section id="flashcards-section" data-progress-section>
-            <h2>Flashcards</h2>
-            <p>Click a card to flip it. Use the navigation buttons to move between cards.</p>
+        <div id="section-flashcards" class="flashcard-container" data-progress-section="s-flashcards">
+            <div class="section-header">
+                <span class="emoji">&#128179;</span>
+                <h2>Flashcards</h2>
+            </div>
 
-            <div class="flashcard-container" id="flashcardContainer">
-                <div class="flashcard" data-card="0">
-                    <div class="flashcard-front">
-                        <h3>Logistic Regression</h3>
-                        <p>What is it?</p>
-                    </div>
+            <div class="flashcard-controls">
+                <button class="btn btn-sm btn-secondary flash-prev">Previous</button>
+                <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
+                <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
+                <button class="btn btn-sm btn-secondary flash-next">Next</button>
+            </div>
+            <div class="flashcard-counter"></div>
+
+            <div class="flashcard" data-progress-section="s-flash-1">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">Logistic Regression — What is it?</div>
                     <div class="flashcard-back">
-                        <p>A <strong>probabilistic</strong> classification model that predicts P(y=1|x) by passing a linear score through the sigmoid function. Despite its name, it is a classification (not regression) algorithm. It models the log-odds as a linear function of the features.</p>
+                        A <strong>probabilistic</strong> classification model that predicts P(y=1|x) by passing a linear score through the sigmoid function. Despite its name, it is a classification (not regression) algorithm. It models the log-odds as a linear function of the features.
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
                     </div>
                 </div>
+            </div>
 
-                <div class="flashcard" data-card="1">
-                    <div class="flashcard-front">
-                        <h3>Sigmoid Function</h3>
-                        <p>What is σ(z) and its key property?</p>
-                    </div>
+            <div class="flashcard" data-progress-section="s-flash-2">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">Sigmoid Function — What is σ(z) and its key property?</div>
                     <div class="flashcard-back">
                         <div class="formula">σ(z) = 1 / (1 + e<sup>−z</sup>)</div>
                         <p>Maps any real number z ∈ (−∞, +∞) to a value in (0, 1). S-shaped, symmetric about (0, 0.5), with maximum gradient of 0.25 at z=0. Used to convert linear scores into probabilities.</p>
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
                     </div>
                 </div>
+            </div>
 
-                <div class="flashcard" data-card="2">
-                    <div class="flashcard-front">
-                        <h3>Decision Boundary</h3>
-                        <p>What is it and where does it occur?</p>
-                    </div>
+            <div class="flashcard" data-progress-section="s-flash-3">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">Decision Boundary — What is it and where does it occur?</div>
                     <div class="flashcard-back">
                         <p>The <strong>hyperplane</strong> where the model switches its prediction. For logistic regression, it occurs where σ(z) = 0.5, i.e., where z = wᵀx + b = 0. Points on one side → class 1; points on the other → class 0. For 2D features, this is a line.</p>
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
                     </div>
                 </div>
+            </div>
 
-                <div class="flashcard" data-card="3">
-                    <div class="flashcard-front">
-                        <h3>Odds</h3>
-                        <p>What are odds and how do they relate to probability?</p>
-                    </div>
+            <div class="flashcard" data-progress-section="s-flash-4">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">Odds — What are odds and how do they relate to probability?</div>
                     <div class="flashcard-back">
                         <div class="formula">Odds = P / (1 − P)</div>
                         <p>Odds range from 0 to ∞. Odds = 1 means P = 0.5. Odds = 3 means 3:1 (75% probability). Odds < 1 means the event is unlikely. Odds are multiplicative: an odds ratio of 2.23 means the odds double and then some.</p>
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
                     </div>
                 </div>
+            </div>
 
-                <div class="flashcard" data-card="4">
-                    <div class="flashcard-front">
-                        <h3>Logit</h3>
-                        <p>What is the logit function?</p>
-                    </div>
+            <div class="flashcard" data-progress-section="s-flash-5">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">Logit — What is the logit function?</div>
                     <div class="flashcard-back">
                         <div class="formula">logit(P) = ln(P / (1 − P))</div>
                         <p>The inverse of the sigmoid. Maps probabilities in (0, 1) to log-odds in (−∞, +∞). Logistic regression is <strong>linear in log-odds</strong>: logit(P) = wᵀx + b.</p>
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
                     </div>
                 </div>
+            </div>
 
-                <div class="flashcard" data-card="5">
-                    <div class="flashcard-front">
-                        <h3>Binary Cross-Entropy (BCE)</h3>
-                        <p>What is the BCE loss formula?</p>
-                    </div>
+            <div class="flashcard" data-progress-section="s-flash-6">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">Binary Cross-Entropy (BCE) — What is the BCE loss formula?</div>
                     <div class="flashcard-back">
                         <div class="formula">L_BCE = −(1/N) Σ [y·log(ŷ) + (1−y)·log(1−ŷ)]</div>
                         <p>Derived from Maximum Likelihood Estimation. Convex loss function with a single global minimum. Penalizes confident wrong predictions heavily (loss → ∞ as ŷ → 0 for y=1).</p>
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
                     </div>
                 </div>
+            </div>
 
-                <div class="flashcard" data-card="6">
-                    <div class="flashcard-front">
-                        <h3>Maximum Likelihood Estimation (MLE)</h3>
-                        <p>What is the core idea?</p>
-                    </div>
+            <div class="flashcard" data-progress-section="s-flash-7">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">Maximum Likelihood Estimation (MLE) — What is the core idea?</div>
                     <div class="flashcard-back">
                         <p>Find the parameter values (w, b) that <strong>maximize the probability</strong> of the observed training data. MLE for logistic regression leads to BCE loss. Key steps: write likelihood as product → take log (product→sum) → negate (max→min).</p>
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
                     </div>
                 </div>
+            </div>
 
-                <div class="flashcard" data-card="7">
-                    <div class="flashcard-front">
-                        <h3>L1 Regularisation (Lasso)</h3>
-                        <p>What does it do differently from L2?</p>
-                    </div>
+            <div class="flashcard" data-progress-section="s-flash-8">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">L1 Regularisation (Lasso) — What does it do differently from L2?</div>
                     <div class="flashcard-back">
                         <div class="formula">L = L_BCE + λ·Σ|wᵢ|</div>
                         <p>Pushes weights to <strong>exactly 0</strong>, performing automatic <strong>feature selection</strong>. Creates sparse models. Useful when many features are irrelevant. The L1 penalty is not differentiable at 0, but subgradient methods handle this.</p>
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
                     </div>
                 </div>
+            </div>
 
-                <div class="flashcard" data-card="8">
-                    <div class="flashcard-front">
-                        <h3>L2 Regularisation (Ridge)</h3>
-                        <p>How does it prevent overfitting?</p>
-                    </div>
+            <div class="flashcard" data-progress-section="s-flash-9">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">L2 Regularisation (Ridge) — How does it prevent overfitting?</div>
                     <div class="flashcard-back">
                         <div class="formula">L = L_BCE + λ·Σwᵢ²</div>
                         <p>Penalizes large weights by adding the sum of squared weights. Shrinks all weights toward 0 but rarely makes them exactly 0. Encourages <strong>small, distributed weights</strong> rather than reliance on a few large weights.</p>
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
                     </div>
                 </div>
+            </div>
 
-                <div class="flashcard" data-card="9">
-                    <div class="flashcard-front">
-                        <h3>Softmax Function</h3>
-                        <p>What does it do for multi-class?</p>
-                    </div>
+            <div class="flashcard" data-progress-section="s-flash-10">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">Softmax Function — What does it do for multi-class?</div>
                     <div class="flashcard-back">
                         <div class="formula">P(y=k|x) = e<sup>zₖ</sup> / Σⱼ e<sup>zⱼ</sup></div>
                         <p>Converts K raw scores into a valid probability distribution (all positive, sum to 1). Preserves the argmax. When K=2, softmax reduces to sigmoid: σ(z) = e<sup>z</sup>/(e<sup>z</sup>+1).</p>
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
                     </div>
                 </div>
+            </div>
 
-                <div class="flashcard" data-card="10">
-                    <div class="flashcard-front">
-                        <h3>Cross-Entropy</h3>
-                        <p>What does it measure?</p>
-                    </div>
+            <div class="flashcard" data-progress-section="s-flash-11">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">Cross-Entropy — What does it measure?</div>
                     <div class="flashcard-back">
                         <p>Cross-entropy measures the <strong>divergence between two probability distributions</strong>: the true distribution (y) and the predicted distribution (ŷ). Lower cross-entropy means better predictions. BCE is the binary case. For multi-class, use categorical cross-entropy.</p>
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
                     </div>
                 </div>
+            </div>
 
-                <div class="flashcard" data-card="11">
-                    <div class="flashcard-front">
-                        <h3>Convex Loss</h3>
-                        <p>Why is it important for optimisation?</p>
-                    </div>
+            <div class="flashcard" data-progress-section="s-flash-12">
+                <div class="flashcard-inner">
+                    <div class="flashcard-front">Convex Loss — Why is it important for optimisation?</div>
                     <div class="flashcard-back">
                         <p>A convex function has exactly <strong>one global minimum</strong> and no local minima. Gradient descent is <strong>guaranteed</strong> to converge to the global minimum (with appropriate learning rate). BCE loss is convex in w, while MSE + sigmoid is non-convex (local minima trap gradient descent).</p>
+                        <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+                        <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
                     </div>
                 </div>
             </div>
-
-            <div class="flashcard-nav">
-                <button id="prevCard" class="collapsible">← Previous</button>
-                <span id="cardCounter">Card 1 of 12</span>
-                <button id="nextCard" class="collapsible">Next →</button>
-            </div>
-        </section>
+        </div>
 
         <!-- ===== QUIZ SECTION ===== -->
-        <section id="quiz-section" data-progress-section>
-            <h2>Quiz Questions</h2>
-            <p>Test your understanding. Select an answer and click "Check Answer" for feedback.</p>
+        <div id="section-quiz" data-progress-section="s-quiz">
+            <div class="section-header">
+                <span class="emoji">&#128220;</span>
+                <h2>Knowledge Check Quiz</h2>
+            </div>
 
-            <div class="quiz-container" id="quizContainer">
-                <!-- Quiz 1 -->
-                <div class="quiz-question" data-question="1">
-                    <h3>Question 1</h3>
-                    <p>What is the range of the sigmoid function σ(z)?</p>
-                    <label><input type="radio" name="q1" value="a"> (−∞, +∞)</label><br>
-                    <label><input type="radio" name="q1" value="b"> [0, 1]</label><br>
-                    <label><input type="radio" name="q1" value="c"> (0, 1)</label><br>
-                    <label><input type="radio" name="q1" value="d"> [−1, 1]</label><br>
-                    <button class="check-answer" data-correct="c" data-explanation="The sigmoid function maps any real number to the open interval (0, 1). It never actually reaches exactly 0 or exactly 1 — it only approaches them asymptotically. This is important because log(0) is undefined, and we need strict positivity for the BCE loss.">Check Answer</button>
-                    <div class="quiz-feedback"></div>
-                </div>
-
-                <!-- Quiz 2 -->
-                <div class="quiz-question" data-question="2">
-                    <h3>Question 2</h3>
-                    <p>If the odds of an event are 4:1 (odds = 4), what is the probability?</p>
-                    <label><input type="radio" name="q2" value="a"> 0.25</label><br>
-                    <label><input type="radio" name="q2" value="b"> 0.40</label><br>
-                    <label><input type="radio" name="q2" value="c"> 0.80</label><br>
-                    <label><input type="radio" name="q2" value="d"> 0.75</label><br>
-                    <button class="check-answer" data-correct="c" data-explanation="Odds = P/(1−P) → 4 = P/(1−P) → 4(1−P) = P → 4−4P = P → 4 = 5P → P = 4/5 = 0.80. So odds of 4:1 means 80% probability.">Check Answer</button>
-                    <div class="quiz-feedback"></div>
-                </div>
-
-                <!-- Quiz 3 -->
-                <div class="quiz-question" data-question="3">
-                    <h3>Question 3</h3>
-                    <p>What is the maximum value of the sigmoid derivative dσ/dz = σ(z)(1−σ(z))?</p>
-                    <label><input type="radio" name="q3" value="a"> 1.0</label><br>
-                    <label><input type="radio" name="q3" value="b"> 0.5</label><br>
-                    <label><input type="radio" name="q3" value="c"> 0.25</label><br>
-                    <label><input type="radio" name="q3" value="d"> 0.1</label><br>
-                    <button class="check-answer" data-correct="c" data-explanation="The maximum of σ(1−σ) occurs when σ = 0.5 (at z=0). The maximum value is 0.5 × (1−0.5) = 0.25. This is why deep networks with sigmoid activations suffer from vanishing gradients — the gradient is at most 0.25 and shrinks with each layer.">Check Answer</button>
-                    <div class="quiz-feedback"></div>
-                </div>
-
-                <!-- Quiz 4 -->
-                <div class="quiz-question" data-question="4">
-                    <h3>Question 4</h3>
-                    <p>Why is Binary Cross-Entropy preferred over MSE for classification?</p>
-                    <label><input type="radio" name="q4" value="a"> BCE is simpler to compute</label><br>
-                    <label><input type="radio" name="q4" value="b"> BCE is convex while MSE + sigmoid is non-convex</label><br>
-                    <label><input type="radio" name="q4" value="c"> BCE always gives higher accuracy</label><br>
-                    <label><input type="radio" name="q4" value="d"> MSE cannot handle binary labels</label><br>
-                    <button class="check-answer" data-correct="b" data-explanation="BCE loss is convex with respect to the weights, meaning it has a single global minimum. MSE combined with the sigmoid function produces a non-convex loss surface with local minima, where gradient descent can get stuck. Both can technically be computed and handle binary labels, but convexity guarantees convergence to the optimal solution.">Check Answer</button>
-                    <div class="quiz-feedback"></div>
-                </div>
-
-                <!-- Quiz 5 -->
-                <div class="quiz-question" data-question="5">
-                    <h3>Question 5</h3>
-                    <p>In scikit-learn, what does setting C=0.01 (very small C) do?</p>
-                    <label><input type="radio" name="q5" value="a"> Increases model complexity</label><br>
-                    <label><input type="radio" name="q5" value="b"> Reduces regularization strength</label><br>
-                    <label><input type="radio" name="q5" value="c"> Increases regularization strength (stronger shrinkage)</label><br>
-                    <label><input type="radio" name="q5" value="d"> Disables regularization entirely</label><br>
-                    <button class="check-answer" data-correct="c" data-explanation="Since C = 1/λ, a small C means a large λ, which means stronger regularization. C=0.01 applies very aggressive weight shrinkage, leading to a simpler model that may underfit. C=1000 (large C) means weak regularization, which may overfit.">Check Answer</button>
-                    <div class="quiz-feedback"></div>
-                </div>
-
-                <!-- Quiz 6 -->
-                <div class="quiz-question" data-question="6">
-                    <h3>Question 6</h3>
-                    <p>For a multi-label classification problem (e.g., tagging a photo with multiple labels), which approach should you use?</p>
-                    <label><input type="radio" name="q6" value="a"> Softmax with argmax</label><br>
-                    <label><input type="radio" name="q6" value="b"> One-vs-Rest with softmax</label><br>
-                    <label><input type="radio" name="q6" value="c"> Independent sigmoid for each class</label><br>
-                    <label><input type="radio" name="q6" value="d"> A single sigmoid with threshold 0.5</label><br>
-                    <button class="check-answer" data-correct="c" data-explanation="Multi-label means each sample can belong to multiple classes simultaneously. Softmax forces outputs to sum to 1, which would prevent multiple classes from being selected. Instead, use independent sigmoids for each class, each outputting a probability independently, with its own threshold.">Check Answer</button>
-                    <div class="quiz-feedback"></div>
-                </div>
-
-                <!-- Quiz 7 -->
-                <div class="quiz-question" data-question="7">
-                    <h3>Question 7</h3>
-                    <p>If a logistic regression model has weight w₁ = 1.0 for feature "hours_exercised", what does e<sup>1.0</sup> represent?</p>
-                    <label><input type="radio" name="q7" value="a"> The probability of the positive class</label><br>
-                    <label><input type="radio" name="q7" value="b"> The odds ratio: each additional hour multiplies odds by e<sup>1.0</sup> ≈ 2.72</label><br>
-                    <label><input type="radio" name="q7" value="c"> The change in probability per unit increase</label><br>
-                    <label><input type="radio" name="q7" value="d"> The log-odds when hours_exercised = 1</label><br>
-                    <button class="check-answer" data-correct="b" data-explanation="In logistic regression, e<sup>wᵢ</sup> is the odds ratio for feature xᵢ. It means each one-unit increase in xᵢ multiplies the odds of the positive class by e<sup>wᵢ</sup>. So e<sup>1.0</sup> ≈ 2.718 means each additional hour of exercise multiplies the odds by ~2.72.">Check Answer</button>
-                    <div class="quiz-feedback"></div>
-                </div>
-
-                <!-- Quiz 8 -->
-                <div class="quiz-question" data-question="8">
-                    <h3>Question 8</h3>
-                    <p>What happens to BCE loss when the model predicts ŷ = 0.01 for a sample where y = 1?</p>
-                    <label><input type="radio" name="q8" value="a"> Loss is small (≈ 0.01)</label><br>
-                    <label><input type="radio" name="q8" value="b"> Loss is moderate (≈ 0.69)</label><br>
-                    <label><input type="radio" name="q8" value="c"> Loss is very large (≈ 4.61)</label><br>
-                    <label><input type="radio" name="q8" value="d"> Loss is undefined</label><br>
-                    <button class="check-answer" data-correct="c" data-explanation="For y=1, BCE loss = −log(ŷ) = −log(0.01) = −(−4.605) = 4.605. The model is confidently wrong (predicted 1% chance of class 1 when it's actually class 1), so the penalty is very large. This strong penalty drives the model to correct confident mistakes.">Check Answer</button>
-                    <div class="quiz-feedback"></div>
-                </div>
-
-                <!-- Quiz 9 -->
-                <div class="quiz-question" data-question="9">
-                    <h3>Question 9</h3>
-                    <p>When does softmax reduce to sigmoid?</p>
-                    <label><input type="radio" name="q9" value="a"> When there are 3 classes</label><br>
-                    <label><input type="radio" name="q9" value="b"> When all class scores are equal</label><br>
-                    <label><input type="radio" name="q9" value="c"> When K = 2 (binary classification)</label><br>
-                    <label><input type="radio" name="q9" value="d"> When learning rate is very small</label><br>
-                    <button class="check-answer" data-correct="c" data-explanation="For K=2 classes with scores z₁ and z₂, softmax gives P(y=1) = e<sup>z₁</sup>/(e<sup>z₁</sup>+e<sup>z₂</sup>). Setting z₂ = 0 as reference: P(y=1) = e<sup>z₁</sup>/(e<sup>z₁</sup>+1) = 1/(1+e<sup>−z₁</sup>) = σ(z₁). This is why logistic regression is a special case of softmax regression.">Check Answer</button>
-                    <div class="quiz-feedback"></div>
-                </div>
-
-                <!-- Quiz 10 -->
-                <div class="quiz-question" data-question="10">
-                    <h3>Question 10</h3>
-                    <p>A doctor says "the test has 95% sensitivity" — what does this mean in probability notation?</p>
-                    <label><input type="radio" name="q10" value="a"> P(disease | positive test) = 0.95</label><br>
-                    <label><input type="radio" name="q10" value="b"> P(positive test | disease) = 0.95</label><br>
-                    <label><input type="radio" name="q10" value="c"> P(disease) = 0.95</label><br>
-                    <label><input type="radio" name="q10" value="d"> P(negative test | no disease) = 0.95</label><br>
-                    <button class="check-answer" data-correct="b" data-explanation="Sensitivity (also called recall or true positive rate) = P(positive test | disease) = 0.95. It means 95% of people who actually have the disease test positive. This is NOT the same as P(disease | positive test), which depends on disease prevalence (base rate). Confusing these is the classic base rate fallacy.">Check Answer</button>
-                    <div class="quiz-feedback"></div>
+            <div class="quiz-container" data-quiz-id="q1" data-progress-section="s-quiz-q1">
+                <h3>Question 1</h3>
+                <div class="quiz-question">
+                    <div class="q-num">Question 1 of 10</div>
+                    <div class="q-text">What is the range of the sigmoid function σ(z)?</div>
+                    <div class="quiz-option" data-correct="false">A. (−∞, +∞)</div>
+                    <div class="quiz-option" data-correct="false">B. [0, 1]</div>
+                    <div class="quiz-option" data-correct="true">C. (0, 1)</div>
+                    <div class="quiz-option" data-correct="false">D. [−1, 1]</div>
+                    <div class="quiz-feedback">The sigmoid function maps any real number to the open interval (0, 1). It never actually reaches exactly 0 or exactly 1 — it only approaches them asymptotically. This is important because log(0) is undefined, and we need strict positivity for the BCE loss.</div>
                 </div>
             </div>
-        </section>
+
+            <div class="quiz-container" data-quiz-id="q2" data-progress-section="s-quiz-q2">
+                <div class="quiz-question">
+                    <div class="q-num">Question 2 of 10</div>
+                    <div class="q-text">If the odds of an event are 4:1 (odds = 4), what is the probability?</div>
+                    <div class="quiz-option" data-correct="false">A. 0.25</div>
+                    <div class="quiz-option" data-correct="false">B. 0.40</div>
+                    <div class="quiz-option" data-correct="true">C. 0.80</div>
+                    <div class="quiz-option" data-correct="false">D. 0.75</div>
+                    <div class="quiz-feedback">Odds = P/(1−P) → 4 = P/(1−P) → 4(1−P) = P → 4−4P = P → 4 = 5P → P = 4/5 = 0.80. So odds of 4:1 means 80% probability.</div>
+                </div>
+            </div>
+
+            <div class="quiz-container" data-quiz-id="q3" data-progress-section="s-quiz-q3">
+                <div class="quiz-question">
+                    <div class="q-num">Question 3 of 10</div>
+                    <div class="q-text">What is the maximum value of the sigmoid derivative dσ/dz = σ(z)(1−σ(z))?</div>
+                    <div class="quiz-option" data-correct="false">A. 1.0</div>
+                    <div class="quiz-option" data-correct="false">B. 0.5</div>
+                    <div class="quiz-option" data-correct="true">C. 0.25</div>
+                    <div class="quiz-option" data-correct="false">D. 0.1</div>
+                    <div class="quiz-feedback">The maximum of σ(1−σ) occurs when σ = 0.5 (at z=0). The maximum value is 0.5 × (1−0.5) = 0.25. This is why deep networks with sigmoid activations suffer from vanishing gradients — the gradient is at most 0.25 and shrinks with each layer.</div>
+                </div>
+            </div>
+
+            <div class="quiz-container" data-quiz-id="q4" data-progress-section="s-quiz-q4">
+                <div class="quiz-question">
+                    <div class="q-num">Question 4 of 10</div>
+                    <div class="q-text">Why is Binary Cross-Entropy preferred over MSE for classification?</div>
+                    <div class="quiz-option" data-correct="false">A. BCE is simpler to compute</div>
+                    <div class="quiz-option" data-correct="true">B. BCE is convex while MSE + sigmoid is non-convex</div>
+                    <div class="quiz-option" data-correct="false">C. BCE always gives higher accuracy</div>
+                    <div class="quiz-option" data-correct="false">D. MSE cannot handle binary labels</div>
+                    <div class="quiz-feedback">BCE loss is convex with respect to the weights, meaning it has a single global minimum. MSE combined with the sigmoid function produces a non-convex loss surface with local minima, where gradient descent can get stuck. Both can technically be computed and handle binary labels, but convexity guarantees convergence to the optimal solution.</div>
+                </div>
+            </div>
+
+            <div class="quiz-container" data-quiz-id="q5" data-progress-section="s-quiz-q5">
+                <div class="quiz-question">
+                    <div class="q-num">Question 5 of 10</div>
+                    <div class="q-text">In scikit-learn, what does setting C=0.01 (very small C) do?</div>
+                    <div class="quiz-option" data-correct="false">A. Increases model complexity</div>
+                    <div class="quiz-option" data-correct="false">B. Reduces regularization strength</div>
+                    <div class="quiz-option" data-correct="true">C. Increases regularization strength (stronger shrinkage)</div>
+                    <div class="quiz-option" data-correct="false">D. Disables regularization entirely</div>
+                    <div class="quiz-feedback">Since C = 1/λ, a small C means a large λ, which means stronger regularization. C=0.01 applies very aggressive weight shrinkage, leading to a simpler model that may underfit. C=1000 (large C) means weak regularization, which may overfit.</div>
+                </div>
+            </div>
+
+            <div class="quiz-container" data-quiz-id="q6" data-progress-section="s-quiz-q6">
+                <div class="quiz-question">
+                    <div class="q-num">Question 6 of 10</div>
+                    <div class="q-text">For a multi-label classification problem (e.g., tagging a photo with multiple labels), which approach should you use?</div>
+                    <div class="quiz-option" data-correct="false">A. Softmax with argmax</div>
+                    <div class="quiz-option" data-correct="false">B. One-vs-Rest with softmax</div>
+                    <div class="quiz-option" data-correct="true">C. Independent sigmoid for each class</div>
+                    <div class="quiz-option" data-correct="false">D. A single sigmoid with threshold 0.5</div>
+                    <div class="quiz-feedback">Multi-label means each sample can belong to multiple classes simultaneously. Softmax forces outputs to sum to 1, which would prevent multiple classes from being selected. Instead, use independent sigmoids for each class, each outputting a probability independently, with its own threshold.</div>
+                </div>
+            </div>
+
+            <div class="quiz-container" data-quiz-id="q7" data-progress-section="s-quiz-q7">
+                <div class="quiz-question">
+                    <div class="q-num">Question 7 of 10</div>
+                    <div class="q-text">If a logistic regression model has weight w₁ = 1.0 for feature "hours_exercised", what does e<sup>1.0</sup> represent?</div>
+                    <div class="quiz-option" data-correct="false">A. The probability of the positive class</div>
+                    <div class="quiz-option" data-correct="true">B. The odds ratio: each additional hour multiplies odds by e<sup>1.0</sup> ≈ 2.72</div>
+                    <div class="quiz-option" data-correct="false">C. The change in probability per unit increase</div>
+                    <div class="quiz-option" data-correct="false">D. The log-odds when hours_exercised = 1</div>
+                    <div class="quiz-feedback">In logistic regression, e<sup>wᵢ</sup> is the odds ratio for feature xᵢ. It means each one-unit increase in xᵢ multiplies the odds of the positive class by e<sup>wᵢ</sup>. So e<sup>1.0</sup> ≈ 2.718 means each additional hour of exercise multiplies the odds by ~2.72.</div>
+                </div>
+            </div>
+
+            <div class="quiz-container" data-quiz-id="q8" data-progress-section="s-quiz-q8">
+                <div class="quiz-question">
+                    <div class="q-num">Question 8 of 10</div>
+                    <div class="q-text">What happens to BCE loss when the model predicts ŷ = 0.01 for a sample where y = 1?</div>
+                    <div class="quiz-option" data-correct="false">A. Loss is small (≈ 0.01)</div>
+                    <div class="quiz-option" data-correct="false">B. Loss is moderate (≈ 0.69)</div>
+                    <div class="quiz-option" data-correct="true">C. Loss is very large (≈ 4.61)</div>
+                    <div class="quiz-option" data-correct="false">D. Loss is undefined</div>
+                    <div class="quiz-feedback">For y=1, BCE loss = −log(ŷ) = −log(0.01) = −(−4.605) = 4.605. The model is confidently wrong (predicted 1% chance of class 1 when it's actually class 1), so the penalty is very large. This strong penalty drives the model to correct confident mistakes.</div>
+                </div>
+            </div>
+
+            <div class="quiz-container" data-quiz-id="q9" data-progress-section="s-quiz-q9">
+                <div class="quiz-question">
+                    <div class="q-num">Question 9 of 10</div>
+                    <div class="q-text">When does softmax reduce to sigmoid?</div>
+                    <div class="quiz-option" data-correct="false">A. When there are 3 classes</div>
+                    <div class="quiz-option" data-correct="false">B. When all class scores are equal</div>
+                    <div class="quiz-option" data-correct="true">C. When K = 2 (binary classification)</div>
+                    <div class="quiz-option" data-correct="false">D. When learning rate is very small</div>
+                    <div class="quiz-feedback">For K=2 classes with scores z₁ and z₂, softmax gives P(y=1) = e<sup>z₁</sup>/(e<sup>z₁</sup>+e<sup>z₂</sup>). Setting z₂ = 0 as reference: P(y=1) = e<sup>z₁</sup>/(e<sup>z₁</sup>+1) = 1/(1+e<sup>−z₁</sup>) = σ(z₁). This is why logistic regression is a special case of softmax regression.</div>
+                </div>
+            </div>
+
+            <div class="quiz-container" data-quiz-id="q10" data-progress-section="s-quiz-q10">
+                <div class="quiz-question">
+                    <div class="q-num">Question 10 of 10</div>
+                    <div class="q-text">A doctor says "the test has 95% sensitivity" — what does this mean in probability notation?</div>
+                    <div class="quiz-option" data-correct="false">A. P(disease | positive test) = 0.95</div>
+                    <div class="quiz-option" data-correct="true">B. P(positive test | disease) = 0.95</div>
+                    <div class="quiz-option" data-correct="false">C. P(disease) = 0.95</div>
+                    <div class="quiz-option" data-correct="false">D. P(negative test | no disease) = 0.95</div>
+                    <div class="quiz-feedback">Sensitivity (also called recall or true positive rate) = P(positive test | disease) = 0.95. It means 95% of people who actually have the disease test positive. This is NOT the same as P(disease | positive test), which depends on disease prevalence (base rate). Confusing these is the classic base rate fallacy.</div>
+                </div>
+            </div>
+        </div>
 
         <!-- ===== FILL IN THE BLANKS ===== -->
-        <section id="fill-blank-section" data-progress-section>
-            <h2>Fill in the Blanks</h2>
-            <p>Complete the sentences by typing the missing terms. Click "Check" to verify.</p>
-
-            <div class="fill-blank-container" id="fillBlankContainer">
-                <!-- Fill-in 1 -->
-                <div class="fill-blank-question" data-blank="1">
-                    <p>The sigmoid function is defined as σ(z) = 1 / (1 + e<sup>___</sup>).</p>
-                    <input type="text" class="fill-blank-input" data-answer="-z" placeholder="Type your answer">
-                    <button class="check-fill-blank">Check</button>
-                    <div class="fill-blank-feedback"></div>
-                </div>
-
-                <!-- Fill-in 2 -->
-                <div class="fill-blank-question" data-blank="2">
-                    <p>The derivative of the sigmoid function is dσ/dz = σ(z) · (1 − ___).</p>
-                    <input type="text" class="fill-blank-input" data-answer="σ(z)" placeholder="Type your answer">
-                    <button class="check-fill-blank">Check</button>
-                    <div class="fill-blank-feedback"></div>
-                </div>
-
-                <!-- Fill-in 3 -->
-                <div class="fill-blank-question" data-blank="3">
-                    <p>The odds of an event are defined as P / (1 − ___).</p>
-                    <input type="text" class="fill-blank-input" data-answer="P" placeholder="Type your answer">
-                    <button class="check-fill-blank">Check</button>
-                    <div class="fill-blank-feedback"></div>
-                </div>
-
-                <!-- Fill-in 4 -->
-                <div class="fill-blank-question" data-blank="4">
-                    <p>L1 regularisation is also known as ___ regularisation.</p>
-                    <input type="text" class="fill-blank-input" data-answer="lasso" placeholder="Type your answer">
-                    <button class="check-fill-blank">Check</button>
-                    <div class="fill-blank-feedback"></div>
-                </div>
-
-                <!-- Fill-in 5 -->
-                <div class="fill-blank-question" data-blank="5">
-                    <p>The binary cross-entropy loss is derived from Maximum ___ Estimation.</p>
-                    <input type="text" class="fill-blank-input" data-answer="likelihood" placeholder="Type your answer">
-                    <button class="check-fill-blank">Check</button>
-                    <div class="fill-blank-feedback"></div>
-                </div>
-
-                <!-- Fill-in 6 -->
-                <div class="fill-blank-question" data-blank="6">
-                    <p>In scikit-learn, the parameter C is related to the regularisation strength by C = 1/___.</p>
-                    <input type="text" class="fill-blank-input" data-answer="λ" placeholder="Type your answer">
-                    <button class="check-fill-blank">Check</button>
-                    <div class="fill-blank-feedback"></div>
-                </div>
-
-                <!-- Fill-in 7 -->
-                <div class="fill-blank-question" data-blank="7">
-                    <p>The maximum value of the sigmoid derivative σ(z)(1−σ(z)) is ___.</p>
-                    <input type="text" class="fill-blank-input" data-answer="0.25" placeholder="Type your answer">
-                    <button class="check-fill-blank">Check</button>
-                    <div class="fill-blank-feedback"></div>
-                </div>
-
-                <!-- Fill-in 8 -->
-                <div class="fill-blank-question" data-blank="8">
-                    <p>The softmax function outputs a probability distribution where all outputs are positive and they sum to ___.</p>
-                    <input type="text" class="fill-blank-input" data-answer="1" placeholder="Type your answer">
-                    <button class="check-fill-blank">Check</button>
-                    <div class="fill-blank-feedback"></div>
-                </div>
+        <div id="section-fill" data-progress-section="s-fill">
+            <div class="section-header">
+                <span class="emoji">&#9997;</span>
+                <h2>Fill in the Blank</h2>
             </div>
-        </section>
+
+            <div class="fill-blank-container" data-answer="-z" data-alt-answers="" data-fill-id="f1" data-progress-section="s-fill-f1">
+                <p>The sigmoid function is defined as σ(z) = 1 / (1 + e<sup>___</sup>).</p>
+                <input type="text" class="fill-blank-input" placeholder="Type your answer">
+                <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+                <div class="fill-blank-feedback"></div>
+            </div>
+
+            <div class="fill-blank-container" data-answer="σ(z)" data-alt-answers="sigmoid" data-fill-id="f2" data-progress-section="s-fill-f2">
+                <p>The derivative of the sigmoid function is dσ/dz = σ(z) · (1 − ___).</p>
+                <input type="text" class="fill-blank-input" placeholder="Type your answer">
+                <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+                <div class="fill-blank-feedback"></div>
+            </div>
+
+            <div class="fill-blank-container" data-answer="P" data-alt-answers="probability" data-fill-id="f3" data-progress-section="s-fill-f3">
+                <p>The odds of an event are defined as P / (1 − ___).</p>
+                <input type="text" class="fill-blank-input" placeholder="Type your answer">
+                <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+                <div class="fill-blank-feedback"></div>
+            </div>
+
+            <div class="fill-blank-container" data-answer="lasso" data-alt-answers="Lasso" data-fill-id="f4" data-progress-section="s-fill-f4">
+                <p>L1 regularisation is also known as ___ regularisation.</p>
+                <input type="text" class="fill-blank-input" placeholder="Type your answer">
+                <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+                <div class="fill-blank-feedback"></div>
+            </div>
+
+            <div class="fill-blank-container" data-answer="likelihood" data-alt-answers="Likelihood" data-fill-id="f5" data-progress-section="s-fill-f5">
+                <p>The binary cross-entropy loss is derived from Maximum ___ Estimation.</p>
+                <input type="text" class="fill-blank-input" placeholder="Type your answer">
+                <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+                <div class="fill-blank-feedback"></div>
+            </div>
+
+            <div class="fill-blank-container" data-answer="λ" data-alt-answers="lambda" data-fill-id="f6" data-progress-section="s-fill-f6">
+                <p>In scikit-learn, the parameter C is related to the regularisation strength by C = 1/___.</p>
+                <input type="text" class="fill-blank-input" placeholder="Type your answer">
+                <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+                <div class="fill-blank-feedback"></div>
+            </div>
+
+            <div class="fill-blank-container" data-answer="0.25" data-alt-answers="1/4" data-fill-id="f7" data-progress-section="s-fill-f7">
+                <p>The maximum value of the sigmoid derivative σ(z)(1−σ(z)) is ___.</p>
+                <input type="text" class="fill-blank-input" placeholder="Type your answer">
+                <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+                <div class="fill-blank-feedback"></div>
+            </div>
+
+            <div class="fill-blank-container" data-answer="1" data-alt-answers="one" data-fill-id="f8" data-progress-section="s-fill-f8">
+                <p>The softmax function outputs a probability distribution where all outputs are positive and they sum to ___.</p>
+                <input type="text" class="fill-blank-input" placeholder="Type your answer">
+                <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+                <div class="fill-blank-feedback"></div>
+            </div>
+        </div>
 
         <!-- ===== SCENARIO QUESTION ===== -->
         <section id="scenario-section" data-progress-section>
@@ -1351,111 +1398,5 @@
     </main>
 
     <script src="script.js"></script>
-    <script>
-        // Theme Toggle
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        themeToggle.addEventListener('click', function() {
-            body.classList.toggle('dark-theme');
-            themeToggle.textContent = body.classList.contains('dark-theme') ? 'Light' : 'Dark';
-        });
-
-        // Progress Bar
-        const sections = document.querySelectorAll('[data-progress-section]');
-        const progressBar = document.getElementById('progressBar');
-        const progressText = document.getElementById('progressText');
-
-        function updateProgress() {
-            let scrolled = 0;
-            const total = sections.length;
-            sections.forEach(function(section) {
-                const rect = section.getBoundingClientRect();
-                if (rect.top < window.innerHeight * 0.5) {
-                    scrolled++;
-                }
-            });
-            const pct = Math.round((scrolled / total) * 100);
-            progressBar.style.width = pct + '%';
-            progressText.textContent = pct + '%';
-        }
-
-        window.addEventListener('scroll', updateProgress);
-        updateProgress();
-
-        // Flashcards
-        var cards = document.querySelectorAll('.flashcard');
-        var currentCard = 0;
-        var cardCounter = document.getElementById('cardCounter');
-
-        function showCard(index) {
-            cards.forEach(function(c, i) {
-                c.style.display = i === index ? 'block' : 'none';
-                c.classList.remove('flipped');
-            });
-            cardCounter.textContent = 'Card ' + (index + 1) + ' of ' + cards.length;
-        }
-
-        cards.forEach(function(card) {
-            card.addEventListener('click', function() {
-                card.classList.toggle('flipped');
-            });
-        });
-
-        document.getElementById('prevCard').addEventListener('click', function() {
-            currentCard = (currentCard - 1 + cards.length) % cards.length;
-            showCard(currentCard);
-        });
-
-        document.getElementById('nextCard').addEventListener('click', function() {
-            currentCard = (currentCard + 1) % cards.length;
-            showCard(currentCard);
-        });
-
-        showCard(0);
-
-        // Quiz Answers
-        document.querySelectorAll('.check-answer').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                var question = btn.closest('.quiz-question');
-                var selected = question.querySelector('input[type="radio"]:checked');
-                var feedback = question.querySelector('.quiz-feedback');
-                var correct = btn.getAttribute('data-correct');
-                var explanation = btn.getAttribute('data-explanation');
-
-                if (!selected) {
-                    feedback.textContent = 'Please select an answer.';
-                    feedback.className = 'quiz-feedback incorrect';
-                    return;
-                }
-
-                if (selected.value === correct) {
-                    feedback.textContent = 'Correct! ' + explanation;
-                    feedback.className = 'quiz-feedback correct';
-                } else {
-                    feedback.textContent = 'Incorrect. ' + explanation;
-                    feedback.className = 'quiz-feedback incorrect';
-                }
-            });
-        });
-
-        // Fill in the Blanks
-        document.querySelectorAll('.check-fill-blank').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                var container = btn.closest('.fill-blank-question');
-                var input = container.querySelector('.fill-blank-input');
-                var feedback = container.querySelector('.fill-blank-feedback');
-                var answer = input.getAttribute('data-answer').toLowerCase().trim();
-                var userAnswer = input.value.toLowerCase().trim();
-
-                if (userAnswer === answer) {
-                    feedback.textContent = 'Correct!';
-                    feedback.className = 'fill-blank-feedback correct';
-                } else {
-                    feedback.textContent = 'Incorrect. The answer is: ' + input.getAttribute('data-answer');
-                    feedback.className = 'fill-blank-feedback incorrect';
-                }
-            });
-        });
-    </script>
 </body>
 </html>

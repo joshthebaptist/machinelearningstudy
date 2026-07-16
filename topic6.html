@@ -9,43 +9,65 @@
 <body>
 
 <!-- ═══════════════════════════ TOP NAV ═══════════════════════════ -->
-<nav class="top-nav">
-  <a href="index.html" class="nav-home">Lecture Notes</a>
-  <span class="nav-separator">|</span>
-  <span class="nav-current">Topic 6 – Generative Models, Bayesian Reasoning &amp; Integrative Model Selection</span>
-  <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span class="icon">&#9728;</span> Toggle Theme</button>
-</nav>
-
-<!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <h2>Topic 6</h2>
-    <p class="sidebar-subtitle">Generative Models &amp; Bayesian Reasoning</p>
+<div class="top-nav">
+  <a href="index.html" class="logo">&#8592; TTTC2453 ML Hub</a>
+  <div class="nav-links">
+    <a href="index.html">All Topics</a>
   </div>
+</div>
 
-  <div class="progress-container">
-    <div class="progress-bar" id="progress-bar"></div>
-    <span class="progress-text" id="progress-text">0% complete</span>
+<!-- Theme Toggle -->
+<button class="theme-toggle" id="themeToggle">
+  <span class="icon">&#9728;</span>
+  <span class="label-text">Toggle Theme</span>
+</button>
+
+  <!-- Mobile Sidebar Toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-title">Sections</div>
+    <a class="nav-item active" data-section="generative-vs-discriminative" href="#generative-vs-discriminative">
+      <span class="nav-emoji">&#128260;</span> Generative vs Discriminative
+    </a>
+    <a class="nav-item" data-section="conditional-probability" href="#conditional-probability">
+      <span class="nav-emoji">&#128209;</span> Conditional Probability
+    </a>
+    <a class="nav-item" data-section="bayes-theorem" href="#bayes-theorem">
+      <span class="nav-emoji">&#128218;</span> Bayes' Theorem
+    </a>
+    <a class="nav-item" data-section="naive-bayes-assumptions" href="#naive-bayes-assumptions">
+      <span class="nav-emoji">&#9888;</span> Naive Bayes Assumptions
+    </a>
+    <a class="nav-item" data-section="naive-bayes-spam" href="#naive-bayes-spam">
+      <span class="nav-emoji">&#128231;</span> Spam Classification
+    </a>
+    <a class="nav-item" data-section="naive-bayes-advantages" href="#naive-bayes-advantages">
+      <span class="nav-emoji">&#9989;</span> NB Advantages &amp; Limits
+    </a>
+    <a class="nav-item" data-section="prior-knowledge-callbacks" href="#prior-knowledge-callbacks">
+      <span class="nav-emoji">&#128279;</span> Prior Knowledge Callbacks
+    </a>
+    <a class="nav-item" data-section="common-mistakes" href="#common-mistakes">
+      <span class="nav-emoji">&#128680;</span> Common Mistakes
+    </a>
+    <a class="nav-item" data-section="flashcards" href="#flashcards">
+      <span class="nav-emoji">&#128179;</span> Flashcards
+    </a>
+    <a class="nav-item" data-section="quiz" href="#quiz">
+      <span class="nav-emoji">&#128221;</span> Quiz
+    </a>
+    <a class="nav-item" data-section="fill-blank" href="#fill-blank">
+      <span class="nav-emoji">&#9997;</span> Fill-in-the-Blank
+    </a>
+    <div class="sidebar-progress">
+      <div class="progress-label">Topic Progress</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-pct" style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">0%</div>
+    </div>
   </div>
-
-  <nav class="section-nav" id="section-nav">
-    <ul>
-      <li><a href="#generative-vs-discriminative">Generative vs Discriminative</a></li>
-      <li><a href="#conditional-probability">Conditional Probability</a></li>
-      <li><a href="#bayes-theorem">Bayes' Theorem</a></li>
-      <li><a href="#naive-bayes-assumptions">Naive Bayes Assumptions</a></li>
-      <li><a href="#naive-bayes-spam">Naive Bayes: Spam Classification</a></li>
-      <li><a href="#naive-bayes-advantages">NB Advantages &amp; Limitations</a></li>
-      <li><a href="#prior-knowledge-callbacks">Prior Knowledge Callbacks</a></li>
-      <li><a href="#common-mistakes">Common Mistakes &amp; Exam Traps</a></li>
-      <li><a href="#flashcards">Flashcards</a></li>
-      <li><a href="#quiz">Quiz</a></li>
-      <li><a href="#fill-blank">Fill-in-the-Blank</a></li>
-      <li><a href="#scenario">Scenario Question</a></li>
-      <li><a href="#recap">Final Recap</a></li>
-    </ul>
-  </nav>
-</aside>
 
 <!-- ═══════════════════════════ MAIN CONTENT ═══════════════════════════ -->
 <main class="main-content" id="main-content">
@@ -1161,152 +1183,180 @@
 <!-- ═══════════════════════════════════════════════════════════════════
      FLASHCARDS
      ═══════════════════════════════════════════════════════════════════ -->
-<section id="flashcards" data-progress-section>
-  <h2>Flashcards</h2>
+<div id="section-flashcards" class="flashcard-container" data-progress-section="s-flashcards">
+  <div class="section-header">
+    <span class="emoji">&#128179;</span>
+    <h2>Flashcards</h2>
+  </div>
 
-  <div class="flashcard-container">
-
-    <div class="flashcard-controls">
-      <button class="btn btn-sm btn-secondary flash-prev">&#9664; Prev</button>
-      <button class="btn btn-sm btn-primary flash-next">Next &#9654;</button>
-      <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
-      <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
-      <span class="flashcard-counter"></span>
-    </div>
+  <div class="flashcard-controls">
+    <button class="btn btn-sm btn-secondary flash-prev">&#9664; Prev</button>
+    <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
+    <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
+    <button class="btn btn-sm btn-primary flash-next">Next &#9654;</button>
+  </div>
+  <div class="flashcard-counter"></div>
 
     <!-- Card 1 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is a <strong>Generative Model</strong>?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>A model that learns the <strong>joint distribution P(X, Y)</strong> or equivalently the class-conditional distribution P(X|Y) and the prior P(Y). It can derive P(Y|X) via Bayes' theorem and can also <strong>generate new data samples</strong>. Examples: Naive Bayes, GMM, HMM.</p>
+    <div class="flashcard" data-progress-section="s-flash-1">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is a <strong>Generative Model</strong>?</div>
+        <div class="flashcard-back">
+          <p>A model that learns the <strong>joint distribution P(X, Y)</strong> or equivalently the class-conditional distribution P(X|Y) and the prior P(Y). It can derive P(Y|X) via Bayes' theorem and can also <strong>generate new data samples</strong>. Examples: Naive Bayes, GMM, HMM.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 2 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is a <strong>Discriminative Model</strong>?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>A model that learns the <strong>conditional distribution P(Y|X)</strong> directly, or learns a decision boundary between classes. It does not model how the data is generated. Examples: Logistic Regression, SVM, Random Forest, Neural Networks.</p>
+    <div class="flashcard" data-progress-section="s-flash-2">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is a <strong>Discriminative Model</strong>?</div>
+        <div class="flashcard-back">
+          <p>A model that learns the <strong>conditional distribution P(Y|X)</strong> directly, or learns a decision boundary between classes. It does not model how the data is generated. Examples: Logistic Regression, SVM, Random Forest, Neural Networks.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 3 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>State <strong>Bayes' Theorem</strong>.</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>P(A|B) = P(B|A) &times; P(A) / P(B)</strong></p>
-        <p>The posterior probability of A given B equals the likelihood of B given A, multiplied by the prior P(A), divided by the evidence P(B). It converts P(B|A) into P(A|B).</p>
+    <div class="flashcard" data-progress-section="s-flash-3">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">State <strong>Bayes' Theorem</strong>.</div>
+        <div class="flashcard-back">
+          <p><strong>P(A|B) = P(B|A) &times; P(A) / P(B)</strong></p>
+          <p>The posterior probability of A given B equals the likelihood of B given A, multiplied by the prior P(A), divided by the evidence P(B). It converts P(B|A) into P(A|B).</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 4 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is a <strong>Prior Probability</strong>?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>The <strong>initial belief about an event before observing any evidence</strong>. In Bayes' theorem, P(A) is the prior. In Naive Bayes, P(class) is the prior — typically the fraction of training samples in that class.</p>
+    <div class="flashcard" data-progress-section="s-flash-4">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is a <strong>Prior Probability</strong>?</div>
+        <div class="flashcard-back">
+          <p>The <strong>initial belief about an event before observing any evidence</strong>. In Bayes' theorem, P(A) is the prior. In Naive Bayes, P(class) is the prior — typically the fraction of training samples in that class.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 5 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is a <strong>Posterior Probability</strong>?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>The <strong>updated belief after observing evidence</strong>. In Bayes' theorem, P(A|B) is the posterior. In Naive Bayes, P(class|features) is the posterior — computed as (prior &times; likelihood) / evidence.</p>
+    <div class="flashcard" data-progress-section="s-flash-5">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is a <strong>Posterior Probability</strong>?</div>
+        <div class="flashcard-back">
+          <p>The <strong>updated belief after observing evidence</strong>. In Bayes' theorem, P(A|B) is the posterior. In Naive Bayes, P(class|features) is the posterior — computed as (prior &times; likelihood) / evidence.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 6 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is the <strong>Likelihood</strong> in Bayes' theorem?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>P(B|A)</strong> — the probability of observing the evidence B given that hypothesis A is true. In Naive Bayes, P(word|class) is the likelihood: how probable is this word if the message belongs to this class?</p>
+    <div class="flashcard" data-progress-section="s-flash-6">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is the <strong>Likelihood</strong> in Bayes' theorem?</div>
+        <div class="flashcard-back">
+          <p><strong>P(B|A)</strong> — the probability of observing the evidence B given that hypothesis A is true. In Naive Bayes, P(word|class) is the likelihood: how probable is this word if the message belongs to this class?</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 7 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>Define <strong>Conditional Probability</strong> and give its formula.</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>P(A|B) = P(A &#8745; B) / P(B)</strong></p>
-        <p>The probability of A occurring given that B has already occurred. It restricts the sample space to outcomes where B is true, then re-measures A within that reduced space. Note: P(A|B) &#8800; P(B|A) in general.</p>
+    <div class="flashcard" data-progress-section="s-flash-7">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Define <strong>Conditional Probability</strong> and give its formula.</div>
+        <div class="flashcard-back">
+          <p><strong>P(A|B) = P(A &#8745; B) / P(B)</strong></p>
+          <p>The probability of A occurring given that B has already occurred. It restricts the sample space to outcomes where B is true, then re-measures A within that reduced space. Note: P(A|B) &#8800; P(B|A) in general.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 8 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is <strong>Naive Bayes</strong>?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>A classifier based on Bayes' theorem that assumes all features are <strong>conditionally independent given the class</strong>. Classification rule: y* = argmax_y P(y) &times; &#8719; P(x_i|y). Despite the "naive" assumption being wrong, it often performs well because classification only needs correct rankings, not exact probabilities.</p>
+    <div class="flashcard" data-progress-section="s-flash-8">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is <strong>Naive Bayes</strong>?</div>
+        <div class="flashcard-back">
+          <p>A classifier based on Bayes' theorem that assumes all features are <strong>conditionally independent given the class</strong>. Classification rule: y* = argmax_y P(y) &times; &#8719; P(x_i|y). Despite the "naive" assumption being wrong, it often performs well because classification only needs correct rankings, not exact probabilities.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 9 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is <strong>Laplace Smoothing</strong> and why is it essential?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>Adds &#945; = 1 to every count before computing likelihoods: p(word|class) = (count + 1) / (total + V). It prevents <strong>zero probabilities</strong> for unseen words. Without it, a single unseen word produces p = 0, which multiplies the entire class score to zero, making the class impossible regardless of other evidence.</p>
+    <div class="flashcard" data-progress-section="s-flash-9">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is <strong>Laplace Smoothing</strong> and why is it essential?</div>
+        <div class="flashcard-back">
+          <p>Adds &#945; = 1 to every count before computing likelihoods: p(word|class) = (count + 1) / (total + V). It prevents <strong>zero probabilities</strong> for unseen words. Without it, a single unseen word produces p = 0, which multiplies the entire class score to zero, making the class impossible regardless of other evidence.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 10 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>Why do we use <strong>Log-Odds</strong> / log-probabilities in Naive Bayes?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>Multiplying many small probabilities (e.g., 0.01^200) causes <strong>numerical underflow</strong> — the result rounds to zero in floating-point. Taking logarithms converts multiplication to addition: log(p1 &times; p2 &times; ...) = log(p1) + log(p2) + .... This keeps values in a representable range while preserving the ranking needed for classification.</p>
+    <div class="flashcard" data-progress-section="s-flash-10">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Why do we use <strong>Log-Odds</strong> / log-probabilities in Naive Bayes?</div>
+        <div class="flashcard-back">
+          <p>Multiplying many small probabilities (e.g., 0.01^200) causes <strong>numerical underflow</strong> — the result rounds to zero in floating-point. Taking logarithms converts multiplication to addition: log(p1 &times; p2 &times; ...) = log(p1) + log(p2) + .... This keeps values in a representable range while preserving the ranking needed for classification.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 11 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is the <strong>Naive Assumption</strong> in Naive Bayes?</p>
-      </div>
-      <div class="flashcard-back">
-        <p>That all features are <strong>conditionally independent given the class label</strong>. Formally: P(X_1, X_2, ..., X_n|Y) = &#8719; P(X_i|Y). This means knowing the class makes all features independent of each other. It is called "naive" because real features are almost always correlated, but the assumption makes computation tractable and often preserves correct classification rankings.</p>
+    <div class="flashcard" data-progress-section="s-flash-11">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is the <strong>Naive Assumption</strong> in Naive Bayes?</div>
+        <div class="flashcard-back">
+          <p>That all features are <strong>conditionally independent given the class label</strong>. Formally: P(X_1, X_2, ..., X_n|Y) = &#8719; P(X_i|Y). This means knowing the class makes all features independent of each other. It is called "naive" because real features are almost always correlated, but the assumption makes computation tractable and often preserves correct classification rankings.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 12 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>State the <strong>Bayes Rule</strong> for classification.</p>
-      </div>
-      <div class="flashcard-back">
-        <p>P(Y = c | X) = P(X | Y = c) &times; P(Y = c) / P(X)</p>
-        <p>For classification, we compute this for each class c and predict the class with the highest posterior. Since P(X) is the same for all classes, we can compare unnormalised scores: score(c) = P(Y = c) &times; &#8719; P(X_i | Y = c).</p>
+    <div class="flashcard" data-progress-section="s-flash-12">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">State the <strong>Bayes Rule</strong> for classification.</div>
+        <div class="flashcard-back">
+          <p>P(Y = c | X) = P(X | Y = c) &times; P(Y = c) / P(X)</p>
+          <p>For classification, we compute this for each class c and predict the class with the highest posterior. Since P(X) is the same for all classes, we can compare unnormalised scores: score(c) = P(Y = c) &times; &#8719; P(X_i | Y = c).</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
   </div>
-</section>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      QUIZ
      ═══════════════════════════════════════════════════════════════════ -->
-<section id="quiz" data-progress-section>
-  <h2>Quiz</h2>
+<div id="section-quiz" data-progress-section="s-quiz">
+  <div class="section-header">
+    <span class="emoji">&#128220;</span>
+    <h2>Knowledge Check Quiz</h2>
+  </div>
 
-  <div class="quiz-container">
+  <div class="quiz-container" data-quiz-id="q1" data-progress-section="s-quiz-q1">
 
     <!-- Q1 -->
     <div class="quiz-question">
@@ -1316,8 +1366,7 @@
       <div class="quiz-option" data-correct="false">90% — the specificity is 90%</div>
       <div class="quiz-option" data-correct="true">About 16.3% — the low prevalence means most positives are false alarms</div>
       <div class="quiz-option" data-correct="false">2% — the prevalence does not change</div>
-      <div class="quiz-feedback correct">Correct! P(D|+) = P(+|D)P(D) / P(+) = (0.95)(0.02) / [(0.95)(0.02) + (0.10)(0.98)] = 0.019 / 0.117 = 0.163. Despite a 95% accurate test, only ~16% of positive results indicate actual disease because the base rate is low.</div>
-      <div class="quiz-feedback incorrect">Incorrect. You must apply Bayes' theorem: P(D|+) = P(+|D)P(D) / [P(+|D)P(D) + P(+|&#172;D)P(&#172;D)] = (0.95)(0.02) / [(0.95)(0.02) + (0.10)(0.98)] &#8776; 16.3%. The low prevalence means most positives are false alarms.</div>
+      <div class="quiz-feedback">P(D|+) = P(+|D)P(D) / P(+) = (0.95)(0.02) / [(0.95)(0.02) + (0.10)(0.98)] = 0.019 / 0.117 = 0.163. Despite a 95% accurate test, only ~16% of positive results indicate actual disease because the base rate is low.</div>
     </div>
 
     <!-- Q2 -->
@@ -1328,8 +1377,7 @@
       <div class="quiz-option" data-correct="false">It reduces the computational complexity of the model</div>
       <div class="quiz-option" data-correct="true">It prevents zero probabilities for unseen words, which would destroy the entire class score</div>
       <div class="quiz-option" data-correct="false">It enforces the conditional independence assumption</div>
-      <div class="quiz-feedback correct">Correct! Without Laplace smoothing, any word not seen in the training data for a class gets p = 0. Since Naive Bayes multiplies all word likelihoods, a single zero makes the entire class score zero — making classification impossible for that class.</div>
-      <div class="quiz-feedback incorrect">Incorrect. Laplace smoothing adds &#945; = 1 to every word count so that no probability is exactly zero. A single zero probability would multiply the entire class score to zero, making that class impossible regardless of other evidence.</div>
+      <div class="quiz-feedback">Without Laplace smoothing, any word not seen in the training data for a class gets p = 0. Since Naive Bayes multiplies all word likelihoods, a single zero makes the entire class score zero — making classification impossible for that class.</div>
     </div>
 
     <!-- Q3 -->
@@ -1340,8 +1388,7 @@
       <div class="quiz-option" data-correct="false">It makes Naive Bayes computationally impossible for large datasets</div>
       <div class="quiz-option" data-correct="true">It is technically wrong but often sufficient for classification because it preserves the ranking of class posteriors</div>
       <div class="quiz-option" data-correct="false">It requires that all features have the same variance</div>
-      <div class="quiz-feedback correct">Correct! The conditional independence assumption is almost always violated in practice, but Naive Bayes often classifies correctly because the distortion from correlation tends to affect all classes similarly, preserving the relative ranking of posterior probabilities.</div>
-      <div class="quiz-feedback incorrect">Incorrect. The independence assumption is almost always wrong in practice, but Naive Bayes works because: (1) classification only needs correct rankings, not exact probabilities, and (2) the assumption reduces variance, acting as implicit regularisation.</div>
+      <div class="quiz-feedback">The conditional independence assumption is almost always violated in practice, but Naive Bayes often classifies correctly because the distortion from correlation tends to affect all classes similarly, preserving the relative ranking of posterior probabilities.</div>
     </div>
 
     <!-- Q4 -->
@@ -1352,8 +1399,7 @@
       <div class="quiz-option" data-correct="false">The probability of the evidence given the hypothesis</div>
       <div class="quiz-option" data-correct="true">The overall probability of observing the evidence, computed via the total probability formula</div>
       <div class="quiz-option" data-correct="false">The strength of the likelihood function</div>
-      <div class="quiz-feedback correct">Correct! P(B) = P(B|A)P(A) + P(B|&#172;A)P(&#172;A) is the total probability of observing the evidence across all possible hypotheses. It acts as a normalising constant to ensure the posterior probabilities sum to 1.</div>
-      <div class="quiz-feedback incorrect">Incorrect. P(B) is the total probability of the evidence: P(B) = P(B|A)P(A) + P(B|&#172;A)P(&#172;A). It normalises the posterior so that probabilities across all classes sum to 1.</div>
+      <div class="quiz-feedback">P(B) = P(B|A)P(A) + P(B|&#172;A)P(&#172;A) is the total probability of observing the evidence across all possible hypotheses. It acts as a normalising constant to ensure the posterior probabilities sum to 1.</div>
     </div>
 
     <!-- Q5 -->
@@ -1364,8 +1410,7 @@
       <div class="quiz-option" data-correct="true">Multiplying many small probabilities causes numerical underflow; logs convert multiplication to addition, keeping values representable</div>
       <div class="quiz-option" data-correct="false">Log-probabilities automatically apply Laplace smoothing</div>
       <div class="quiz-option" data-correct="false">Raw probabilities always sum to more than 1</div>
-      <div class="quiz-feedback correct">Correct! When a message has hundreds of words, each with small probability, their product can be smaller than the smallest floating-point number (underflow to 0.0). Taking logs converts this to a sum of manageable negative numbers: log(p1 &times; p2 &times; ...) = log(p1) + log(p2) + ....</div>
-      <div class="quiz-feedback incorrect">Incorrect. The main reason is numerical underflow. For example, (0.01)^200 = 10^(-400), which underflows to 0.0 in floating-point. But log(0.01) &times; 200 = -921, which is perfectly representable.</div>
+      <div class="quiz-feedback">When a message has hundreds of words, each with small probability, their product can be smaller than the smallest floating-point number (underflow to 0.0). Taking logs converts this to a sum of manageable negative numbers: log(p1 &times; p2 &times; ...) = log(p1) + log(p2) + ....</div>
     </div>
 
     <!-- Q6 -->
@@ -1376,8 +1421,7 @@
       <div class="quiz-option" data-correct="false">You only need a decision boundary and nothing else</div>
       <div class="quiz-option" data-correct="true">You need to generate new data samples or detect outliers</div>
       <div class="quiz-option" data-correct="false">Training speed is the only concern</div>
-      <div class="quiz-feedback correct">Correct! Generative models learn the full data distribution P(X|Y), enabling them to generate new samples and identify outliers (points with low P(X)). Discriminative models only learn P(Y|X) and cannot assess whether an input is "unusual."</div>
-      <div class="quiz-feedback incorrect">Incorrect. Generative models are preferred when you need to generate data, detect anomalies, handle missing features, or work with small datasets. With large data and pure classification, discriminative models usually win on accuracy.</div>
+      <div class="quiz-feedback">Generative models learn the full data distribution P(X|Y), enabling them to generate new samples and identify outliers (points with low P(X)). Discriminative models only learn P(Y|X) and cannot assess whether an input is "unusual."</div>
     </div>
 
     <!-- Q7 -->
@@ -1388,79 +1432,69 @@
       <div class="quiz-option" data-correct="true">High bias and low variance</div>
       <div class="quiz-option" data-correct="false">Low bias and high variance</div>
       <div class="quiz-option" data-correct="false">High bias and high variance</div>
-      <div class="quiz-feedback correct">Correct! The independence assumption is almost always wrong, creating systematic (high) bias. But the strong assumption also constrains the model, so it barely changes across different training sets (low variance). Naive Bayes is a high-bias, low-variance classifier.</div>
-      <div class="quiz-feedback incorrect">Incorrect. Naive Bayes has HIGH bias (the independence assumption is wrong, causing systematic error) and LOW variance (the strong assumption means the model barely changes across training sets). This makes it a high-bias, low-variance classifier.</div>
+      <div class="quiz-feedback">The independence assumption is almost always wrong in practice, but Naive Bayes works because classification only needs correct rankings, not exact probabilities, and the strong assumption reduces variance, acting as implicit regularisation.</div>
     </div>
 
   </div>
-</section>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      FILL-IN-THE-BLANK
      ═══════════════════════════════════════════════════════════════════ -->
-<section id="fill-blank" data-progress-section>
-  <h2>Fill-in-the-Blank</h2>
-
-  <div class="fill-blank-container" data-answer="conditional independence" data-alt-answers="conditionally independent|independent given the class">
-    <div class="fill-blank-question">
-      <h4>1. The Naive Bayes classifier assumes that all features are <strong>______</strong> given the class label.</h4>
-      <input type="text" class="fill-blank-input" placeholder="Type the assumption...">
-      <button class="btn btn-sm btn-primary btn-check">Check</button>
-      <p class="fill-blank-feedback">Answer: <strong>conditional independence</strong> — P(X_1, X_2, ..., X_n|Y) = &#8719; P(X_i|Y). This is the "naive" assumption that simplifies computation.</p>
-    </div>
+<div id="section-fill" data-progress-section="s-fill">
+  <div class="section-header">
+    <span class="emoji">&#9997;</span>
+    <h2>Fill in the Blank</h2>
   </div>
 
-  <div class="fill-blank-container" data-answer="Laplace" data-alt-answers="laplace|additive smoothing|alpha=1">
-    <div class="fill-blank-question">
-      <h4>2. <strong>______</strong> smoothing adds &#945; = 1 to every count before computing likelihoods, preventing zero probabilities for unseen words.</h4>
-      <input type="text" class="fill-blank-input" placeholder="Type the smoothing method...">
-      <button class="btn btn-sm btn-primary btn-check">Check</button>
-      <p class="fill-blank-feedback">Answer: <strong>Laplace</strong> smoothing (also called additive smoothing). Formula: p(word|class) = (count + 1) / (total + V).</p>
-    </div>
+  <div class="fill-blank-container" data-answer="conditional independence" data-alt-answers="conditionally independent|independent given the class" data-fill-id="f1" data-progress-section="s-fill-f1">
+    <p>The Naive Bayes classifier assumes that all features are <strong>______</strong> given the class label.</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
   </div>
 
-  <div class="fill-blank-container" data-answer="log probabilities" data-alt-answers="log probabilities|logarithms|log-probabilities|log">
-    <div class="fill-blank-question">
-      <h4>3. In practice, Naive Bayes uses <strong>______</strong> instead of raw probabilities to prevent numerical underflow when multiplying many small values.</h4>
-      <input type="text" class="fill-blank-input" placeholder="Type the technique...">
-      <button class="btn btn-sm btn-primary btn-check">Check</button>
-      <p class="fill-blank-feedback">Answer: <strong>log probabilities</strong> — converting multiplication to addition: log(p1 &times; p2 &times; ...) = log(p1) + log(p2) + ....</p>
-    </div>
+  <div class="fill-blank-container" data-answer="Laplace" data-alt-answers="laplace|additive smoothing|alpha=1" data-fill-id="f2" data-progress-section="s-fill-f2">
+    <p><strong>______</strong> smoothing adds &#945; = 1 to every count before computing likelihoods, preventing zero probabilities for unseen words.</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
   </div>
 
-  <div class="fill-blank-container" data-answer="generative" data-alt-answers="generative model|joint">
-    <div class="fill-blank-question">
-      <h4>4. A model that learns P(X|Y) and P(Y) — the full data distribution — is called a <strong>______</strong> model, as opposed to a discriminative model that learns P(Y|X) directly.</h4>
-      <input type="text" class="fill-blank-input" placeholder="Type the model type...">
-      <button class="btn btn-sm btn-primary btn-check">Check</button>
-      <p class="fill-blank-feedback">Answer: <strong>generative</strong> — it learns how each class generates data (P(X|Y)) and can therefore generate new samples, detect anomalies, and compute P(Y|X) via Bayes' theorem.</p>
-    </div>
+  <div class="fill-blank-container" data-answer="log probabilities" data-alt-answers="log probabilities|logarithms|log-probabilities|log" data-fill-id="f3" data-progress-section="s-fill-f3">
+    <p>In practice, Naive Bayes uses <strong>______</strong> instead of raw probabilities to prevent numerical underflow when multiplying many small values.</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
   </div>
 
-  <div class="fill-blank-container" data-answer="posterior" data-alt-answers="posterior probability|updated belief">
-    <div class="fill-blank-question">
-      <h4>5. In Bayes' theorem, P(A|B) is called the <strong>______</strong> — it represents the updated belief about A after observing evidence B.</h4>
-      <input type="text" class="fill-blank-input" placeholder="Type the term...">
-      <button class="btn btn-sm btn-primary btn-check">Check</button>
-      <p class="fill-blank-feedback">Answer: <strong>posterior</strong> (or posterior probability). Posterior = (Likelihood &times; Prior) / Evidence.</p>
-    </div>
+  <div class="fill-blank-container" data-answer="generative" data-alt-answers="generative model|joint" data-fill-id="f4" data-progress-section="s-fill-f4">
+    <p>A model that learns P(X|Y) and P(Y) — the full data distribution — is called a <strong>______</strong> model, as opposed to a discriminative model that learns P(Y|X) directly.</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
   </div>
 
-  <div class="fill-blank-container" data-answer="P(B|A)" data-alt-answers="pb|a|p(b given a)|likelihood">
-    <div class="fill-blank-question">
-      <h4>6. In Bayes' theorem P(A|B) = P(B|A) &times; P(A) / P(B), the term <strong>______</strong> is called the "likelihood."</h4>
-      <input type="text" class="fill-blank-input" placeholder="Type the formula term...">
-      <button class="btn btn-sm btn-primary btn-check">Check</button>
-      <p class="fill-blank-feedback">Answer: <strong>P(B|A)</strong> — the probability of observing evidence B if hypothesis A is true. In Naive Bayes, this corresponds to P(word|class).</p>
-    </div>
+  <div class="fill-blank-container" data-answer="posterior" data-alt-answers="posterior probability|updated belief" data-fill-id="f5" data-progress-section="s-fill-f5">
+    <p>In Bayes' theorem, P(A|B) is called the <strong>______</strong> — it represents the updated belief about A after observing evidence B.</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
   </div>
 
-</section>
+  <div class="fill-blank-container" data-answer="P(B|A)" data-alt-answers="pb|a|p(b given a)|likelihood" data-fill-id="f6" data-progress-section="s-fill-f6">
+    <p>In Bayes' theorem P(A|B) = P(B|A) &times; P(A) / P(B), the term <strong>______</strong> is called the "likelihood."</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
+  </div>
+
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      SCENARIO QUESTION
      ═══════════════════════════════════════════════════════════════════ -->
-<section id="scenario" data-progress-section>
+<div id="section-scenario" data-progress-section="s-scenario">
   <h2>Scenario Question</h2>
 
   <div class="scenario-box" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 24px; margin: 20px 0;">

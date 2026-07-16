@@ -9,46 +9,74 @@
 <body>
 
 <!-- ═══════════════════════════ TOP NAV ═══════════════════════════ -->
-<nav class="top-nav">
-  <a href="index.html" class="nav-home">Lecture Notes</a>
-  <span class="nav-separator">|</span>
-  <span class="nav-current">Topic 5 – Model Validation &amp; Generalisation</span>
-  <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span class="icon">&#9728;</span> Toggle Theme</button>
-</nav>
-
-<!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
-<aside class="sidebar" id="sidebar">
-  <div class="sidebar-header">
-    <h2>Topic 5</h2>
-    <p class="sidebar-subtitle">Model Validation &amp; Generalisation</p>
+<div class="top-nav">
+  <a href="index.html" class="logo">&#8592; TTTC2453 ML Hub</a>
+  <div class="nav-links">
+    <a href="index.html">All Topics</a>
   </div>
+</div>
 
-  <div class="progress-container">
-    <div class="progress-bar" id="progress-bar"></div>
-    <span class="progress-text" id="progress-text">0% complete</span>
+<!-- Theme Toggle -->
+<button class="theme-toggle" id="themeToggle">
+  <span class="icon">&#9728;</span>
+  <span class="label-text">Toggle Theme</span>
+</button>
+
+  <!-- Mobile Sidebar Toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-title">Sections</div>
+    <a class="nav-item active" data-section="generalisation-problem" href="#generalisation-problem">
+      <span class="nav-emoji">&#127919;</span> The Generalisation Problem
+    </a>
+    <a class="nav-item" data-section="three-way-split" href="#three-way-split">
+      <span class="nav-emoji">&#9997;</span> The Three-Way Split
+    </a>
+    <a class="nav-item" data-section="bias-variance" href="#bias-variance">
+      <span class="nav-emoji">&#9878;</span> Bias-Variance Trade-Off
+    </a>
+    <a class="nav-item" data-section="k-fold-cv" href="#k-fold-cv">
+      <span class="nav-emoji">&#128260;</span> K-Fold Cross-Validation
+    </a>
+    <a class="nav-item" data-section="cv-strategies" href="#cv-strategies">
+      <span class="nav-emoji">&#128209;</span> CV Strategies
+    </a>
+    <a class="nav-item" data-section="hyperparameter-optimisation" href="#hyperparameter-optimisation">
+      <span class="nav-emoji">&#128295;</span> Hyperparameter Tuning
+    </a>
+    <a class="nav-item" data-section="erm-reanchor" href="#erm-reanchor">
+      <span class="nav-emoji">&#128218;</span> ERM Re-Anchor
+    </a>
+    <a class="nav-item" data-section="regularisation" href="#regularisation">
+      <span class="nav-emoji">&#128737;</span> Regularisation
+    </a>
+    <a class="nav-item" data-section="preventing-overfitting" href="#preventing-overfitting">
+      <span class="nav-emoji">&#128737;</span> Preventing Overfitting
+    </a>
+    <a class="nav-item" data-section="feature-engineering" href="#feature-engineering">
+      <span class="nav-emoji">&#128200;</span> Feature Engineering
+    </a>
+    <a class="nav-item" data-section="common-misconceptions" href="#common-misconceptions">
+      <span class="nav-emoji">&#128680;</span> Common Misconceptions
+    </a>
+    <a class="nav-item" data-section="flashcards" href="#flashcards">
+      <span class="nav-emoji">&#128179;</span> Flashcards
+    </a>
+    <a class="nav-item" data-section="quiz" href="#quiz">
+      <span class="nav-emoji">&#128221;</span> Quiz
+    </a>
+    <a class="nav-item" data-section="fill-blank" href="#fill-blank">
+      <span class="nav-emoji">&#9997;</span> Fill-in-the-Blank
+    </a>
+    <div class="sidebar-progress">
+      <div class="progress-label">Topic Progress</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-pct" style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">0%</div>
+    </div>
   </div>
-
-  <nav class="section-nav" id="section-nav">
-    <ul>
-      <li><a href="#generalisation-problem">The Generalisation Problem</a></li>
-      <li><a href="#three-way-split">The Three-Way Split</a></li>
-      <li><a href="#bias-variance">Bias-Variance Trade-Off</a></li>
-      <li><a href="#k-fold-cv">K-Fold Cross-Validation</a></li>
-      <li><a href="#cv-strategies">CV Strategies Table</a></li>
-      <li><a href="#hyperparameter-optimisation">Hyperparameter Optimisation</a></li>
-      <li><a href="#erm-reanchor">ERM Re-Anchor</a></li>
-      <li><a href="#regularisation">Regularisation</a></li>
-      <li><a href="#preventing-overfitting">Preventing Overfitting</a></li>
-      <li><a href="#feature-engineering">Feature Engineering</a></li>
-      <li><a href="#common-misconceptions">Common Misconceptions</a></li>
-      <li><a href="#flashcards">Flashcards</a></li>
-      <li><a href="#quiz">Quiz</a></li>
-      <li><a href="#fill-blank">Fill-in-the-Blank</a></li>
-      <li><a href="#scenario">Scenario Question</a></li>
-      <li><a href="#recap">Final Recap</a></li>
-    </ul>
-  </nav>
-</aside>
 
 <!-- ═══════════════════════════ MAIN CONTENT ═══════════════════════════ -->
 <main class="main-content" id="main-content">
@@ -1123,152 +1151,178 @@
 <!-- ═══════════════════════════════════════════════════════════════════
      FLASHCARDS
      ═══════════════════════════════════════════════════════════════════ -->
-<section id="flashcards" data-progress-section>
-  <h2>Flashcards</h2>
+<div id="section-flashcards" class="flashcard-container" data-progress-section="s-flashcards">
+  <div class="section-header">
+    <span class="emoji">&#128179;</span>
+    <h2>Flashcards</h2>
+  </div>
 
-  <div class="flashcard-container">
-
-    <div class="flashcard-controls">
-      <button class="btn btn-sm btn-secondary flash-prev">&#9664; Prev</button>
-      <button class="btn btn-sm btn-primary flash-next">Next &#9654;</button>
-      <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
-      <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
-      <span class="flashcard-counter"></span>
-    </div>
+  <div class="flashcard-controls">
+    <button class="btn btn-sm btn-secondary flash-prev">&#9664; Prev</button>
+    <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
+    <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
+    <button class="btn btn-sm btn-primary flash-next">Next &#9654;</button>
+  </div>
+  <div class="flashcard-counter"></div>
 
     <!-- Card 1 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is the decomposition of expected test error?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>E[Error] = Bias² + Variance + Irreducible Noise (σ²)</strong></p>
-        <p>Bias² captures systematic error from model simplification. Variance captures sensitivity to training data fluctuations. Noise is inherent randomness that no model can eliminate.</p>
+    <div class="flashcard" data-progress-section="s-flash-1">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is the decomposition of expected test error?</div>
+        <div class="flashcard-back">
+          <p><strong>E[Error] = Bias² + Variance + Irreducible Noise (σ²)</strong></p>
+          <p>Bias² captures systematic error from model simplification. Variance captures sensitivity to training data fluctuations. Noise is inherent randomness that no model can eliminate.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 2 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is the key difference between the validation set and the test set?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>The validation set is used for model selection and hyperparameter tuning.</strong> The test set is held out until the very end and is used only once for the final, unbiased performance estimate. Using the test set for decisions invalidates its role as an honest measure of generalisation.</p>
+    <div class="flashcard" data-progress-section="s-flash-2">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is the key difference between the validation set and the test set?</div>
+        <div class="flashcard-back">
+          <p><strong>The validation set is used for model selection and hyperparameter tuning.</strong> The test set is held out until the very end and is used only once for the final, unbiased performance estimate. Using the test set for decisions invalidates its role as an honest measure of generalisation.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 3 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>Why is Leave-One-Out (LOO) cross-validation sometimes problematic?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>High computational cost (N model fits) and high variance in the estimate.</strong> Each training set differs by only one sample, so the K estimates are highly correlated. The overlap between training sets means the variance of the average can actually be higher than K-Fold CV with K=5 or K=10.</p>
+    <div class="flashcard" data-progress-section="s-flash-3">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Why is Leave-One-Out (LOO) cross-validation sometimes problematic?</div>
+        <div class="flashcard-back">
+          <p><strong>High computational cost (N model fits) and high variance in the estimate.</strong> Each training set differs by only one sample, so the K estimates are highly correlated. The overlap between training sets means the variance of the average can actually be higher than K-Fold CV with K=5 or K=10.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 4 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is the difference between L1 and L2 regularisation?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>L2 (Ridge) shrinks all weights toward zero</strong> but never makes them exactly zero. <strong>L1 (Lasso) can set weights to exactly zero</strong>, performing automatic feature selection. L2 is preferred when all features are relevant; L1 when many features may be irrelevant.</p>
+    <div class="flashcard" data-progress-section="s-flash-4">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is the difference between L1 and L2 regularisation?</div>
+        <div class="flashcard-back">
+          <p><strong>L2 (Ridge) shrinks all weights toward zero</strong> but never makes them exactly zero. <strong>L1 (Lasso) can set weights to exactly zero</strong>, performing automatic feature selection. L2 is preferred when all features are relevant; L1 when many features may be irrelevant.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 5 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is data leakage and why is it dangerous?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>Data leakage occurs when information from outside the training set influences the model.</strong> It produces overly optimistic performance estimates that fail in production. Common causes: feature selection before CV, scaling before split, target leakage, temporal leakage.</p>
+    <div class="flashcard" data-progress-section="s-flash-5">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is data leakage and why is it dangerous?</div>
+        <div class="flashcard-back">
+          <p><strong>Data leakage occurs when information from outside the training set influences the model.</strong> It produces overly optimistic performance estimates that fail in production. Common causes: feature selection before CV, scaling before split, target leakage, temporal leakage.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 6 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is the purpose of nested cross-validation?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>The outer loop provides an unbiased estimate of generalisation performance.</strong> The inner loop performs hyperparameter selection. Without nesting, the hyperparameter tuning process itself overfits to the validation data, producing an optimistically biased performance estimate.</p>
+    <div class="flashcard" data-progress-section="s-flash-6">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is the purpose of nested cross-validation?</div>
+        <div class="flashcard-back">
+          <p><strong>The outer loop provides an unbiased estimate of generalisation performance.</strong> The inner loop performs hyperparameter selection. Without nesting, the hyperparameter tuning process itself overfits to the validation data, producing an optimistically biased performance estimate.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 7 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What are the five main strategies for preventing overfitting?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>1. Regularisation</strong> (L1/L2 penalty). <strong>2. More training data.</strong> <strong>3. Simpler model</strong> (fewer features, reduced complexity). <strong>4. Dropout</strong> (randomly zero neurons during training). <strong>5. Early stopping</strong> (halt training when validation loss stops improving).</p>
+    <div class="flashcard" data-progress-section="s-flash-7">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What are the five main strategies for preventing overfitting?</div>
+        <div class="flashcard-back">
+          <p><strong>1. Regularisation</strong> (L1/L2 penalty). <strong>2. More training data.</strong> <strong>3. Simpler model</strong> (fewer features, reduced complexity). <strong>4. Dropout</strong> (randomly zero neurons during training). <strong>5. Early stopping</strong> (halt training when validation loss stops improving).</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 8 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>Why must feature selection happen inside the CV loop?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>To prevent data leakage.</strong> If features are selected using the full dataset (including validation folds), the selected features may be optimised for the validation data, producing an overly optimistic CV score. Each fold's feature selection must use only that fold's training data.</p>
+    <div class="flashcard" data-progress-section="s-flash-8">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Why must feature selection happen inside the CV loop?</div>
+        <div class="flashcard-back">
+          <p><strong>To prevent data leakage.</strong> If features are selected using the full dataset (including validation folds), the selected features may be optimised for the validation data, producing an overly optimistic CV score. Each fold's feature selection must use only that fold's training data.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 9 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What is an overfit model's characteristic error pattern?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>Training error → near zero; test error → very high.</strong> The gap between training and test error is large. The model has memorised noise and specific patterns of the training data rather than learning the general signal.</p>
+    <div class="flashcard" data-progress-section="s-flash-9">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What is an overfit model's characteristic error pattern?</div>
+        <div class="flashcard-back">
+          <p><strong>Training error → near zero; test error → very high.</strong> The gap between training and test error is large. The model has memorised noise and specific patterns of the training data rather than learning the general signal.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 10 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>Which CV strategy should you use for time-series data and why?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>Time-Series Split.</strong> Standard K-Fold randomly assigns samples to folds, which can put future data in the training set and past data in the validation set — causing temporal leakage. Time-Series Split ensures the training set always precedes the validation set chronologically.</p>
+    <div class="flashcard" data-progress-section="s-flash-10">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Which CV strategy should you use for time-series data and why?</div>
+        <div class="flashcard-back">
+          <p><strong>Time-Series Split.</strong> Standard K-Fold randomly assigns samples to folds, which can put future data in the training set and past data in the validation set — causing temporal leakage. Time-Series Split ensures the training set always precedes the validation set chronologically.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 11 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>What happens to model performance as λ (regularisation strength) increases?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>Bias increases, variance decreases.</strong> At λ=0: no regularisation (potential overfit). At optimal λ: balanced bias-variance. As λ→∞: all weights → 0, model predicts the mean always (severe underfit). The optimal λ is found via cross-validation.</p>
+    <div class="flashcard" data-progress-section="s-flash-11">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">What happens to model performance as λ (regularisation strength) increases?</div>
+        <div class="flashcard-back">
+          <p><strong>Bias increases, variance decreases.</strong> At λ=0: no regularisation (potential overfit). At optimal λ: balanced bias-variance. As λ→∞: all weights → 0, model predicts the mean always (severe underfit). The optimal λ is found via cross-validation.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
     <!-- Card 12 -->
-    <div class="flashcard" onclick="this.classList.toggle('flipped')">
-      <div class="flashcard-front">
-        <p>Does feature scaling help tree-based models like Random Forest?</p>
-      </div>
-      <div class="flashcard-back">
-        <p><strong>No.</strong> Tree-based models make splits based on individual feature thresholds, not distances or gradients. Scaling does not change the relative ordering of threshold-based splits. Scaling is useful for distance-based (KNN, SVM) and gradient-based (neural networks, logistic regression) methods.</p>
+    <div class="flashcard" data-progress-section="s-flash-12">
+      <div class="flashcard-inner">
+        <div class="flashcard-front">Does feature scaling help tree-based models like Random Forest?</div>
+        <div class="flashcard-back">
+          <p><strong>No.</strong> Tree-based models make splits based on individual feature thresholds, not distances or gradients. Scaling does not change the relative ordering of threshold-based splits. Scaling is useful for distance-based (KNN, SVM) and gradient-based (neural networks, logistic regression) methods.</p>
+          <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+          <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+        </div>
       </div>
     </div>
 
   </div>
-</section>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      QUIZ
      ═══════════════════════════════════════════════════════════════════ -->
-<section id="quiz" data-progress-section>
-  <h2>Quiz</h2>
+<div id="section-quiz" data-progress-section="s-quiz">
+  <div class="section-header">
+    <span class="emoji">&#128220;</span>
+    <h2>Knowledge Check Quiz</h2>
+  </div>
 
-  <div class="quiz-container">
-
-    <!-- Q1 -->
+  <div class="quiz-container" data-quiz-id="q1" data-progress-section="s-quiz-q1">
     <div class="quiz-question">
       <div class="q-num">Question 1</div>
       <div class="q-text">A model achieves 0.3% training error and 34% test error. What is the most likely diagnosis?</div>
@@ -1276,8 +1330,7 @@
       <div class="quiz-option" data-correct="true">Overfitting — the model has memorised the training data</div>
       <div class="quiz-option" data-correct="false">Irreducible noise — the data is too noisy</div>
       <div class="quiz-option" data-correct="false">The model is well-calibrated</div>
-      <div class="quiz-feedback correct">Correct! A near-zero training error with a large test error is the classic signature of overfitting. The model has memorised the training data (including noise) rather than learning the general pattern.</div>
-      <div class="quiz-feedback incorrect">Incorrect. Near-zero training error with high test error is the hallmark of overfitting, not underfitting. Underfitting would show high errors on both training and test.</div>
+      <div class="quiz-feedback">A near-zero training error with a large test error is the classic signature of overfitting. The model has memorised the training data (including noise) rather than learning the general pattern. Underfitting would show high errors on both training and test.</div>
     </div>
 
     <!-- Q2 -->
@@ -1288,8 +1341,7 @@
       <div class="quiz-option" data-correct="false">The variance of the model across different training sets</div>
       <div class="quiz-option" data-correct="true">Irreducible noise — inherent randomness in the data that no model can eliminate</div>
       <div class="quiz-option" data-correct="false">The generalisation gap between training and test error</div>
-      <div class="quiz-feedback correct">Correct! σ² (irreducible noise) represents the inherent randomness in the data-generating process — measurement error, missing variables, and stochastic effects. Even a perfect model with infinite data would still have this error.</div>
-      <div class="quiz-feedback incorrect">Incorrect. σ² is the irreducible noise term — the inherent randomness in the data that no model can eliminate. It sets the theoretical floor for model performance.</div>
+      <div class="quiz-feedback">σ² (irreducible noise) represents the inherent randomness in the data-generating process — measurement error, missing variables, and stochastic effects. Even a perfect model with infinite data would still have this error.</div>
     </div>
 
     <!-- Q3 -->
@@ -1300,8 +1352,7 @@
       <div class="quiz-option" data-correct="true">5 times</div>
       <div class="quiz-option" data-correct="false">25 times</div>
       <div class="quiz-option" data-correct="false">4 times</div>
-      <div class="quiz-feedback correct">Correct! In K-Fold CV, the model is trained K times — once for each fold, where that fold serves as the validation set while the remaining K-1 folds form the training set.</div>
-      <div class="quiz-feedback incorrect">Incorrect. K-Fold CV trains the model K times — once for each iteration where a different fold is held out for validation. In 5-Fold CV, that means 5 training runs.</div>
+      <div class="quiz-feedback">In K-Fold CV, the model is trained K times — once for each fold, where that fold serves as the validation set while the remaining K-1 folds form the training set.</div>
     </div>
 
     <!-- Q4 -->
@@ -1312,8 +1363,7 @@
       <div class="quiz-option" data-correct="true">L1 (Lasso)</div>
       <div class="quiz-option" data-correct="false">Dropout</div>
       <div class="quiz-option" data-correct="false">Early Stopping</div>
-      <div class="quiz-feedback correct">Correct! L1 (Lasso) regularisation uses the absolute value of weights as the penalty term. The geometry of the L1 constraint (a diamond) has corners on the axes, which means the optimal solution often lands exactly on an axis — setting that weight to zero. L2 (Ridge) uses squared weights and only shrinks toward zero, never reaching it exactly.</div>
-      <div class="quiz-feedback incorrect">Incorrect. L1 (Lasso) regularisation is the method that can set weights to exactly zero. Its penalty λΣ|wᵢ| has a geometric property (diamond-shaped constraint region with corners on axes) that promotes sparsity.</div>
+      <div class="quiz-feedback">L1 (Lasso) regularisation uses the absolute value of weights as the penalty term. The geometry of the L1 constraint (a diamond) has corners on the axes, which means the optimal solution often lands exactly on an axis — setting that weight to zero. L2 (Ridge) uses squared weights and only shrinks toward zero, never reaching it exactly.</div>
     </div>
 
     <!-- Q5 -->
@@ -1324,8 +1374,7 @@
       <div class="quiz-option" data-correct="false">Because the inner CV score is always pessimistically biased</div>
       <div class="quiz-option" data-correct="true">Because the inner CV score is optimistically biased — hyperparameters were selected to minimise it</div>
       <div class="quiz-option" data-correct="false">Because inner CV and outer CV use different metrics</div>
-      <div class="quiz-feedback correct">Correct! The inner CV score is used to select hyperparameters. Since the hyperparameters were chosen to minimise the inner CV score, this score is an optimistically biased estimate of generalisation. The outer CV score provides the honest, unbiased estimate.</div>
-      <div class="quiz-feedback incorrect">Incorrect. The inner CV score is optimistically biased because the hyperparameters were specifically chosen to minimise it. It's like a student who practises with the answer key — the practice score will be higher than the real exam score.</div>
+      <div class="quiz-feedback">The inner CV score is used to select hyperparameters. Since the hyperparameters were chosen to minimise the inner CV score, this score is an optimistically biased estimate of generalisation. The outer CV score provides the honest, unbiased estimate.</div>
     </div>
 
     <!-- Q6 -->
@@ -1336,8 +1385,7 @@
       <div class="quiz-option" data-correct="false">Support Vector Machine (SVM)</div>
       <div class="quiz-option" data-correct="true">Random Forest</div>
       <div class="quiz-option" data-correct="false">Logistic Regression with gradient descent</div>
-      <div class="quiz-feedback correct">Correct! Random Forest (and other tree-based methods) make splits based on individual feature thresholds. The relative ordering of values is what matters, not their absolute scale. Scaling does not change the ordering, so it has no effect on tree-based models.</div>
-      <div class="quiz-feedback incorrect">Incorrect. Random Forest does not require feature scaling because it uses threshold-based splits on individual features. The ordering of values is invariant to linear scaling.</div>
+      <div class="quiz-feedback">Random Forest (and other tree-based methods) make splits based on individual feature thresholds. The relative ordering of values is what matters, not their absolute scale. Scaling does not change the ordering, so it has no effect on tree-based models.</div>
     </div>
 
     <!-- Q7 -->
@@ -1348,79 +1396,69 @@
       <div class="quiz-option" data-correct="false">Run CV again with different random seeds</div>
       <div class="quiz-option" data-correct="true">Retrain the model with the selected hyperparameters on ALL training data</div>
       <div class="quiz-option" data-correct="false">Report the CV score as the final performance</div>
-      <div class="quiz-feedback correct">Correct! The CV models are only for evaluation — they are discarded. The final model should be retrained on all available training data (the full train+validation set) with the hyperparameters that achieved the best CV score. This maximises the data available for learning before the one-time test evaluation.</div>
-      <div class="quiz-feedback incorrect">Incorrect. CV models exist only for evaluation and are discarded. After selecting hyperparameters, retrain on ALL training data to maximise learning, then evaluate once on the held-out test set.</div>
+      <div class="quiz-feedback">The CV models are only for evaluation — they are discarded. The final model should be retrained on all available training data (the full train+validation set) with the hyperparameters that achieved the best CV score. This maximises the data available for learning before the one-time test evaluation.</div>
     </div>
 
   </div>
-</section>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      FILL-IN-THE-BLANK
      ═══════════════════════════════════════════════════════════════════ -->
-<section id="fill-blank" data-progress-section>
-  <h2>Fill-in-the-Blank</h2>
-
-  <div class="fill-blank-container" data-answer="Bias² + Variance + Irreducible Noise" data-alt-answers="bias squared + variance + irreducible noise|bias^2 + variance + noise">
-    <div class="fill-blank-question">
-      <h4>1. The expected test error decomposes as: E[Error] = <strong>______</strong> + σ²</h4>
-      <input type="text" class="fill-blank-input" placeholder="Type the two missing terms...">
-      <button class="btn btn-sm btn-primary btn-check">Check</button>
-      <p class="fill-blank-feedback">Answer: <strong>Bias² + Variance</strong> — the two controllable sources of error. σ² is the irreducible noise.</p>
-    </div>
+<div id="section-fill" data-progress-section="s-fill">
+  <div class="section-header">
+    <span class="emoji">&#9997;</span>
+    <h2>Fill in the Blank</h2>
   </div>
 
-  <div class="fill-blank-container" data-answer="test set" data-alt-answers="testing set|held-out set">
-    <div class="fill-blank-question">
-      <h4>2. The <strong>______</strong> is NEVER used during training or hyperparameter tuning — it is reserved for the final, unbiased evaluation.</h4>
-      <input type="text" class="fill-blank-input" placeholder="Type the answer...">
-      <button class="btn btn-sm btn-primary btn-check">Check</button>
-      <p class="fill-blank-feedback">Answer: <strong>test set</strong> — it must remain untouched until the very end to provide an honest measure of generalisation.</p>
-    </div>
+  <div class="fill-blank-container" data-answer="Bias² + Variance + Irreducible Noise" data-alt-answers="bias squared + variance + irreducible noise|bias^2 + variance + noise" data-fill-id="f1" data-progress-section="s-fill-f1">
+    <p>The expected test error decomposes as: E[Error] = <strong>______</strong> + σ²</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
   </div>
 
-  <div class="fill-blank-container" data-answer="Pipeline" data-alt-answers="pipeline|sklearn pipeline">
-    <div class="fill-blank-question">
-      <h4>3. In sklearn, the <strong>______</strong> class ensures that feature selection and scaling happen inside the CV loop, preventing data leakage.</h4>
-      <input type="text" class="fill-blank-input" placeholder="Type the class name...">
-      <button class="btn btn-sm btn-primary btn-check">Check</button>
-      <p class="fill-blank-feedback">Answer: <strong>Pipeline</strong> — sklearn's Pipeline chains preprocessing and model steps so that fit/transform are correctly applied within each CV fold.</p>
-    </div>
+  <div class="fill-blank-container" data-answer="test set" data-alt-answers="testing set|held-out set" data-fill-id="f2" data-progress-section="s-fill-f2">
+    <p>The <strong>______</strong> is NEVER used during training or hyperparameter tuning — it is reserved for the final, unbiased evaluation.</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
   </div>
 
-  <div class="fill-blank-container" data-answer="exactly zero" data-alt-answers="zero|0">
-    <div class="fill-blank-question">
-      <h4>4. Unlike L2 (Ridge), L1 (Lasso) regularisation can shrink feature weights to <strong>______</strong>, performing automatic feature selection.</h4>
-      <input type="text" class="fill-blank-input" placeholder="Type the answer...">
-      <button class="btn btn-sm btn-primary btn-check">Check</button>
-      <p class="fill-blank-feedback">Answer: <strong>exactly zero</strong> — the diamond-shaped L1 constraint region has corners on the axes, which causes the optimiser to set some weights to precisely zero.</p>
-    </div>
+  <div class="fill-blank-container" data-answer="Pipeline" data-alt-answers="pipeline|sklearn pipeline" data-fill-id="f3" data-progress-section="s-fill-f3">
+    <p>In sklearn, the <strong>______</strong> class ensures that feature selection and scaling happen inside the CV loop, preventing data leakage.</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
   </div>
 
-  <div class="fill-blank-container" data-answer="Time-Series Split" data-alt-answers="time series split|time-series-split|temporal split">
-    <div class="fill-blank-question">
-      <h4>5. For sequential data where observations are ordered in time, you should use <strong>______</strong> instead of standard K-Fold CV.</h4>
-      <input type="text" class="fill-blank-input" placeholder="Type the CV strategy...">
-      <button class="btn btn-sm btn-primary btn-check">Check</button>
-      <p class="fill-blank-feedback">Answer: <strong>Time-Series Split</strong> — it ensures the training set always precedes the validation set chronologically, preventing future information leakage.</p>
-    </div>
+  <div class="fill-blank-container" data-answer="exactly zero" data-alt-answers="zero|0" data-fill-id="f4" data-progress-section="s-fill-f4">
+    <p>Unlike L2 (Ridge), L1 (Lasso) regularisation can shrink feature weights to <strong>______</strong>, performing automatic feature selection.</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
   </div>
 
-  <div class="fill-blank-container" data-answer="λ" data-alt-answers="lambda|alpha">
-    <div class="fill-blank-question">
-      <h4>6. The hyperparameter <strong>______</strong> controls the strength of regularisation — higher values increase bias but decrease variance.</h4>
-      <input type="text" class="fill-blank-input" placeholder="Type the symbol or name...">
-      <button class="btn btn-sm btn-primary btn-check">Check</button>
-      <p class="fill-blank-feedback">Answer: <strong>λ (lambda)</strong> — the regularisation strength hyperparameter that controls the bias-variance trade-off.</p>
-    </div>
+  <div class="fill-blank-container" data-answer="Time-Series Split" data-alt-answers="time series split|time-series-split|temporal split" data-fill-id="f5" data-progress-section="s-fill-f5">
+    <p>For sequential data where observations are ordered in time, you should use <strong>______</strong> instead of standard K-Fold CV.</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
   </div>
 
-</section>
+  <div class="fill-blank-container" data-answer="λ" data-alt-answers="lambda|alpha" data-fill-id="f6" data-progress-section="s-fill-f6">
+    <p>The hyperparameter <strong>______</strong> controls the strength of regularisation — higher values increase bias but decrease variance.</p>
+    <input type="text" class="fill-blank-input" placeholder="Type your answer">
+    <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+    <div class="fill-blank-feedback"></div>
+  </div>
+
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      SCENARIO QUESTION
      ═══════════════════════════════════════════════════════════════════ -->
-<section id="scenario" data-progress-section>
+<div id="section-scenario" data-progress-section="s-scenario">
   <h2>Scenario Question</h2>
 
   <div class="scenario-box" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 24px; margin: 20px 0;">
