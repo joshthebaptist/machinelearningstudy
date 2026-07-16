@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TTTC2453 Machine Learning - Study Hub</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <button class="theme-toggle" id="themeToggle">
+    <span class="icon">&#9728;</span>
+    <span class="label-text">Toggle Theme</span>
+  </button>
+
+  <div class="hero">
+    <h1>TTTC2453 Machine Learning</h1>
+    <p class="subtitle">Your complete exam-preparation study tool. Work through each topic, test yourself with flashcards and quizzes, and track your progress.</p>
+    <div class="overall-progress mt-2">
+      <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+        <span style="font-size:0.82rem; color:var(--text-muted);">Overall Progress</span>
+        <span class="overall-pct" style="font-size:0.82rem; color:var(--text-muted);">0%</span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" style="width:0%"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="topic-grid" id="topicGrid">
+
+    <!-- Topic 1 -->
+    <a class="topic-card" href="topic1.html" data-topic-id="topic1">
+      <div class="card-num">Topic 01</div>
+      <div class="card-title">Introduction to Machine Learning</div>
+      <div class="card-desc">The paradigm shift from traditional programming to ML, the AI/ML/DL hierarchy, perceptrons, activation functions, and the weight update loop.</div>
+      <div class="card-progress">
+        <div class="progress-bar-container"><div class="progress-bar-fill" style="width:0%"></div></div>
+        <span class="pct">0%</span>
+      </div>
+      <div class="completion-badge" style="display:none">&#10003;</div>
+      <span data-progress-section="s1"></span><span data-progress-section="s2"></span><span data-progress-section="s3"></span>
+    </a>
+
+    <!-- Topic 2 -->
+    <a class="topic-card" href="topic2.html" data-topic-id="topic2">
+      <div class="card-num">Topic 02</div>
+      <div class="card-title">Linear Regression</div>
+      <div class="card-desc">Objective functions, MSE cost, gradient descent, learning rate, evaluation metrics (MAE, RMSE, R&#178;), and LINE assumptions.</div>
+      <div class="card-progress">
+        <div class="progress-bar-container"><div class="progress-bar-fill" style="width:0%"></div></div>
+        <span class="pct">0%</span>
+      </div>
+      <div class="completion-badge" style="display:none">&#10003;</div>
+      <span data-progress-section="s1"></span><span data-progress-section="s2"></span><span data-progress-section="s3"></span>
+    </a>
+
+    <!-- Topic 3 -->
+    <a class="topic-card" href="topic3.html" data-topic-id="topic3">
+      <div class="card-num">Topic 03</div>
+      <div class="card-title">Probabilistic Classification</div>
+      <div class="card-desc">Logistic regression, sigmoid activation, binary cross-entropy loss, log-odds interpretation, L1/L2 regularisation, and multi-class extension.</div>
+      <div class="card-progress">
+        <div class="progress-bar-container"><div class="progress-bar-fill" style="width:0%"></div></div>
+        <span class="pct">0%</span>
+      </div>
+      <div class="completion-badge" style="display:none">&#10003;</div>
+      <span data-progress-section="s1"></span><span data-progress-section="s2"></span><span data-progress-section="s3"></span>
+    </a>
+
+    <!-- Topic 4 -->
+    <a class="topic-card" href="topic4.html" data-topic-id="topic4">
+      <div class="card-num">Topic 04</div>
+      <div class="card-title">Decision Trees &amp; Random Forests</div>
+      <div class="card-desc">Non-linear decision boundaries, Gini impurity, entropy, information gain, pruning, bagging, bootstrap sampling, and feature randomisation.</div>
+      <div class="card-progress">
+        <div class="progress-bar-container"><div class="progress-bar-fill" style="width:0%"></div></div>
+        <span class="pct">0%</span>
+      </div>
+      <div class="completion-badge" style="display:none">&#10003;</div>
+      <span data-progress-section="s1"></span><span data-progress-section="s2"></span><span data-progress-section="s3"></span>
+    </a>
+
+    <!-- Topic 5 -->
+    <a class="topic-card" href="topic5.html" data-topic-id="topic5">
+      <div class="card-num">Topic 05</div>
+      <div class="card-title">Model Validation &amp; Generalisation</div>
+      <div class="card-desc">Bias-variance trade-off, K-fold cross-validation, hyperparameter tuning (grid, random, Bayesian), nested CV, ERM, and data leakage.</div>
+      <div class="card-progress">
+        <div class="progress-bar-container"><div class="progress-bar-fill" style="width:0%"></div></div>
+        <span class="pct">0%</span>
+      </div>
+      <div class="completion-badge" style="display:none">&#10003;</div>
+      <span data-progress-section="s1"></span><span data-progress-section="s2"></span><span data-progress-section="s3"></span>
+    </a>
+
+    <!-- Topic 6 -->
+    <a class="topic-card" href="topic6.html" data-topic-id="topic6">
+      <div class="card-num">Topic 06</div>
+      <div class="card-title">Generative Models &amp; Bayesian Reasoning</div>
+      <div class="card-desc">Generative vs discriminative models, Bayes' theorem, conditional probability, Naive Bayes classifier, spam classification, and Laplace smoothing.</div>
+      <div class="card-progress">
+        <div class="progress-bar-container"><div class="progress-bar-fill" style="width:0%"></div></div>
+        <span class="pct">0%</span>
+      </div>
+      <div class="completion-badge" style="display:none">&#10003;</div>
+      <span data-progress-section="s1"></span><span data-progress-section="s2"></span><span data-progress-section="s3"></span>
+    </a>
+
+    <!-- Topic 7 -->
+    <a class="topic-card" href="topic7.html" data-topic-id="topic7">
+      <div class="card-num">Topic 07</div>
+      <div class="card-title">Neural Network Foundations</div>
+      <div class="card-desc">Multi-layer perceptron, forward pass, backpropagation, chain rule, weight updates, and the complete training loop.</div>
+      <div class="card-progress">
+        <div class="progress-bar-container"><div class="progress-bar-fill" style="width:0%"></div></div>
+        <span class="pct">0%</span>
+      </div>
+      <div class="completion-badge" style="display:none">&#10003;</div>
+      <span data-progress-section="s1"></span><span data-progress-section="s2"></span><span data-progress-section="s3"></span>
+    </a>
+
+    <!-- Topic 8 -->
+    <a class="topic-card" href="topic8.html" data-topic-id="topic8">
+      <div class="card-num">Topic 08</div>
+      <div class="card-title">Deep Neural Architectures</div>
+      <div class="card-desc">ReLU activation, vanishing gradients, softmax, categorical cross-entropy, dropout, batch normalisation, and regularisation strategies.</div>
+      <div class="card-progress">
+        <div class="progress-bar-container"><div class="progress-bar-fill" style="width:0%"></div></div>
+        <span class="pct">0%</span>
+      </div>
+      <div class="completion-badge" style="display:none">&#10003;</div>
+      <span data-progress-section="s1"></span><span data-progress-section="s2"></span><span data-progress-section="s3"></span>
+    </a>
+
+    <!-- Topic 9 -->
+    <a class="topic-card" href="topic9.html" data-topic-id="topic9">
+      <div class="card-num">Topic 09</div>
+      <div class="card-title">Convolutional Neural Networks</div>
+      <div class="card-desc">Filters, kernels, stride, padding, output-size formula, ReLU activation maps, max pooling, hierarchical feature learning, and weight sharing.</div>
+      <div class="card-progress">
+        <div class="progress-bar-container"><div class="progress-bar-fill" style="width:0%"></div></div>
+        <span class="pct">0%</span>
+      </div>
+      <div class="completion-badge" style="display:none">&#10003;</div>
+      <span data-progress-section="s1"></span><span data-progress-section="s2"></span><span data-progress-section="s3"></span>
+    </a>
+
+    <!-- Topic 10 -->
+    <a class="topic-card" href="topic10.html" data-topic-id="topic10">
+      <div class="card-num">Topic 10</div>
+      <div class="card-title">Sequential Data Modeling</div>
+      <div class="card-desc">RNN hidden states, vanishing gradients, LSTM gates (forget, input, output), cell state, GRU, and sequence task shapes.</div>
+      <div class="card-progress">
+        <div class="progress-bar-container"><div class="progress-bar-fill" style="width:0%"></div></div>
+        <span class="pct">0%</span>
+      </div>
+      <div class="completion-badge" style="display:none">&#10003;</div>
+      <span data-progress-section="s1"></span><span data-progress-section="s2"></span><span data-progress-section="s3"></span>
+    </a>
+
+    <!-- Topic 11 -->
+    <a class="topic-card" href="topic11.html" data-topic-id="topic11">
+      <div class="card-num">Topic 11</div>
+      <div class="card-title">Transfer Learning &amp; Pre-trained Models</div>
+      <div class="card-desc">Feature extraction vs fine-tuning, layer-wise LR decay, warmup schedules, LoRA, EWC, catastrophic forgetting, and the adaptation spectrum.</div>
+      <div class="card-progress">
+        <div class="progress-bar-container"><div class="progress-bar-fill" style="width:0%"></div></div>
+        <span class="pct">0%</span>
+      </div>
+      <div class="completion-badge" style="display:none">&#10003;</div>
+      <span data-progress-section="s1"></span><span data-progress-section="s2"></span><span data-progress-section="s3"></span>
+    </a>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

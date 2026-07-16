@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 2: Linear Regression - TTTC2453</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <a href="index.html" class="logo">&#8592; TTTC2453 ML Hub</a>
+    <div class="nav-links">
+      <a href="index.html">All Topics</a>
+      <a href="topic2.html">Topic 2</a>
+    </div>
+  </div>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle">
+    <span class="icon">&#9728;</span>
+    <span class="label-text">Toggle Theme</span>
+  </button>
+
+  <!-- Mobile Sidebar Toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-title">Sections</div>
+    <a class="nav-item active" data-section="section-why-lr" href="#section-why-lr">
+      <span class="nav-emoji">&#128200;</span> Why Linear Regression?
+    </a>
+    <a class="nav-item" data-section="section-bias-variance" href="#section-bias-variance">
+      <span class="nav-emoji">&#9878;</span> Bias-Variance Trade-Off
+    </a>
+    <a class="nav-item" data-section="section-hypothesis" href="#section-hypothesis">
+      <span class="nav-emoji">&#128221;</span> Hypothesis Function
+    </a>
+    <a class="nav-item" data-section="section-cost" href="#section-cost">
+      <span class="nav-emoji">&#128202;</span> Cost Function (MSE)
+    </a>
+    <a class="nav-item" data-section="section-gradient" href="#section-gradient">
+      <span class="nav-emoji">&#128260;</span> Gradient Descent
+    </a>
+    <a class="nav-item" data-section="section-normal" href="#section-normal">
+      <span class="nav-emoji">&#128218;</span> Normal Equation
+    </a>
+    <a class="nav-item" data-section="section-assumptions" href="#section-assumptions">
+      <span class="nav-emoji">&#9888;</span> LINE Assumptions
+    </a>
+    <a class="nav-item" data-section="section-metrics" href="#section-metrics">
+      <span class="nav-emoji">&#127942;</span> Evaluation Metrics
+    </a>
+    <a class="nav-item" data-section="section-mistakes" href="#section-mistakes">
+      <span class="nav-emoji">&#128680;</span> Common Mistakes
+    </a>
+    <a class="nav-item" data-section="section-flashcards" href="#section-flashcards">
+      <span class="nav-emoji">&#128179;</span> Flashcards
+    </a>
+    <a class="nav-item" data-section="section-quiz" href="#section-quiz">
+      <span class="nav-emoji">&#128220;</span> Quiz
+    </a>
+    <a class="nav-item" data-section="section-fill" href="#section-fill">
+      <span class="nav-emoji">&#9997;</span> Fill in the Blank
+    </a>
+    <a class="nav-item" data-section="section-scenario" href="#section-scenario">
+      <span class="nav-emoji">&#127919;</span> Scenario Challenge
+    </a>
+
+    <div class="sidebar-progress">
+      <div class="progress-label">Topic Progress</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-pct" style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">0%</div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h1>Topic 2: Linear Regression</h1>
+    <p style="color:var(--text-muted); font-size:0.92rem; margin-bottom:32px;">TTTC2453 &mdash; The most foundational algorithm in machine learning. Every concept you learn here echoes through every model you will ever build.</p>
+
+    <!-- ========================================================
+         SECTION 1: WHY LINEAR REGRESSION
+    ======================================================== -->
+    <div id="section-why-lr" class="content-section" data-progress-section="s-why-lr">
+      <div class="section-header">
+        <span class="emoji">&#128200;</span>
+        <h2>Why Linear Regression?</h2>
+      </div>
+
+      <p>You might wonder: <em>"Why start with a straight line? Real life is complicated."</em> The answer is that linear regression is the <strong>backbone of machine learning</strong>. It is the first model everyone learns, the first model everyone implements, and the first model that still gets used in production at many companies every single day.</p>
+
+      <p>Even when you move on to neural networks, decision trees, or transformers, the concepts from linear regression &mdash; cost functions, gradient descent, overfitting, evaluation metrics &mdash; show up everywhere. Learn this well, and everything else becomes easier.</p>
+
+      <h3>Real-World Applications</h3>
+      <p>Linear regression is not just an academic exercise. It powers real decisions in the real world:</p>
+
+      <table>
+        <tr>
+          <th>Industry</th>
+          <th>Use Case</th>
+          <th>What It Predicts</th>
+        </tr>
+        <tr>
+          <td><strong>Netflix / Streaming</strong></td>
+          <td>Rating prediction</td>
+          <td>Predicts how many stars you would give a movie based on your viewing history and similar users' ratings</td>
+        </tr>
+        <tr>
+          <td><strong>Healthcare</strong></td>
+          <td>Disease progression</td>
+          <td>Predicts blood sugar levels over time for diabetic patients based on dosage, diet, and exercise</td>
+        </tr>
+        <tr>
+          <td><strong>Credit Scoring</strong></td>
+          <td>Loan risk assessment</td>
+          <td>Predicts the probability of default based on income, debt ratio, credit history</td>
+        </tr>
+        <tr>
+          <td><strong>Real Estate</strong></td>
+          <td>House price estimation</td>
+          <td>Predicts property value based on square footage, location, number of bedrooms</td>
+        </tr>
+        <tr>
+          <td><strong>Energy Grids</strong></td>
+          <td>Load forecasting</td>
+          <td>Predicts electricity demand 24 hours ahead based on temperature, time of day, historical usage</td>
+        </tr>
+      </table>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: Learning to Walk Before Running</div>
+        <p>Think of linear regression as learning to walk. You would not try to run a marathon before you can walk to the kitchen. Linear regression is the walking &mdash; it is simple, stable, and teaches you balance (cost functions, optimization, evaluation). When you are ready to run (deep learning), you will already know the fundamentals.</p>
+        <p><strong>Mapping:</strong> Walking = linear regression (simple, foundational). Running a marathon = deep learning (complex, powerful). Balance = understanding cost functions and gradient descent. Walking to the kitchen = solving a real prediction problem.</p>
+      </div>
+
+      <div class="recap-box">
+        <div class="label">Plain-English Recap</div>
+        <p>Linear regression is the starting point of machine learning. It predicts continuous values by fitting a straight line through data. It is used in real companies (Netflix, banks, hospitals) and every concept it teaches &mdash; cost functions, gradient descent, overfiting, metrics &mdash; carries forward into every other algorithm you will ever study. Master it now and the rest of the course becomes easier.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 2: BIAS-VARIANCE TRADE-OFF
+    ======================================================== -->
+    <div id="section-bias-variance" class="content-section" data-progress-section="s-bias-variance">
+      <div class="section-header">
+        <span class="emoji">&#9878;</span>
+        <h2>The Challenge: Bias-Variance Trade-Off</h2>
+      </div>
+
+      <p>Before we dive into formulas, you need to understand the single most important problem in machine learning: <strong>how do we make sure our model works on data it has never seen before?</strong></p>
+
+      <p>The answer involves understanding two types of errors: <strong>bias</strong> and <strong>variance</strong>.</p>
+
+      <div class="definition-box">
+        <div class="label">Definition: Bias</div>
+        <p><strong>Bias</strong> is the error from wrong assumptions in the model. A high-bias model is too simple &mdash; it assumes the data follows a pattern it does not actually follow. Think of it as "stubbornness" &mdash; the model insists on a simple rule even when reality is more complex.</p>
+      </div>
+
+      <div class="definition-box">
+        <div class="label">Definition: Variance</div>
+        <p><strong>Variance</strong> is the error from sensitivity to small fluctuations in the training data. A high-variance model is too flexible &mdash; it changes drastically depending on which data points it was trained on. Think of it as "over-sensitivity" &mdash; the model overreacts to noise.</p>
+      </div>
+
+      <h3>The Three Scenarios</h3>
+
+      <h4>1. Underfitting (High Bias, Low Variance)</h4>
+      <p>The model is <strong>too simple</strong>. It cannot capture the underlying pattern in the data. Both training error and test error are high.</p>
+
+      <div class="warning-box">
+        <div class="label">Symptoms of Underfitting</div>
+        <p>
+          &bull; Training error is HIGH<br>
+          &bull; Test error is HIGH<br>
+          &bull; The model misses obvious patterns<br>
+          &bull; Example: Fitting a straight line through clearly curved data
+        </p>
+      </div>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: A Child's Painting</div>
+        <p>Imagine a child trying to paint a portrait of you. They draw a circle for the head, two dots for eyes, and stick lines for the body. The painting does not look like you at all &mdash; it is too simple. That is underfitting. The child has not captured enough detail (the pattern) to represent the reality.</p>
+        <p><strong>Mapping:</strong> Child's simple painting = underfitted model. Your actual face = the true data pattern. Missing details = unlearned patterns. High bias = the child's assumption that faces are just circles.</p>
+      </div>
+
+      <h4>2. Just Right &mdash; The Goldilocks Zone (Low Bias, Low Variance)</h4>
+      <p>The model captures the true signal in the data without memorizing noise. Training error is low, and test error is only slightly higher.</p>
+
+      <div class="takeaway-box">
+        <div class="label">Goldilocks Zone</div>
+        <p>
+          &bull; Training error is LOW<br>
+          &bull; Test error is LOW (and close to training error)<br>
+          &bull; The model captures the real pattern without overreacting to noise<br>
+          &bull; This is what we aim for every time
+        </p>
+      </div>
+
+      <h4>3. Overfitting (Low Bias, High Variance)</h4>
+      <p>The model is <strong>too complex</strong>. It memorizes the training data, including its noise and random quirks, and then fails on new data. Training error is very low, but test error is very high.</p>
+
+      <div class="warning-box">
+        <div class="label">Symptoms of Overfitting</div>
+        <p>
+          &bull; Training error is very LOW<br>
+          &bull; Test error is very HIGH<br>
+          &bull; Large gap between training and test performance<br>
+          &bull; Example: A wiggly line that passes through every training point but zigzags wildly
+        </p>
+      </div>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: Memorizing vs Understanding</div>
+        <p>Imagine studying for an exam by memorizing the exact answers to practice questions instead of understanding the concepts. You would ace the practice test (training error = 0!) but fail when the real exam asks slightly different questions. That is overfitting. A student who understands the concepts would get most practice questions right AND do well on the real exam.</p>
+        <p><strong>Mapping:</strong> Memorizing exact answers = overfitting (memorizing training data). Understanding concepts = good generalization (low bias, low variance). Practice test = training set. Real exam = test set. Different questions = unseen data.</p>
+      </div>
+
+      <div class="formula">
+        <span class="label">Total Error Decomposition</span>
+        Expected Error = Bias&sup2; + Variance + Irreducible Noise
+      </div>
+
+      <p class="formula-note">
+        The <strong>irreducible noise</strong> is randomness inherent in the data itself (measurement error, hidden variables). No model can eliminate it. Our goal is to minimize bias and variance while accepting that noise will always exist.
+      </p>
+
+      <div class="warning-box">
+        <div class="label">Common Misconception</div>
+        <p>Students often think they should always make the model more complex to reduce error. Wrong! Making a model more complex reduces bias but increases variance. You want the sweet spot, not the most complex model. A simple model that generalizes beats a complex model that memorizes.</p>
+      </div>
+
+      <div class="recap-box">
+        <div class="label">Plain-English Recap</div>
+        <p>The bias-variance trade-off is the central challenge of machine learning. Underfitting (high bias) means the model is too simple and misses patterns. Overfitting (high variance) means the model memorizes training data and fails on new data. The goal is the Goldilocks zone: low bias AND low variance, where the model captures real patterns and generalizes well. Total error = Bias&sup2; + Variance + Noise.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 3: THE HYPOTHESIS FUNCTION
+    ======================================================== -->
+    <div id="section-hypothesis" class="content-section" data-progress-section="s-hypothesis">
+      <div class="section-header">
+        <span class="emoji">&#128221;</span>
+        <h2>The Hypothesis Function</h2>
+      </div>
+
+      <p>Now let us get formal. In linear regression, we want to find a function that maps inputs (features) to an output (prediction). We call this the <strong>hypothesis function</strong> &mdash; it is our "guess" at the relationship between X and y.</p>
+
+      <h3>Simple Linear Regression</h3>
+      <p>When you have <strong>one input feature</strong> (x), the hypothesis is a straight line:</p>
+
+      <div class="formula">
+        <span class="label">Simple Linear Regression</span>
+        h<sub>&theta;</sub>(x) = &theta;&#8320; + &theta;&#8321;x
+      </div>
+
+      <p class="formula-note">
+        <strong>Where:</strong><br>
+        h<sub>&theta;</sub>(x) = the predicted output (our hypothesis)<br>
+        x = the input feature (e.g., square footage of a house)<br>
+        &theta;&#8320; = the intercept (the value of h when x = 0; where the line crosses the y-axis)<br>
+        &theta;&#8321; = the slope (how much h changes for each 1-unit increase in x; the steepness of the line)
+      </p>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: Taxi Fare</div>
+        <p>A taxi charges a fixed base fare plus a rate per kilometre. The formula is: <em>Total Fare = Base Fare + (Rate per km &times; Distance)</em>. In our notation: <em>h(x) = &theta;&#8320; + &theta;&#8321;x</em> where &theta;&#8320; is the base fare, &theta;&#8321; is the per-km rate, and x is the distance travelled.</p>
+        <p><strong>Mapping:</strong> Base fare = intercept (&theta;&#8320;). Rate per km = slope (&theta;&#8321;). Distance travelled = input feature (x). Total fare = prediction h(x).</p>
+      </div>
+
+      <h3>Multiple Linear Regression</h3>
+      <p>When you have <strong>multiple features</strong> (x&#8321;, x&#8322;, ..., x<sub>n</sub>), the hypothesis generalizes to:</p>
+
+      <div class="formula">
+        <span class="label">Multiple Linear Regression</span>
+        h<sub>&theta;</sub>(x) = &theta;&#8320; + &theta;&#8321;x&#8321; + &theta;&#8322;x&#8322; + ... + &theta;<sub>n</sub>x<sub>n</sub>
+      </div>
+
+      <p class="formula-note">
+        Each feature x<sub>i</sub> gets its own weight &theta;<sub>i</sub>. The weight tells us how much that feature contributes to the prediction. A weight of 0 means the feature is irrelevant. A large positive weight means the feature strongly increases the prediction. A negative weight means it decreases it.
+      </p>
+
+      <h3>Matrix Form</h3>
+      <p>For computational efficiency, we write the hypothesis using <strong>matrix notation</strong>. We prepend a 1 to each input vector (to account for &theta;&#8320;) and multiply:</p>
+
+      <div class="formula">
+        <span class="label">Matrix Form</span>
+        h<sub>&theta;</sub>(x) = &theta;<sup>T</sup>x
+      </div>
+
+      <p class="formula-note">
+        Where &theta; = [&theta;&#8320;, &theta;&#8321;, ..., &theta;<sub>n</sub>]<sup>T</sup> is a column vector of parameters, and x = [1, x&#8321;, x&#8322;, ..., x<sub>n</sub>]<sup>T</sup> is a column vector of features (with a leading 1 for the intercept). The dot product &theta;<sup>T</sup>x gives the same result as expanding out all the individual terms.
+      </p>
+
+      <div class="worked-example">
+        <div class="example-title">Worked Example: Simple vs Multiple Hypothesis</div>
+
+        <div class="step">
+          <span class="step-num">1</span>
+          <span class="step-title">Simple: Predicting house price from square footage</span>
+          <div class="step-content">
+            h(x) = 50,000 + 150x<br>
+            Where &theta;&#8320; = 50,000 (base price) and &theta;&#8321; = 150 (price per sq ft)<br>
+            For x = 1,500 sq ft: h = 50,000 + 150(1,500) = 50,000 + 225,000 = $275,000
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">2</span>
+          <span class="step-title">Multiple: Adding bedrooms and age as features</span>
+          <div class="step-content">
+            h(x) = 30,000 + 120x&#8321; + 15,000x&#8322; - 2,000x&#8323;<br>
+            x&#8321; = sq ft, x&#8322; = bedrooms, x&#8323; = age in years<br>
+            For 1,500 sq ft, 3 bedrooms, 10 years old:<br>
+            h = 30,000 + 120(1,500) + 15,000(3) - 2,000(10)<br>
+            h = 30,000 + 180,000 + 45,000 - 20,000 = $235,000
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">3</span>
+          <span class="step-title">Matrix form for the same example</span>
+          <div class="step-content">
+            &theta; = [30000, 120, 15000, -2000]<sup>T</sup><br>
+            x = [1, 1500, 3, 10]<sup>T</sup><br>
+            h(x) = &theta;<sup>T</sup>x = (30000)(1) + (120)(1500) + (15000)(3) + (-2000)(10)<br>
+            h(x) = 30,000 + 180,000 + 45,000 - 20,000 = $235,000
+          </div>
+        </div>
+      </div>
+
+      <div class="warning-box">
+        <div class="label">Common Misconception</div>
+        <p>Students sometimes think &theta;&#8320; is just a "throwaway" constant. It is not! It represents the <strong>baseline prediction</strong> when all features are zero. In house price prediction, it is the price of a house with 0 sq ft, 0 bedrooms, and age 0 &mdash; physically meaningless, but mathematically essential to shift the line up or down to fit the data.</p>
+      </div>
+
+      <div class="recap-box">
+        <div class="label">Plain-English Recap</div>
+        <p>The hypothesis function h(x) = &theta;&#8320; + &theta;&#8321;x is our model's prediction formula. &theta;&#8320; (intercept) sets the baseline, and &theta;&#8321; (slope) controls the tilt. With multiple features, each gets its own weight. In matrix form, h(x) = &theta;<sup>T</sup>x, which is compact and efficient for computation. The entire job of training is to find the best values of &theta;.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 4: THE COST FUNCTION (MSE)
+    ======================================================== -->
+    <div id="section-cost" class="content-section" data-progress-section="s-cost">
+      <div class="section-header">
+        <span class="emoji">&#128202;</span>
+        <h2>The Cost Function (MSE)</h2>
+      </div>
+
+      <p>We know our hypothesis is h<sub>&theta;</sub>(x) = &theta;&#8320; + &theta;&#8321;x. But how do we know if our current values of &theta;&#8320; and &theta;&#8321; are any good? We need a way to <strong>measure how wrong</strong> our model is. That is the job of the cost function.</p>
+
+      <div class="definition-box">
+        <div class="label">Definition: Cost Function</div>
+        <p>A cost function J(&theta;) measures how far off your model's predictions are from the actual values. The goal of training is to find the parameter values &theta; that <strong>minimize</strong> J(&theta;). Lower cost = better model.</p>
+      </div>
+
+      <h3>Step 1: Residuals (Individual Errors)</h3>
+      <p>A <strong>residual</strong> is the difference between the actual value and the predicted value for a single data point:</p>
+
+      <div class="formula">
+        <span class="label">Residual for data point i</span>
+        error<sup>(i)</sup> = h<sub>&theta;</sub>(x<sup>(i)</sup>) - y<sup>(i)</sup>
+      </div>
+
+      <p>Where x<sup>(i)</sup> is the i-th training input and y<sup>(i)</sup> is its actual output. If the residual is positive, we over-predicted. If negative, we under-predicted.</p>
+
+      <h3>Step 2: Square the Errors</h3>
+      <p>We square each residual for three important reasons:</p>
+      <ol>
+        <li><strong>Always positive</strong> &mdash; Without squaring, positive and negative errors would cancel out, making a terrible model look fine.</li>
+        <li><strong>Penalize large errors</strong> &mdash; Squaring doubles the penalty: an error of 3 becomes 9, but an error of 10 becomes 100. Large mistakes are punished much more than small ones.</li>
+        <li><strong>Differentiable</strong> &mdash; The squared function has a smooth derivative everywhere, which gradient descent needs to work.</li>
+      </ol>
+
+      <h3>Step 3: Average Over All Data Points</h3>
+      <p>We sum all squared residuals and divide by the number of training examples m to get the average error. We also divide by 2 (not just m) to make the math of gradient descent cleaner later.</p>
+
+      <div class="formula">
+        <span class="label">Mean Squared Error (MSE) Cost Function</span>
+        J(&theta;) = (1/2m) &times; &sum;<sub>i=1 to m</sub> [h<sub>&theta;</sub>(x<sup>(i)</sup>) - y<sup>(i)</sup>]<sup>2</sup>
+      </div>
+
+      <p class="formula-note">
+        <strong>Where:</strong><br>
+        m = number of training examples<br>
+        h<sub>&theta;</sub>(x<sup>(i)</sup>) = model's prediction for the i-th example<br>
+        y<sup>(i)</sup> = actual value for the i-th example<br>
+        The 1/2 is a mathematical convenience &mdash; when we take the derivative, the 2 cancels with the exponent.
+      </p>
+
+      <div class="worked-example">
+        <div class="example-title">Worked Example: Computing MSE Step by Step</div>
+        <p>Suppose we have 4 training points and a model h(x) = 10 + 3x. We want to compute J(&theta;).</p>
+
+        <div class="step">
+          <span class="step-num">1</span>
+          <span class="step-title">List the data points and compute predictions</span>
+          <div class="step-content">
+            | i | x<sup>(i)</sup> | y<sup>(i)</sup> (actual) | h(x<sup>(i)</sup>) = 10 + 3x | residual = h - y |
+            |---|-----|----------|----------------------|-------------------|
+            | 1 | 1   | 12       | 10 + 3(1) = 13       | 13 - 12 = +1      |
+            | 2 | 2   | 18       | 10 + 3(2) = 16       | 16 - 18 = -2      |
+            | 3 | 3   | 22       | 10 + 3(3) = 19       | 19 - 22 = -3      |
+            | 4 | 4   | 30       | 10 + 3(4) = 22       | 22 - 30 = -8      |
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">2</span>
+          <span class="step-title">Square each residual</span>
+          <div class="step-content">
+            (1)² = 1<br>
+            (-2)² = 4<br>
+            (-3)² = 9<br>
+            (-8)² = 64
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">3</span>
+          <span class="step-title">Sum the squared residuals</span>
+          <div class="step-content">
+            &Sigma; = 1 + 4 + 9 + 64 = 78
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">4</span>
+          <span class="step-title">Apply the 1/(2m) factor (m = 4)</span>
+          <div class="step-content">
+            J(&theta;) = (1 / (2 &times; 4)) &times; 78<br>
+            J(&theta;) = (1/8) &times; 78<br>
+            J(&theta;) = 9.75
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">5</span>
+          <span class="step-title">Interpretation</span>
+          <div class="step-content">
+            The cost is 9.75. The single worst point (x=4) contributed 64/78 = 82% of the total error &mdash; squaring放大了 that outlier. If we tweak &theta;&#8320; or &theta;&#8321;, this number changes. Training means finding the &theta; values that make J(&theta;) as small as possible.
+          </div>
+        </div>
+      </div>
+
+      <h3>Why MSE? Why Not Just Sum of Errors?</h3>
+
+      <table>
+        <tr>
+          <th>Alternative</th>
+          <th>Problem</th>
+        </tr>
+        <tr>
+          <td>Sum of raw errors &Sigma;(h - y)</td>
+          <td>Positive and negative errors cancel out. Model with +50 and -50 errors appears perfect (sum = 0).</td>
+        </tr>
+        <tr>
+          <td>Sum of absolute errors &Sigma;|h - y|</td>
+          <td>Works but not differentiable at 0 (sharp corner). Gradient descent needs smooth derivatives.</td>
+        </tr>
+        <tr>
+          <td>MSE &Sigma;(h - y)&sup2;</td>
+          <td>Always positive, differentiable, penalizes large errors. The math works out beautifully.</td>
+        </tr>
+      </table>
+
+      <h3>The Convex Cost Surface</h3>
+      <p>Here is the beautiful thing about MSE: the cost function J(&theta;) for linear regression is <strong>convex</strong> &mdash; it has a bowl shape with exactly one global minimum. There are no local minima to get trapped in.</p>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: A Bowl on a Table</div>
+        <p>Imagine a marble sitting on the rim of a bowl. No matter where you drop it, it will roll down and settle at the bottom. That bottom is the global minimum &mdash; the best set of parameters. Gradient descent is like tilting the bowl to guide the marble downward. With a convex function (bowl shape), the marble always reaches the bottom. With a non-convex function (a bumpy, hilly surface), the marble might get stuck in a small dip that is not the true bottom.</p>
+        <p><strong>Mapping:</strong> Bowl = convex cost function. Marble = current parameter values. Bottom of bowl = optimal &theta;. Tilting the bowl = gradient descent. Small dips in a hilly surface = local minima (which MSE does NOT have).</p>
+      </div>
+
+      <div class="recap-box">
+        <div class="label">Plain-English Recap</div>
+        <p>The cost function J(&theta;) = (1/2m)&Sigma;(h(x) - y)&sup2; measures average squared prediction error. We square to ensure positivity, penalize large errors, and maintain differentiability. The 1/2 factor simplifies gradient calculations. For linear regression with MSE, the cost surface is convex (bowl-shaped) with one global minimum, which means gradient descent will always find the best solution.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 5: GRADIENT DESCENT
+    ======================================================== -->
+    <div id="section-gradient" class="content-section" data-progress-section="s-gradient">
+      <div class="section-header">
+        <span class="emoji">&#128260;</span>
+        <h2>Gradient Descent</h2>
+      </div>
+
+      <p>We know our model h(x) = &theta;&#8320; + &theta;&#8321;x. We know how to measure its error (cost function J). Now the question is: <strong>how do we find the &theta; values that minimize J?</strong></p>
+
+      <p>The answer is <strong>gradient descent</strong> &mdash; an iterative optimization algorithm that starts with random parameter values and repeatedly adjusts them in the direction that reduces the cost.</p>
+
+      <div class="formula">
+        <span class="label">Gradient Descent Update Rule</span>
+        &theta;<sub>j</sub> := &theta;<sub>j</sub> - &alpha; &middot; &part;J(&theta;)/&part;&theta;<sub>j</sub>
+      </div>
+
+      <p class="formula-note">
+        <strong>Where:</strong><br>
+        &theta;<sub>j</sub> = the j-th parameter (e.g., &theta;&#8320; or &theta;&#8321;)<br>
+        := means "update" (assign the new value)<br>
+        &alpha; = the <strong>learning rate</strong> (a small positive number like 0.01)<br>
+        &part;J(&theta;)/&part;&theta;<sub>j</sub> = the partial derivative of J with respect to &theta;<sub>j</sub> (the "gradient" &mdash; tells us which direction is "downhill")
+      </p>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: Walking Down a Mountain in Fog</div>
+        <p>You are standing on a mountain in thick fog. You cannot see the valley below. Your only strategy: feel the slope under your feet and take a step in the steepest downhill direction. Each step = one update. The slope you feel = the gradient. The step size = the learning rate &alpha;. After many steps, you reach the valley floor (minimum cost).</p>
+        <p><strong>Mapping:</strong> Mountain surface = cost function J(&theta;). Your position on the mountain = current &theta; values. Slope under feet = gradient &part;J/&part;&theta;. Step in steepest downhill direction = update rule. Valley floor = minimum cost (best parameters). Fog = you cannot see the whole landscape; you only know local slope.</p>
+      </div>
+
+      <h3>Simultaneous Update (Critical Detail)</h3>
+      <p>When updating multiple parameters (&theta;&#8320; and &theta;&#8321;), you must compute both gradients <strong>first</strong>, and then update both parameters at the <strong>same time</strong>.</p>
+
+      <div class="worked-example">
+        <div class="example-title">Correct vs Incorrect Update Order</div>
+
+        <div class="step">
+          <span class="step-num">&#10003;</span>
+          <span class="step-title">CORRECT: Simultaneous update</span>
+          <div class="step-content">
+            temp&#8320; = &theta;&#8320; - &alpha; &middot; &part;J/&part;&theta;&#8320;<br>
+            temp&#8321; = &theta;&#8321; - &alpha; &middot; &part;J/&part;&theta;&#8321;<br>
+            &theta;&#8320; = temp&#8320;<br>
+            &theta;&#8321; = temp&#8321;<br>
+            <br>
+            Both derivatives computed with the SAME &theta; values. Fair comparison.
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">&#10007;</span>
+          <span class="step-title">INCORRECT: Sequential update</span>
+          <div class="step-content">
+            &theta;&#8320; = &theta;&#8320; - &alpha; &middot; &part;J/&part;&theta;&#8320; &nbsp;&nbsp;(&theta;&#8320; is now changed!)<br>
+            &theta;&#8321; = &theta;&#8321; - &alpha; &middot; &part;J/&part;&theta;&#8321; &nbsp;&nbsp;(derivative uses the NEW &theta;&#8320;!)<br>
+            <br>
+            The second derivative is computed with an already-updated &theta;&#8320;. This is a different algorithm with different behavior &mdash; not standard gradient descent.
+          </div>
+        </div>
+      </div>
+
+      <h3>Full Derivative of the MSE Cost</h3>
+      <p>Let us derive &part;J/&part;&theta;&#8321; from scratch. For simple linear regression h(x) = &theta;&#8320; + &theta;&#8321;x:</p>
+
+      <div class="formula">
+        <span class="label">Derivation of &part;J/&part;&theta;&#8321;</span>
+        J(&theta;) = (1/2m) &Sigma; (h(x<sup>(i)</sup>) - y<sup>(i)</sup>)&sup2;<br>
+        &part;J/&part;&theta;&#8321; = (1/m) &Sigma; (h(x<sup>(i)</sup>) - y<sup>(i)</sup>) &middot; x<sup>(i)</sup>
+      </div>
+
+      <p class="formula-note">
+        The chain rule gives us: derivative of (something)&sup2; = 2(something) &times; derivative of something. The derivative of h(x) with respect to &theta;&#8321; is just x (since h = &theta;&#8320; + &theta;&#8321;x). The factor of 2 cancels with the 1/2 in the cost function. What remains is the average of (error &times; feature value).
+      </p>
+
+      <div class="formula">
+        <span class="label">Derivation of &part;J/&part;&theta;&#8320;</span>
+        &part;J/&part;&theta;&#8320; = (1/m) &Sigma; (h(x<sup>(i)</sup>) - y<sup>(i)</sup>)
+      </div>
+
+      <p class="formula-note">
+        The derivative of h with respect to &theta;&#8320; is just 1 (since the intercept shifts h by exactly &theta;&#8320;). So the gradient for the intercept is the average of all errors &mdash; it points in the direction where the line needs to shift up or down.
+      </p>
+
+      <div class="worked-example">
+        <div class="example-title">Worked Example: One Gradient Descent Step</div>
+
+        <div class="step">
+          <span class="step-num">1</span>
+          <span class="step-title">Setup</span>
+          <div class="step-content">
+            Training data: (1, 12), (2, 18), (3, 22), (4, 30) &mdash; m = 4<br>
+            Current parameters: &theta;&#8320; = 10, &theta;&#8321; = 3<br>
+            Learning rate: &alpha; = 0.05<br>
+            h(x) = 10 + 3x
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">2</span>
+          <span class="step-title">Compute predictions and errors</span>
+          <div class="step-content">
+            i=1: h(1)=13, y=12, error=13-12=1<br>
+            i=2: h(2)=16, y=18, error=16-18=-2<br>
+            i=3: h(3)=19, y=22, error=19-22=-3<br>
+            i=4: h(4)=22, y=30, error=22-30=-8
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">3</span>
+          <span class="step-title">Compute gradients</span>
+          <div class="step-content">
+            &part;J/&part;&theta;&#8320; = (1/m) &Sigma; error = (1/4)(1 + (-2) + (-3) + (-8))<br>
+            &part;J/&part;&theta;&#8320; = (1/4)(-12) = -3.0<br><br>
+            &part;J/&part;&theta;&#8321; = (1/m) &Sigma; error &middot; x = (1/4)(1(1) + (-2)(2) + (-3)(3) + (-8)(4))<br>
+            &part;J/&part;&theta;&#8321; = (1/4)(1 - 4 - 9 - 32) = (1/4)(-44) = -11.0
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">4</span>
+          <span class="step-title">Update parameters (simultaneous)</span>
+          <div class="step-content">
+            &theta;&#8320;<sub>new</sub> = 10 - 0.05 &times; (-3.0) = 10 + 0.15 = 10.15<br>
+            &theta;&#8321;<sub>new</sub> = 3 - 0.05 &times; (-11.0) = 3 + 0.55 = 3.55
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">5</span>
+          <span class="step-title">Interpretation</span>
+          <div class="step-content">
+            Both gradients were negative, meaning increasing both &theta;&#8320; and &theta;&#8321; will reduce the cost. So the update increased both. After many such steps, the parameters will converge to their optimal values. Note: the error on the last point (-8) dominated both gradients &mdash; it has the most influence because it is the largest error.
+          </div>
+        </div>
+      </div>
+
+      <h3>Learning Rate &alpha;</h3>
+      <p>The learning rate controls how big each step is. Choosing &alpha; is critical:</p>
+
+      <table>
+        <tr>
+          <th>&alpha; Value</th>
+          <th>Behavior</th>
+          <th>Analogy</th>
+        </tr>
+        <tr>
+          <td><strong>Too Large</strong></td>
+          <td>Steps overshoot the minimum. Loss may increase instead of decreasing. Can diverge to infinity.</td>
+          <td>Leaping down the mountain &mdash; you jump past the valley and land on the opposite slope, higher up.</td>
+        </tr>
+        <tr>
+          <td><strong>Too Small</strong></td>
+          <td>Steps are tiny. Convergence is extremely slow. May get stuck before reaching the minimum.</td>
+          <td>Crawling down the mountain one millimetre at a time &mdash; you will get there eventually, but it will take forever.</td>
+        </tr>
+        <tr>
+          <td><strong>Just Right</strong></td>
+          <td>Steps steadily decrease the cost. Converges in a reasonable number of iterations.</td>
+          <td>Walking down the mountain at a steady pace &mdash; each step clearly moves you downhill.</td>
+        </tr>
+      </table>
+
+      <div class="warning-box">
+        <div class="label">Reading a Loss Curve</div>
+        <p>
+          <strong>Ideal convergence:</strong> The loss decreases smoothly and levels off. The curve flattens as the model approaches the minimum.<br><br>
+          <strong>Exploding loss:</strong> The loss increases rapidly or oscillates wildly. Your learning rate is too large &mdash; reduce it immediately.<br><br>
+          <strong>Plateau:</strong> The loss barely changes. Your learning rate might be too small, or the gradients are vanishing.
+        </p>
+      </div>
+
+      <h3>Three Variants of Gradient Descent</h3>
+
+      <table>
+        <tr>
+          <th>Variant</th>
+          <th>Data Used Per Step</th>
+          <th>Pros</th>
+          <th>Cons</th>
+        </tr>
+        <tr>
+          <td><strong>Batch GD</strong></td>
+          <td>ALL m training examples</td>
+          <td>Stable, guaranteed to converge for convex problems</td>
+          <td>Slow for large datasets (must process all data per step)</td>
+        </tr>
+        <tr>
+          <td><strong>Stochastic GD (SGD)</strong></td>
+          <td>1 random training example</td>
+          <td>Very fast per step, can escape local minima</td>
+          <td>Noisy, may never fully converge, oscillates around minimum</td>
+        </tr>
+        <tr>
+          <td><strong>Mini-Batch GD</strong></td>
+          <td>A small random subset (e.g., 32 or 64)</td>
+          <td>Balance of speed and stability, best of both worlds</td>
+          <td>Need to choose batch size (another hyperparameter)</td>
+        </tr>
+      </table>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: Surveying a Valley</div>
+        <p><strong>Batch GD</strong> = you survey the entire valley floor before taking one step. Very accurate, but very slow. <strong>SGD</strong> = you take a step based on the slope at a single random point. Very fast, but noisy &mdash; you zigzag. <strong>Mini-Batch</strong> = you check a small patch of ground before each step. A good compromise between accuracy and speed.</p>
+        <p><strong>Mapping:</strong> Surveying the valley = computing the gradient. Entire valley = full training set. Single point = one training example. Small patch = mini-batch.</p>
+      </div>
+
+      <h3>Convergence Criteria</h3>
+      <p>When do you stop gradient descent? Common criteria:</p>
+      <ol>
+        <li><strong>Maximum iterations</strong> &mdash; Stop after N steps (e.g., 1,000 or 10,000). Simple and predictable.</li>
+        <li><strong>Cost threshold</strong> &mdash; Stop when J(&theta;) drops below a target (e.g., J &lt; 0.001). Good when you know what error is acceptable.</li>
+        <li><strong>Gradient norm</strong> &mdash; Stop when the magnitude of the gradient is very small (e.g., &lt; 0.0001). This means you are near the minimum &mdash; the slope is essentially flat.</li>
+      </ol>
+
+      <div class="recap-box">
+        <div class="label">Plain-English Recap</div>
+        <p>Gradient descent finds the best parameters by repeatedly computing the gradient (slope) of the cost function and taking a step in the opposite direction. The update rule is &theta; := &theta; - &alpha; &middot; gradient. Parameters must be updated simultaneously. The learning rate &alpha; controls step size: too large diverges, too small is slow. For MSE, the gradient for &theta;&#8321; is (1/m)&Sigma;(error &times; x). Three variants exist: Batch (all data), Stochastic (one point), Mini-Batch (subset). Stop when max iterations reached, cost is low enough, or gradient is near zero.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 6: THE NORMAL EQUATION
+    ======================================================== -->
+    <div id="section-normal" class="content-section" data-progress-section="s-normal">
+      <div class="section-header">
+        <span class="emoji">&#128218;</span>
+        <h2>The Normal Equation</h2>
+      </div>
+
+      <p>Gradient descent is iterative &mdash; it takes many steps to converge. But for linear regression, there is a <strong>closed-form solution</strong>: you can compute the optimal parameters in a single step using linear algebra.</p>
+
+      <div class="formula">
+        <span class="label">Normal Equation</span>
+        &Theta;<sup>*</sup> = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>y
+      </div>
+
+      <p class="formula-note">
+        <strong>Where:</strong><br>
+        &Theta;<sup>*</sup> = the vector of optimal parameters<br>
+        X = the design matrix (each row is a training example, with a leading column of 1s for the intercept)<br>
+        y = the vector of target values<br>
+        X<sup>T</sup> = the transpose of X<br>
+        (X<sup>T</sup>X)<sup>-1</sup> = the inverse of the matrix X<sup>T</sup>X
+      </p>
+
+      <div class="worked-example">
+        <div class="example-title">Worked Example: Normal Equation with 2 Training Points</div>
+
+        <div class="step">
+          <span class="step-num">1</span>
+          <span class="step-title">Define the training data</span>
+          <div class="step-content">
+            Point 1: x&#8321; = 1, y&#8321; = 4<br>
+            Point 2: x&#8322; = 2, y&#8322; = 7<br>
+            We want to fit h(x) = &theta;&#8320; + &theta;&#8321;x
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">2</span>
+          <span class="step-title">Construct matrix X and vector y</span>
+          <div class="step-content">
+            X = [[1, 1],<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1, 2]]<br>
+            &nbsp;&nbsp;(first column is all 1s for the intercept)<br><br>
+            y = [4, 7]<sup>T</sup>
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">3</span>
+          <span class="step-title">Compute X<sup>T</sup>X</span>
+          <div class="step-content">
+            X<sup>T</sup> = [[1, 1],<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1, 2]]<br><br>
+            X<sup>T</sup>X = [[1(1)+1(1), 1(1)+1(2)],<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1(1)+2(1), 1(1)+2(2)]]<br>
+            X<sup>T</sup>X = [[2, 3],<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[3, 5]]
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">4</span>
+          <span class="step-title">Compute (X<sup>T</sup>X)<sup>-1</sup></span>
+          <div class="step-content">
+            For a 2x2 matrix [[a,b],[c,d]], the inverse is (1/det)[[d,-b],[-c,a]]<br>
+            det(X<sup>T</sup>X) = (2)(5) - (3)(3) = 10 - 9 = 1<br>
+            (X<sup>T</sup>X)<sup>-1</sup> = (1/1) &times; [[5, -3], [-3, 2]] = [[5, -3], [-3, 2]]
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">5</span>
+          <span class="step-title">Compute X<sup>T</sup>y</span>
+          <div class="step-content">
+            X<sup>T</sup>y = [[1(4) + 1(7)],<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[1(4) + 2(7)]]<br>
+            X<sup>T</sup>y = [[11], [18]]
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">6</span>
+          <span class="step-title">Compute &Theta;<sup>*</sup> = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>y</span>
+          <div class="step-content">
+            &Theta;<sup>*</sup> = [[5, -3], [-3, 2]] &times; [[11], [18]]<br>
+            &theta;&#8320; = 5(11) + (-3)(18) = 55 - 54 = 1<br>
+            &theta;&#8321; = -3(11) + 2(18) = -33 + 36 = 3<br><br>
+            Optimal model: h(x) = 1 + 3x<br>
+            Check: h(1) = 4 &#10003;, h(2) = 7 &#10003; &mdash; perfectly fits both points!
+          </div>
+        </div>
+      </div>
+
+      <h3>Gradient Descent vs Normal Equation</h3>
+
+      <table>
+        <tr>
+          <th>Feature</th>
+          <th>Gradient Descent</th>
+          <th>Normal Equation</th>
+        </tr>
+        <tr>
+          <td>Need to choose &alpha;</td>
+          <td>Yes</td>
+          <td>No</td>
+        </tr>
+        <tr>
+          <td>Need to choose iterations</td>
+          <td>Yes</td>
+          <td>No</td>
+        </tr>
+        <tr>
+          <td>Time complexity per step</td>
+          <td>O(n&sup2;) (or O(n) with optimized implementations)</td>
+          <td>O(n&sup3;) (matrix inversion)</td>
+        </tr>
+        <tr>
+          <td>Works when n is very large (e.g., 100,000 features)</td>
+          <td>Yes &mdash; scales well</td>
+          <td>No &mdash; matrix inversion becomes too slow</td>
+        </tr>
+        <tr>
+          <td>Works for other algorithms (logistic regression, neural nets)</td>
+          <td>Yes</td>
+          <td>No &mdash; only for linear regression</td>
+        </tr>
+        <tr>
+          <td>When to prefer</td>
+          <td>Large datasets, many features, non-linear models</td>
+          <td>Small datasets, few features, quick one-shot solution</td>
+        </tr>
+      </table>
+
+      <div class="warning-box">
+        <div class="label">Rule of Thumb</div>
+        <p>If the number of features n is less than about 10,000, the Normal Equation is fast enough. If n is larger, use gradient descent. In practice, gradient descent is almost always used because datasets in the real world often have millions of features.</p>
+      </div>
+
+      <div class="recap-box">
+        <div class="label">Plain-English Recap</div>
+        <p>The Normal Equation &Theta;<sup>*</sup> = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>y gives the optimal parameters in one calculation &mdash; no iterations, no learning rate. It works perfectly for small linear regression problems. However, it requires matrix inversion which is O(n&sup3;), so it becomes impractical for large numbers of features. Gradient descent scales better and works for all model types, which is why it is the more general approach.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 7: LINE ASSUMPTIONS
+    ======================================================== -->
+    <div id="section-assumptions" class="content-section" data-progress-section="s-assumptions">
+      <div class="section-header">
+        <span class="emoji">&#9888;</span>
+        <h2>LINE Assumptions</h2>
+      </div>
+
+      <p>Linear regression makes several assumptions about the data. If these assumptions are violated, the model's predictions and statistical inferences (p-values, confidence intervals) may be unreliable. Remember the acronym <strong>LINE</strong>:</p>
+
+      <div class="definition-box">
+        <div class="label">The LINE Assumptions</div>
+        <p>
+          <strong>L</strong> &mdash; <strong>Linearity</strong>: The relationship between features and the target is linear.<br>
+          <strong>I</strong> &mdash; <strong>Independence</strong>: The observations (residuals) are independent of each other.<br>
+          <strong>N</strong> &mdash; <strong>Normality</strong>: The residuals are normally distributed.<br>
+          <strong>E</strong> &mdash; <strong>Equal Variance (Homoscedasticity)</strong>: The residuals have constant variance across all levels of the predictors.
+        </p>
+      </div>
+
+      <h3>L: Linearity</h3>
+      <p>The relationship between each feature and the target should be approximately linear. If the true relationship is curved (e.g., quadratic, exponential), a straight line will systematically miss patterns.</p>
+
+      <div class="warning-box">
+        <div class="label">How to Check</div>
+        <p>Plot each feature against the target. If you see a clear curve (U-shape, exponential growth), linearity is violated. Consider transforming the feature (log, square root) or adding polynomial features.</p>
+      </div>
+
+      <h3>I: Independence</h3>
+      <p>Each observation should be independent of the others. This is commonly violated in time series data, where today's value depends on yesterday's (autocorrelation).</p>
+
+      <div class="warning-box">
+        <div class="label">How to Check</div>
+        <p>Use the <strong>Durbin-Watson test</strong> for autocorrelation. If the test statistic is far from 2, independence is violated.</p>
+      </div>
+
+      <h3>N: Normality of Residuals</h3>
+      <p>The residuals (errors) should be approximately normally distributed. This matters primarily for <strong>statistical inference</strong> (hypothesis tests, confidence intervals), not for prediction accuracy.</p>
+
+      <div class="warning-box">
+        <div class="label">How to Check</div>
+        <p>Create a <strong>Q-Q (Quantile-Quantile) plot</strong> of the residuals. If the points fall approximately on a straight diagonal line, normality holds. Also check a histogram of residuals &mdash; it should be bell-shaped.</p>
+      </div>
+
+      <h3>E: Equal Variance (Homoscedasticity)</h3>
+      <p>The spread of residuals should be roughly constant across all predicted values. If the residuals fan out (like a megaphone), this is called <strong>heteroscedasticity</strong>.</p>
+
+      <div class="warning-box">
+        <div class="label">How to Check</div>
+        <p>Plot residuals vs fitted (predicted) values. Look for a random scatter around zero. If you see a funnel shape (residuals get wider or narrower as predictions increase), homoscedasticity is violated.</p>
+      </div>
+
+      <h3>The Gauss-Markov Theorem</h3>
+
+      <div class="definition-box">
+        <div class="label">Gauss-Markov Theorem (BLUE)</div>
+        <p>If the first three assumptions (Linearity, Independence, Equal Variance) hold, the OLS (Ordinary Least Squares) estimator is the <strong>Best Linear Unbiased Estimator (BLUE)</strong>. "Best" means it has the smallest variance among all linear unbiased estimators. In plain English: no other straight-line model will consistently give you more precise estimates.</p>
+      </div>
+
+      <h3>Diagnostic Plots</h3>
+
+      <table>
+        <tr>
+          <th>Plot</th>
+          <th>What It Checks</th>
+          <th>What You Want to See</th>
+        </tr>
+        <tr>
+          <td><strong>Residuals vs Fitted</strong></td>
+          <td>Linearity and Homoscedasticity</td>
+          <td>Random scatter around 0, no patterns, constant spread</td>
+        </tr>
+        <tr>
+          <td><strong>Q-Q Plot</strong></td>
+          <td>Normality of residuals</td>
+          <td>Points approximately on the diagonal line</td>
+        </tr>
+        <tr>
+          <td><strong>Scale-Location</strong></td>
+          <td>Homoscedasticity (spread of residuals)</td>
+          <td>Horizontal line with random scatter (no fanning)</td>
+        </tr>
+        <tr>
+          <td><strong>Residuals vs Leverage</strong></td>
+          <td>Influential outliers</td>
+          <td>No points beyond Cook's Distance threshold (usually 0.5 or 1)</td>
+        </tr>
+      </table>
+
+      <h3>Cook's Distance</h3>
+      <p><strong>Cook's Distance</strong> measures how much the entire model would change if a specific data point were removed. A high Cook's Distance means that point has <strong>undue influence</strong> on the model's parameters.</p>
+
+      <div class="formula">
+        <span class="label">Cook's Distance (intuition)</span>
+        D<sub>i</sub> &propto; (how much &theta; changes when point i is removed)&sup2;
+      </div>
+
+      <p class="formula-note">
+        A common rule of thumb: points with D<sub>i</sub> &gt; 4/n or D<sub>i</sub> &gt; 0.5 are considered influential and should be investigated. Do not automatically remove them &mdash; understand WHY they are influential first.
+      </p>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: The Classroom Vote</div>
+        <p>Imagine 30 students voting on a class outing. If one student has an unusually strong personality and convinces 10 others to vote their way, that student has a high "Cook's Distance" &mdash; removing them would change the outcome significantly. That does not mean you should kick them out &mdash; you should just be aware their influence is disproportionately large.</p>
+        <p><strong>Mapping:</strong> Students = data points. Class vote outcome = model parameters. One student swaying others = influential outlier. Cook's Distance = measure of that influence.</p>
+      </div>
+
+      <div class="recap-box">
+        <div class="label">Plain-English Recap</div>
+        <p>Linear regression assumes LINE: Linearity (straight-line relationship), Independence (no autocorrelation), Normality (residuals are bell-curved), Equal Variance (constant spread). The Gauss-Markov theorem tells us that if these hold, OLS gives the best possible estimates (BLUE). Diagnostic plots (Residuals vs Fitted, Q-Q, Scale-Location, Residuals vs Leverage) help us check these assumptions. Cook's Distance flags influential points that unduly sway the model.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 8: EVALUATION METRICS
+    ======================================================== -->
+    <div id="section-metrics" class="content-section" data-progress-section="s-metrics">
+      <div class="section-header">
+        <span class="emoji">&#127942;</span>
+        <h2>Evaluation Metrics</h2>
+      </div>
+
+      <p>After training, we need to answer: <em>"How good is our model?"</em> Different metrics answer this question in different ways. No single metric tells the whole story &mdash; you need to understand when to use which one.</p>
+
+      <h3>Mean Absolute Error (MAE)</h3>
+
+      <div class="formula">
+        <span class="label">MAE</span>
+        MAE = (1/m) &times; &Sigma; |h(x<sup>(i)</sup>) - y<sup>(i)</sup>|
+      </div>
+
+      <p>MAE takes the absolute value of each error and averages them. It is measured in the same units as y, making it easy to interpret. It is also <strong>robust to outliers</strong> because it does not square errors &mdash; one extreme error does not dominate the metric.</p>
+
+      <h3>Mean Squared Error (MSE)</h3>
+
+      <div class="formula">
+        <span class="label">MSE</span>
+        MSE = (1/m) &times; &Sigma; (h(x<sup>(i)</sup>) - y<sup>(i)</sup>)&sup2;
+      </div>
+
+      <p>MSE squares each error, so it <strong>penalizes large errors heavily</strong>. An error of 10 contributes 100 to the sum, while an error of 1 contributes only 1. This makes MSE very sensitive to outliers &mdash; which can be good (catches big mistakes) or bad (one outlier skews everything). The units are squared (e.g., dollars&sup2;), which makes interpretation harder.</p>
+
+      <h3>Root Mean Squared Error (RMSE)</h3>
+
+      <div class="formula">
+        <span class="label">RMSE</span>
+        RMSE = &radic;MSE = &radic;[(1/m) &times; &Sigma; (h(x<sup>(i)</sup>) - y<sup>(i)</sup>)&sup2;]
+      </div>
+
+      <p>RMSE is the square root of MSE. It fixes MSE's biggest interpretability problem: the units are back to the original scale (e.g., dollars, not dollars&sup2;). It still penalizes large errors more than MAE (because of the squaring before the root), but now you can say "the typical error is about $X" and it makes intuitive sense.</p>
+
+      <h3>R&sup2; (Coefficient of Determination)</h3>
+
+      <div class="formula">
+        <span class="label">R&sup2;</span>
+        R&sup2; = 1 - SS<sub>res</sub>/SS<sub>tot</sub>
+      </div>
+
+      <p class="formula-note">
+        SS<sub>res</sub> = &Sigma;(y<sub>i</sub> - h(x<sub>i</sub>))&sup2; = sum of squared residuals (unexplained variance)<br>
+        SS<sub>tot</sub> = &Sigma;(y<sub>i</sub> - y&#772;)&sup2; = total sum of squares (variance of the data itself, where y&#772; is the mean of y)
+      </p>
+
+      <p>R&sup2; measures the <strong>proportion of variance explained</strong> by the model. R&sup2; = 1 means the model explains all the variance (perfect predictions). R&sup2; = 0 means the model is no better than just predicting the mean. R&sup2; &lt; 0 means the model is worse than predicting the mean.</p>
+
+      <h3>Adjusted R&sup2;</h3>
+
+      <div class="formula">
+        <span class="label">Adjusted R&sup2;</span>
+        R&sup2;<sub>adj</sub> = 1 - [(1 - R&sup2;)(m - 1) / (m - n - 1)]
+      </div>
+
+      <p class="formula-note">
+        Where m = number of training examples and n = number of features.
+      </p>
+
+      <p>Regular R&sup2; can never decrease when you add a new feature &mdash; even if that feature is random noise. Adjusted R&sup2; adds a <strong>penalty for unnecessary features</strong>. If a feature genuinely helps, adjusted R&sup2; goes up. If it does not help, adjusted R&sup2; goes down. Always prefer adjusted R&sup2; when comparing models with different numbers of features.</p>
+
+      <div class="worked-example">
+        <div class="example-title">Worked Example: All Metrics with 5 Predictions</div>
+        <p>Suppose we predict house prices and get these results:</p>
+
+        <div class="step">
+          <span class="step-num">1</span>
+          <span class="step-title">Data and predictions</span>
+          <div class="step-content">
+            | i | Actual (y) | Predicted (h) | Error (h-y) | |Error| | Error&sup2; |
+            |---|------------|---------------|-------------|--------|---------|
+            | 1 | 200        | 210           | +10         | 10     | 100     |
+            | 2 | 350        | 330           | -20         | 20     | 400     |
+            | 3 | 500        | 490           | -10         | 10     | 100     |
+            | 4 | 150        | 180           | +30         | 30     | 900     |
+            | 5 | 420        | 400           | -20         | 20     | 400     |
+            <br>
+            m = 5, y&#772; = (200+350+500+150+420)/5 = 324
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">2</span>
+          <span class="step-title">Compute MAE</span>
+          <div class="step-content">
+            MAE = (10 + 20 + 10 + 30 + 20) / 5<br>
+            MAE = 90 / 5 = 18<br>
+            Interpretation: On average, our predictions are off by $18 (in thousands).
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">3</span>
+          <span class="step-title">Compute MSE</span>
+          <div class="step-content">
+            MSE = (100 + 400 + 100 + 900 + 400) / 5<br>
+            MSE = 1900 / 5 = 380<br>
+            Interpretation: The average squared error is 380 (in thousands&sup2;).
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">4</span>
+          <span class="step-title">Compute RMSE</span>
+          <div class="step-content">
+            RMSE = &radic;380 &asymp; 19.49<br>
+            Interpretation: The typical prediction error is about $19.49 (in thousands).
+            Note: RMSE (19.49) &gt; MAE (18) because RMSE penalizes the larger errors more.
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">5</span>
+          <span class="step-title">Compute R&sup2;</span>
+          <div class="step-content">
+            SS<sub>res</sub> = 100 + 400 + 100 + 900 + 400 = 1900<br>
+            SS<sub>tot</sub> = (200-324)&sup2; + (350-324)&sup2; + (500-324)&sup2; + (150-324)&sup2; + (420-324)&sup2;<br>
+            SS<sub>tot</sub> = (-124)&sup2; + (26)&sup2; + (176)&sup2; + (-174)&sup2; + (96)&sup2;<br>
+            SS<sub>tot</sub> = 15376 + 676 + 30976 + 30276 + 9216 = 86520<br><br>
+            R&sup2; = 1 - 1900/86520 = 1 - 0.0220 = 0.978<br>
+            Interpretation: The model explains 97.8% of the variance in house prices. Excellent!
+          </div>
+        </div>
+      </div>
+
+      <h3>When to Use Which Metric</h3>
+
+      <table>
+        <tr>
+          <th>Scenario</th>
+          <th>Best Metric</th>
+          <th>Why</th>
+        </tr>
+        <tr>
+          <td>Outliers present, want robust measure</td>
+          <td><strong>MAE</strong></td>
+          <td>Does not amplify extreme errors</td>
+        </tr>
+        <tr>
+          <td>Large errors are unacceptable (safety-critical)</td>
+          <td><strong>RMSE / MSE</strong></td>
+          <td>Squaring penalizes big mistakes heavily</td>
+        </tr>
+        <tr>
+          <td>Want to explain results to non-technical audience</td>
+          <td><strong>RMSE</strong></td>
+          <td>Same units as the target, easy to say "typical error is $X"</td>
+        </tr>
+        <tr>
+          <td>Want to compare model quality across datasets</td>
+          <td><strong>R&sup2;</strong></td>
+          <td>Scale-free (0 to 1), so it works across different datasets</td>
+        </tr>
+        <tr>
+          <td>Comparing models with different numbers of features</td>
+          <td><strong>Adjusted R&sup2;</strong></td>
+          <td>Penalizes unnecessary features, prevents overfitting illusion</td>
+        </tr>
+      </table>
+
+      <div class="warning-box">
+        <div class="label">Common Misconception</div>
+        <p>High R&sup2; does NOT mean the model is good. A model can have R&sup2; = 0.95 but still violate every LINE assumption. Always check diagnostics alongside R&sup2;. Also, R&sup2; only measures linear relationships &mdash; a model can have low R&sup2; even if the relationship is strong but non-linear.</p>
+      </div>
+
+      <div class="recap-box">
+        <div class="label">Plain-English Recap</div>
+        <p>MAE = average absolute error (robust, in original units). MSE = average squared error (penalizes large errors, units are squared). RMSE = square root of MSE (penalizes large errors AND in original units). R&sup2; = proportion of variance explained (0-1 scale, 1 is perfect). Adjusted R&sup2; = R&sup2; with penalty for unnecessary features. Use MAE for robustness, RMSE for interpretability, R&sup2; for comparison. Always use multiple metrics &mdash; no single number tells the full story.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 9: COMMON MISTAKES
+    ======================================================== -->
+    <div id="section-mistakes" class="content-section" data-progress-section="s-mistakes">
+      <div class="section-header">
+        <span class="emoji">&#128680;</span>
+        <h2>Common Mistakes</h2>
+      </div>
+
+      <p>Even though linear regression is "simple," there are several pitfalls that trip up beginners. Knowing these will save you hours of debugging.</p>
+
+      <h3>1. Not Handling Outliers</h3>
+
+      <div class="warning-box">
+        <div class="label">The Problem</div>
+        <p>MSE squares errors, so a single outlier with a large error can dominate the cost function and pull the regression line toward it, distorting predictions for all other points.</p>
+      </div>
+
+      <div class="worked-example">
+        <div class="example-title">Example: Outlier Effect</div>
+        <div class="step">
+          <span class="step-num">1</span>
+          <span class="step-title">Three normal points and one outlier</span>
+          <div class="step-content">
+            Normal points: (1, 2), (2, 4), (3, 6) &mdash; perfect line y = 2x<br>
+            Outlier: (4, 50) &mdash; way off the pattern
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <span class="step-title">Effect on the regression line</span>
+          <div class="step-content">
+            Without outlier: h(x) = 0 + 2x (perfect fit)<br>
+            With outlier: h(x) &asymp; -2.7 + 12.3x (line pulled upward to accommodate the outlier)<br>
+            The model now makes bad predictions for the 3 normal points to reduce the error on 1 outlier.
+          </div>
+        </div>
+      </div>
+
+      <p><strong>How to fix:</strong> Detect outliers using box plots, Z-scores (|Z| &gt; 3), or Cook's Distance. Then decide: remove them (if they are data entry errors), transform the target (log transform), or use robust regression methods.</p>
+
+      <h3>2. Multicollinearity</h3>
+
+      <div class="warning-box">
+        <div class="label">The Problem</div>
+        <p>Multicollinearity occurs when two or more features are highly correlated with each other (e.g., height in cm and height in inches). This makes it impossible to determine which feature is actually responsible for the effect on the target &mdash; the weights become unstable and unreliable.</p>
+      </div>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: Two Identical Students</div>
+        <p>Imagine two students who always give the same answers on every test. If you try to figure out which one is actually smart (has a high weight), you cannot &mdash; they provide the same information. Your model cannot tell them apart, so the weights for both become unreliable.</p>
+        <p><strong>Mapping:</strong> Two identical students = two perfectly correlated features. Cannot tell who is smart = cannot determine individual feature importance. Unreliable weights = unstable coefficient estimates.</p>
+      </div>
+
+      <p><strong>How to fix:</strong> Check the <strong>Variance Inflation Factor (VIF)</strong>. VIF &gt; 10 indicates severe multicollinearity. Solutions: remove one of the correlated features, combine them (e.g., average), or use PCA for dimensionality reduction.</p>
+
+      <h3>3. Ignoring Assumptions</h3>
+
+      <div class="warning-box">
+        <div class="label">The Problem</div>
+        <p>Applying linear regression without checking the LINE assumptions can lead to misleading p-values, wrong confidence intervals, and unreliable predictions. The model might "work" on your training data but give you incorrect conclusions.</p>
+      </div>
+
+      <p><strong>How to fix:</strong> Always run the four diagnostic plots after fitting a linear regression model. Check residuals vs fitted for linearity and homoscedasticity, Q-Q plot for normality, and residual vs leverage for influential points.</p>
+
+      <h3>4. Not Scaling Features</h3>
+
+      <div class="warning-box">
+        <div class="label">The Problem</div>
+        <p>When features have vastly different scales (e.g., age in years 0-100 vs income in dollars 0-500,000), gradient descent takes a zigzag path because the contours of the cost function are elongated ellipses instead of circles. This makes convergence slow.</p>
+      </div>
+
+      <div class="worked-example">
+        <div class="example-title">Example: Why Scale Matters</div>
+        <div class="step">
+          <span class="step-num">1</span>
+          <span class="step-title">Unscaled features</span>
+          <div class="step-content">
+            Feature A: age (0 to 100)<br>
+            Feature B: income (0 to 500,000)<br><br>
+            A change of 1 in &theta;<sub>A</sub> affects h(x) by ~1 unit.<br>
+            A change of 1 in &theta;<sub>B</sub> affects h(x) by ~500,000 units.<br>
+            Gradient descent must use different step sizes for each parameter.
+          </div>
+        </div>
+        <div class="step">
+          <span class="step-num">2</span>
+          <span class="step-title">After scaling (standardization)</span>
+          <div class="step-content">
+            Feature A: z-score &rarr; range roughly -2 to +2<br>
+            Feature B: z-score &rarr; range roughly -2 to +2<br><br>
+            Now both features have similar scales. The cost function contours become more circular, and gradient descent converges much faster.
+          </div>
+        </div>
+      </div>
+
+      <div class="definition-box">
+        <div class="label">Common Scaling Methods</div>
+        <p>
+          &bull; <strong>Min-Max Scaling:</strong> x<sub>new</sub> = (x - min)/(max - min). Scales to [0, 1].<br>
+          &bull; <strong>Standardization (Z-score):</strong> x<sub>new</sub> = (x - &mu;)/&sigma;. Centers at 0 with unit variance. Most commonly used.<br>
+          &bull; <strong>Note:</strong> Do NOT scale the target variable y unless you are using regularized regression.
+        </p>
+      </div>
+
+      <div class="recap-box">
+        <div class="label">Plain-English Recap</div>
+        <p>Four common mistakes: (1) Ignoring outliers, which skew the regression line via MSE. (2) Multicollinearity, where correlated features make weights unstable. (3) Not checking LINE assumptions, leading to unreliable inferences. (4) Not scaling features, which makes gradient descent slow and unstable. Always preprocess your data: detect/remove outliers, check VIF for multicollinearity, run diagnostic plots for assumptions, and standardize features before gradient descent.</p>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ========================================================
+         FLASHCARDS
+    ======================================================== -->
+    <div id="section-flashcards" class="flashcard-container" data-progress-section="s-flashcards">
+      <div class="section-header">
+        <span class="emoji">&#128179;</span>
+        <h2>Flashcards</h2>
+      </div>
+
+      <div class="flashcard-controls">
+        <button class="btn btn-sm btn-secondary flash-prev">Previous</button>
+        <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
+        <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
+        <button class="btn btn-sm btn-secondary flash-next">Next</button>
+      </div>
+      <div class="flashcard-counter"></div>
+
+      <!-- Card 1 -->
+      <div class="flashcard" data-progress-section="s-flash-1">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Mean Squared Error (MSE)</div>
+          <div class="flashcard-back">
+            J(&theta;) = (1/2m)&Sigma;(h(x<sup>(i)</sup>) - y<sup>(i)</sup>)&sup2;. A cost function that measures the average of squared differences between predictions and actual values. The 1/2 factor simplifies the gradient. Squaring ensures positive errors and penalizes large deviations.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="flashcard" data-progress-section="s-flash-2">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Gradient Descent</div>
+          <div class="flashcard-back">
+            An iterative optimization algorithm that finds the minimum of a cost function by repeatedly computing the gradient (slope) and taking a step in the opposite direction: &theta;<sub>j</sub> := &theta;<sub>j</sub> - &alpha; &middot; &part;J/&part;&theta;<sub>j</sub>. It is the workhorse of machine learning training.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="flashcard" data-progress-section="s-flash-3">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Learning Rate (&alpha;)</div>
+          <div class="flashcard-back">
+            A hyperparameter that controls the size of each step in gradient descent. Too large: the algorithm overshoots and diverges. Too small: convergence is painfully slow. Just right: steady progress toward the minimum. Typical values: 0.001 to 0.1.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="flashcard" data-progress-section="s-flash-4">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Residual</div>
+          <div class="flashcard-back">
+            The difference between the actual value and the predicted value for a single data point: error = h(x) - y. Positive residual means over-prediction, negative means under-prediction. The sum (or average) of squared residuals is what the cost function minimizes.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="flashcard" data-progress-section="s-flash-5">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Overfitting</div>
+          <div class="flashcard-back">
+            When a model learns the training data too well, including noise and random quirks, and fails to generalize to new, unseen data. Characterized by low training error but high test error. Can be caused by too many features, too complex a model, or too little training data.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="flashcard" data-progress-section="s-flash-6">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Underfitting</div>
+          <div class="flashcard-back">
+            When a model is too simple to capture the underlying pattern in the data. Both training error and test error are high. The model has high bias and low variance. Caused by insufficient features, overly simple model, or not enough training.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 7 -->
+      <div class="flashcard" data-progress-section="s-flash-7">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Bias-Variance Trade-Off</div>
+          <div class="flashcard-back">
+            The fundamental tension in ML: reducing bias (model too simple) tends to increase variance (model too complex), and vice versa. Total error = Bias&sup2; + Variance + Noise. The goal is the sweet spot (Goldilocks zone) where both bias and variance are low enough to minimize total error.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 8 -->
+      <div class="flashcard" data-progress-section="s-flash-8">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">R&sup2; (R-squared)</div>
+          <div class="flashcard-back">
+            The coefficient of determination: R&sup2; = 1 - SS<sub>res</sub>/SS<sub>tot</sub>. It measures the proportion of variance in the target explained by the model. R&sup2; = 1 means perfect predictions; R&sup2; = 0 means the model is no better than predicting the mean.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 9 -->
+      <div class="flashcard" data-progress-section="s-flash-9">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">MAE (Mean Absolute Error)</div>
+          <div class="flashcard-back">
+            MAE = (1/m)&Sigma;|h(x) - y|. The average of absolute prediction errors. More robust to outliers than MSE because it does not square errors. Interpretable in the same units as the target variable.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 10 -->
+      <div class="flashcard" data-progress-section="s-flash-10">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">RMSE (Root Mean Squared Error)</div>
+          <div class="flashcard-back">
+            RMSE = &radic;MSE. The square root of MSE. Returns error to the original units of the target variable while still penalizing large errors more heavily than MAE. The most commonly used regression metric in practice.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 11 -->
+      <div class="flashcard" data-progress-section="s-flash-11">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Normal Equation</div>
+          <div class="flashcard-back">
+            &Theta;<sup>*</sup> = (X<sup>T</sup>X)<sup>-1</sup>X<sup>T</sup>y. A closed-form solution that computes the optimal parameters for linear regression in one step. No learning rate or iterations needed. Works for small datasets but becomes slow when the number of features n is very large due to O(n&sup3;) matrix inversion.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 12 -->
+      <div class="flashcard" data-progress-section="s-flash-12">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">BLUE</div>
+          <div class="flashcard-back">
+            Best Linear Unbiased Estimator. The Gauss-Markov theorem states that if LINE assumptions hold (specifically Linearity, Independence, Equal Variance), the OLS estimator has the smallest variance among all linear unbiased estimators. It is the "best" possible straight-line model.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 13 -->
+      <div class="flashcard" data-progress-section="s-flash-13">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Homoscedasticity</div>
+          <div class="flashcard-back">
+            The assumption that residuals have constant variance across all predicted values. The opposite is heteroscedasticity (residuals fan out like a megaphone). Checked with a Residuals vs Fitted plot. If violated, standard errors and p-values become unreliable.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 14 -->
+      <div class="flashcard" data-progress-section="s-flash-14">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Hypothesis Function</div>
+          <div class="flashcard-back">
+            h<sub>&theta;</sub>(x) = &theta;&#8320; + &theta;&#8321;x (simple) or h<sub>&theta;</sub>(x) = &theta;<sup>T</sup>x (matrix form). The model's prediction formula that maps input features to an output. Training is the process of finding the optimal parameter values &theta; that minimize the cost function.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ========================================================
+         QUIZ
+    ======================================================== -->
+    <div id="section-quiz" data-progress-section="s-quiz">
+      <div class="section-header">
+        <span class="emoji">&#128220;</span>
+        <h2>Knowledge Check Quiz</h2>
+      </div>
+
+      <div class="quiz-container" data-quiz-id="q1" data-progress-section="s-quiz-q1">
+        <div class="quiz-question">
+          <div class="q-num">Question 1 of 6</div>
+          <div class="q-text">In the hypothesis function h(x) = &theta;&#8320; + &theta;&#8321;x, what does &theta;&#8321; represent?</div>
+          <div class="quiz-option" data-correct="false">A. The intercept (baseline prediction)</div>
+          <div class="quiz-option" data-correct="true">B. The slope (how much h changes per unit increase in x)</div>
+          <div class="quiz-option" data-correct="false">C. The number of training examples</div>
+          <div class="quiz-option" data-correct="false">D. The learning rate</div>
+          <div class="quiz-feedback">&theta;&#8321; is the slope (weight for feature x). It controls the tilt of the regression line &mdash; how much the prediction changes for each 1-unit increase in x. &theta;&#8320; is the intercept.</div>
+        </div>
+      </div>
+
+      <div class="quiz-container" data-quiz-id="q2" data-progress-section="s-quiz-q2">
+        <div class="quiz-question">
+          <div class="q-num">Question 2 of 6</div>
+          <div class="q-text">The MSE cost function J(&theta;) = (1/2m)&Sigma;(h(x) - y)&sup2; divides by 2m instead of just m. Why is the factor of 1/2 included?</div>
+          <div class="quiz-option" data-correct="false">A. To make the error smaller and more readable</div>
+          <div class="quiz-option" data-correct="false">B. Because errors are always negative and need to be halved</div>
+          <div class="quiz-option" data-correct="true">C. To simplify the derivative &mdash; the 2 cancels with the exponent when differentiating</div>
+          <div class="quiz-option" data-correct="false">D. To account for the bias term</div>
+          <div class="quiz-feedback">The 1/2 is purely a mathematical convenience. When you take the derivative of (something)&sup2; using the chain rule, you get 2(something). The 1/2 cancels with this 2, giving a cleaner gradient formula: &part;J/&part;&theta; = (1/m)&Sigma;(h-y)x.</div>
+        </div>
+      </div>
+
+      <div class="quiz-container" data-quiz-id="q3" data-progress-section="s-quiz-q3">
+        <div class="quiz-question">
+          <div class="q-num">Question 3 of 6</div>
+          <div class="q-text">A model has training error = 2% and test error = 35%. What is this an example of?</div>
+          <div class="quiz-option" data-correct="false">A. Underfitting (high bias)</div>
+          <div class="quiz-option" data-correct="true">B. Overfitting (high variance)</div>
+          <div class="quiz-option" data-correct="false">C. A well-fitted model</div>
+          <div class="quiz-option" data-correct="false">D. Irreducible error</div>
+          <div class="quiz-feedback">Low training error (2%) but very high test error (35%) is the classic signature of overfitting. The model memorized the training data but cannot generalize. A well-fitted model would have both errors low and close together. Underfitting has both errors high.</div>
+        </div>
+      </div>
+
+      <div class="quiz-container" data-quiz-id="q4" data-progress-section="s-quiz-q4">
+        <div class="quiz-question">
+          <div class="q-num">Question 4 of 6</div>
+          <div class="q-text">Given 3 data points (1,3), (2,5), (3,8), and model h(x) = 1 + 2.5x, what is the MSE?</div>
+          <div class="quiz-option" data-correct="false">A. 0.25</div>
+          <div class="quiz-option" data-correct="true">B. 0.50</div>
+          <div class="quiz-option" data-correct="false">C. 0.083</div>
+          <div class="quiz-option" data-correct="false">D. 1.50</div>
+          <div class="quiz-feedback">h(1) = 1 + 2.5(1) = 3.5, error = 3.5 - 3 = 0.5, error&sup2; = 0.25. h(2) = 1 + 2.5(2) = 6, error = 6 - 5 = 1.0, error&sup2; = 1.0. h(3) = 1 + 2.5(3) = 8.5, error = 8.5 - 8 = 0.5, error&sup2; = 0.25. Sum of squared errors = 0.25 + 1.0 + 0.25 = 1.5. MSE = (1/m)&Sigma;error&sup2; = 1.5/3 = 0.50. Note: if using J(&theta;) with the 1/(2m) factor, J = 1.5/(2&times;3) = 0.25 (option A), but plain MSE uses 1/m, giving 0.50.</div>
+        </div>
+      </div>
+
+      <div class="quiz-container" data-quiz-id="q5" data-progress-section="s-quiz-q5">
+        <div class="quiz-question">
+          <div class="q-num">Question 5 of 6</div>
+          <div class="q-text">What does the Gauss-Markov theorem guarantee about the OLS estimator?</div>
+          <div class="quiz-option" data-correct="false">A. It always gives R&sup2; = 1</div>
+          <div class="quiz-option" data-correct="false">B. It finds the global minimum even for non-convex cost functions</div>
+          <div class="quiz-option" data-correct="true">C. It is the Best Linear Unbiased Estimator (BLUE) when LINE assumptions hold</div>
+          <div class="quiz-option" data-correct="false">D. It eliminates all outliers from the data</div>
+          <div class="quiz-feedback">The Gauss-Markov theorem states that when the LINE assumptions hold (Linearity, Independence, Equal Variance), the OLS estimator is BLUE &mdash; it has the smallest variance among all linear unbiased estimators. It does not guarantee perfect fit or outlier removal.</div>
+        </div>
+      </div>
+
+      <div class="quiz-container" data-quiz-id="q6" data-progress-section="s-quiz-q6">
+        <div class="quiz-question">
+          <div class="q-num">Question 6 of 6</div>
+          <div class="q-text">Which of the following is a valid reason to prefer MAE over RMSE?</div>
+          <div class="quiz-option" data-correct="true">A. The dataset contains significant outliers</div>
+          <div class="quiz-option" data-correct="false">B. Large errors must be penalized more heavily</div>
+          <div class="quiz-option" data-correct="false">C. You need the metric to be in squared units</div>
+          <div class="quiz-option" data-correct="false">D. You want to compare models with different numbers of features</div>
+          <div class="quiz-feedback">MAE is more robust to outliers than RMSE because it takes absolute values instead of squaring. When the dataset has significant outliers, MAE gives a more representative picture of typical error. RMSE is preferred when large errors should be penalized heavily.</div>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ========================================================
+         FILL IN THE BLANK
+    ======================================================== -->
+    <div id="section-fill" data-progress-section="s-fill">
+      <div class="section-header">
+        <span class="emoji">&#9997;</span>
+        <h2>Fill in the Blank</h2>
+      </div>
+
+      <div class="fill-blank-container" data-answer="theta0 + theta1 * x" data-alt-answers="&theta;0 + &theta;1x|theta0 + theta1x|θ0 + θ1x|&theta;&#8320; + &theta;&#8321;x" data-fill-id="f1" data-progress-section="s-fill-f1">
+        <p>The simple linear regression hypothesis function is written as h(x) = ___</p>
+        <input type="text" class="fill-blank-input" placeholder="Type answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+      </div>
+
+      <div class="fill-blank-container" data-answer="gradient descent" data-alt-answers="GD|stochastic gradient descent|SGD|mini-batch gradient descent" data-fill-id="f2" data-progress-section="s-fill-f2">
+        <p>The iterative optimization algorithm that repeatedly computes the gradient and takes a step in the opposite direction is called ___</p>
+        <input type="text" class="fill-blank-input" placeholder="Type answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+      </div>
+
+      <div class="fill-blank-container" data-answer="convex" data-alt-answers="" data-fill-id="f3" data-progress-section="s-fill-f3">
+        <p>The MSE cost function for linear regression has a ___ shape (bowl-shaped), guaranteeing a single global minimum.</p>
+        <input type="text" class="fill-blank-input" placeholder="Type answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+      </div>
+
+      <div class="fill-blank-container" data-answer="homoscedasticity" data-alt-answers="equal variance" data-fill-id="f4" data-progress-section="s-fill-f4">
+        <p>The LINE assumption requiring residuals to have constant variance across all predicted values is called ___</p>
+        <input type="text" class="fill-blank-input" placeholder="Type answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+      </div>
+
+      <div class="fill-blank-container" data-answer="blue" data-alt-answers="BLUE|best linear unbiased estimator" data-fill-id="f5" data-progress-section="s-fill-f5">
+        <p>According to the Gauss-Markov theorem, the OLS estimator is the ___ (Best Linear Unbiased Estimator).</p>
+        <input type="text" class="fill-blank-input" placeholder="Type answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ========================================================
+         SCENARIO CHALLENGE
+    ======================================================== -->
+    <div id="section-scenario" data-progress-section="s-scenario">
+      <div class="section-header">
+        <span class="emoji">&#127919;</span>
+        <h2>Scenario Challenge</h2>
+      </div>
+
+      <div class="quiz-question">
+        <div class="q-num">Scenario-Based Question</div>
+        <div class="q-text">
+          You are a data scientist at a hospital. You build a linear regression model to predict patient blood sugar levels based on insulin dosage (mg), BMI, and age. After training, you get R&sup2; = 0.92. However, when you plot residuals vs fitted values, you see a clear funnel pattern (residuals fan out as predictions increase). You also notice one patient with Cook's Distance = 1.8.<br><br>
+          What steps should you take, and in what order? Select the BEST answer:
+        </div>
+        <div class="quiz-option" data-correct="false">A. The R&sup2; is 0.92, so the model is fine. No action needed.</div>
+        <div class="quiz-option" data-correct="false">B. Immediately remove the patient with high Cook's Distance and retrain.</div>
+        <div class="quiz-option" data-correct="true">C. Investigate the outlier first (data entry error? rare condition?), check homoscedasticity violation (apply log transform to target), then investigate the influential point's clinical context before deciding to keep or remove it.</div>
+        <div class="quiz-option" data-correct="false">D. Switch to a neural network since linear regression clearly does not work.</div>
+        <div class="quiz-feedback">
+          <strong>Why C is correct:</strong> The funnel pattern indicates <strong>heteroscedasticity</strong> (violates homoscedasticity assumption). This makes p-values and confidence intervals unreliable even though R&sup2; is high. The recommended fix is to transform the target (e.g., log transform) or use weighted least squares. The high Cook's Distance (1.8 &gt;&gt; 0.5) indicates an influential point, but you should NOT blindly remove it &mdash; investigate whether it represents a rare but legitimate medical condition, a data entry error, or a special patient subgroup. <strong>Why others are wrong:</strong> A ignores the violated assumption (high R&sup2; does not mean the model is valid). B removes data without understanding it first. D is overkill &mdash; the issue is data preprocessing, not model complexity.
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic 7: Neural Network Foundations</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+    <a href="index.html" class="home-link">← Back to Home</a>
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span class="icon">&#9728;</span> Toggle Theme</button>
+</nav>
+
+<div class="sidebar" id="sidebar">
+    <h2>Topic 7: Neural Network Foundations</h2>
+    <nav class="section-nav">
+        <a href="#section1">7.1 Why Neural Networks</a>
+        <a href="#section2">7.2 The Perceptron Recap</a>
+        <a href="#section3">7.3 The MLP</a>
+        <a href="#section4">7.4 Forward Pass</a>
+        <a href="#section5">7.5 Worked Example: Forward Pass</a>
+        <a href="#section6">7.6 Backpropagation</a>
+        <a href="#section7">7.7 Backprop Worked Example</a>
+        <a href="#section8">7.8 Weight Update Table</a>
+        <a href="#section9">7.9 The Backprop Recipe</a>
+        <a href="#section10">7.10 Common Mistakes</a>
+        <a href="#flashcards-section">Flashcards</a>
+        <a href="#quiz-section">Quiz</a>
+        <a href="#fill-blank-section">Fill in the Blanks</a>
+    </nav>
+    <div class="progress-container">
+        <div class="progress-label">Progress</div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-percent" id="progress-percent">0%</div>
+    </div>
+</div>
+
+<main class="content">
+
+<!-- ============================================================ -->
+<!-- SECTION 1: WHY NEURAL NETWORKS -->
+<!-- ============================================================ -->
+<section id="section1" data-progress-section>
+    <h2>7.1 Why Neural Networks?</h2>
+
+    <div class="analogy-box">
+        <strong>Analogy:</strong> Imagine you're trying to separate red and blue marbles on a table. If you can draw a single straight line to separate them, that's easy — a linear model does that. But what if the red marbles are clustered in a circle in the middle and the blue marbles surround them? No single straight line can separate them. You need a curve. Linear models <em>cannot</em> draw curves. Neural networks can.
+    </div>
+
+    <h3>The Limitation of Linear Models</h3>
+    <p>A linear model computes:</p>
+    <p class="formula">ŷ = w₁x₁ + w₂x₂ + b</p>
+    <p>This always produces a <strong>linear decision boundary</strong> — a straight line (in 2D) or flat plane (in higher dimensions). Many real-world problems have decision boundaries that are curved, twisted, or nested.</p>
+
+    <div class="definition-box">
+        <strong>XOR Problem:</strong> The classic example. Given two binary inputs, XOR returns 1 when exactly one input is 1:
+        <br><br>
+        (0,0) → 0 &nbsp; (0,1) → 1 &nbsp; (1,0) → 1 &nbsp; (1,1) → 0
+        <br><br>
+        No single straight line can separate the 0s from the 1s on a 2D grid. This is <em>impossible</em> for any linear classifier. A neural network with even one hidden layer and a non-linear activation can solve XOR trivially.
+    </div>
+
+    <h3>What Neural Networks Give Us</h3>
+    <p>By stacking neurons with non-linear activation functions, neural networks gain the ability to approximate <strong>any continuous function</strong> to arbitrary accuracy. This is the <strong>Universal Approximation Theorem</strong>:</p>
+
+    <div class="definition-box">
+        <strong>Universal Approximation Theorem:</strong> A feedforward neural network with a single hidden layer containing a finite number of neurons can approximate any continuous function on a compact subset of ℝⁿ, given appropriate weights and a non-linear activation function.
+        <br><br>
+        In plain English: with enough neurons in one hidden layer, a neural network can fit <em>any</em> input-output relationship you throw at it. The catch? "Enough" neurons might be impractically many, which is why deeper networks (multiple hidden layers) are more efficient in practice.
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Linear models hit a hard ceiling on expressiveness. Neural networks break through that ceiling by stacking non-linear transformations, allowing them to learn curved, complex decision boundaries and model virtually any function.
+    </div>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">Why can't a linear model solve XOR?</span>
+        <div class="collapsible-content">
+            <p>Plot the four XOR points on a 2D plane. The two points labeled 1 — (0,1) and (1,0) — are separated by the two points labeled 0 — (0,0) and (1,1). Any straight line you draw will either misclassify at least one point, or put two same-label points on opposite sides. Mathematically, you can prove there is no set of weights w₁, w₂, b such that the sign of w₁x₁ + w₂x₂ + b correctly classifies all four points simultaneously.</p>
+        </div>
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> Linear models produce straight decision boundaries. The XOR problem proves this is insufficient. Neural networks with non-linear activations can draw curved boundaries and approximate any function.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 2: THE PERCEPTRON RECAP -->
+<!-- ============================================================ -->
+<section id="section2" data-progress-section>
+    <h2>7.2 The Perceptron Recap</h2>
+
+    <p>The perceptron is the simplest neural network unit — a single neuron. Before we build multi-layer networks, let's make sure the foundation is solid.</p>
+
+    <h3>Step 1: Weighted Sum</h3>
+    <p>A neuron receives inputs x₁, x₂, …, xₙ. Each input is multiplied by a weight, and a bias is added:</p>
+    <p class="formula">z = w₁x₁ + w₂x₂ + w₃x₃ + b</p>
+    <p>In vector form: <strong>z = w·x + b</strong> (dot product of weights and inputs, plus bias).</p>
+
+    <div class="analogy-box">
+        <strong>Analogy:</strong> Think of a neuron as a decision committee. Each input is a piece of evidence (e.g., temperature, humidity, wind speed). Each weight says how much that piece of evidence matters. The bias is the committee's default inclination before seeing any evidence. The weighted sum z is the committee's raw verdict.
+    </div>
+
+    <h3>Step 2: Activation Function</h3>
+    <p>The raw sum z is then passed through a non-linear activation function φ:</p>
+    <p class="formula">a = φ(z)</p>
+    <p>Common activations:</p>
+    <ul>
+        <li><strong>Sigmoid:</strong> φ(z) = 1/(1 + e⁻ᶻ) — squashes output to (0, 1)</li>
+        <li><strong>ReLU:</strong> φ(z) = max(0, z) — outputs 0 for negative inputs, identity for positive</li>
+        <li><strong>Tanh:</strong> φ(z) = (eᶻ − e⁻ᶻ)/(eᶻ + e⁻ᶻ) — squashes to (−1, 1)</li>
+    </ul>
+
+    <div class="definition-box">
+        <strong>Why activation functions matter:</strong> Without an activation function (or with a linear one), stacking neurons would still produce a linear function. The non-linearity in φ is what gives networks their power to model complex relationships.
+    </div>
+
+    <h3>Step 3: Learning = Adjusting Weights</h3>
+    <p>Initially, the weights are random. The perceptron makes a prediction, compares it to the true label, and adjusts weights to reduce the error. This process repeats until predictions match reality (or get close enough).</p>
+
+    <div class="warning-box">
+        <strong>Warning:</strong> A single perceptron can only learn linearly separable patterns. It was shown (Minsky &amp; Papert, 1969) that single-layer perceptrons <em>cannot</em> solve XOR. This limitation motivated multi-layer networks.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> A perceptron computes z = w·x + b, applies activation a = φ(z), and learns by adjusting weights based on prediction error. Single perceptrons are limited to linearly separable problems.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 3: THE MULTI-LAYER PERCEPTRON (MLP) -->
+<!-- ============================================================ -->
+<section id="section3" data-progress-section>
+    <h2>7.3 The Multi-Layer Perceptron (MLP)</h2>
+
+    <p>The MLP solves the perceptron's limitation by <strong>stacking neurons into layers</strong> and connecting those layers together.</p>
+
+    <h3>Architecture</h3>
+    <ul>
+        <li><strong>Input Layer:</strong> Receives raw features (no computation, just passes values forward).</li>
+        <li><strong>Hidden Layer(s):</strong> One or more layers of neurons between input and output. Each neuron computes a weighted sum + activation.</li>
+        <li><strong>Output Layer:</strong> Produces the final prediction (number of neurons matches the task).</li>
+    </ul>
+
+    <div class="definition-box">
+        <strong>Fully Connected (Dense):</strong> In an MLP, every neuron in layer <em>l</em> is connected to every neuron in layer <em>l+1</em>. This means the weight matrix W⁽ˡ⁾ for layer <em>l</em> has dimensions (number of neurons in layer <em>l+1</em>) × (number of neurons in layer <em>l</em>).
+    </div>
+
+    <h3>Notation</h3>
+    <p>This notation is critical for understanding the math in later sections:</p>
+    <table class="formula-table">
+        <tr><th>Symbol</th><th>Meaning</th></tr>
+        <tr><td class="formula">w<sub>ij</sub><sup>(l)</sup></td><td>Weight from neuron <em>j</em> in layer <em>l−1</em> to neuron <em>i</em> in layer <em>l</em></td></tr>
+        <tr><td class="formula">b<sub>j</sub><sup>(l)</sup></td><td>Bias of neuron <em>j</em> in layer <em>l</em></td></tr>
+        <tr><td class="formula">z<sub>j</sub><sup>(l)</sup></td><td>Pre-activation (weighted sum) of neuron <em>j</em> in layer <em>l</em></td></tr>
+        <tr><td class="formula">a<sub>j</sub><sup>(l)</sup></td><td>Post-activation (output) of neuron <em>j</em> in layer <em>l</em></td></tr>
+        <tr><td class="formula">a<sup>(0)</sup></td><td>Input vector (layer 0)</td></tr>
+    </table>
+
+    <h3>A Simple MLP Diagram</h3>
+    <pre style="text-align:center; font-size:0.9em;">
+    Input Layer        Hidden Layer         Output Layer
+
+      [x₁]───────────[h₁]──────────┐
+        │          ╱   │            │
+        │       ╱      │            ├──[ŷ]
+        │    ╱         │            │
+      [x₂]───────────[h₂]──────────┘
+        │          ╲   │
+        │            ╲ │
+    </pre>
+    <p>Every input connects to every hidden neuron. Every hidden neuron connects to the output. This is a fully connected network.</p>
+
+    <div class="analogy-box">
+        <strong>Analogy:</strong> Think of an MLP as a company with departments. The input layer is the raw data team (gatherers). The hidden layers are processing departments — each department specializes in a different aspect of the data. The output layer is the final decision-maker who synthesizes all department reports into a single answer. Each department (layer) transforms the information before passing it on.
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> An MLP stacks perceptrons into layers and connects them fully. The notation w<sub>ij</sub><sup>(l)</sup>, b<sub>j</sub><sup>(l)</sup>, z<sub>j</sub><sup>(l)</sup>, a<sub>j</sub><sup>(l)</sup> lets us describe what happens at every neuron in every layer compactly.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> MLP = input layer → hidden layer(s) → output layer. Fully connected means every neuron connects to every neuron in the next layer. The notation system lets us track weights, biases, pre-activations, and activations across layers.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 4: FORWARD PASS -->
+<!-- ============================================================ -->
+<section id="section4" data-progress-section>
+    <h2>7.4 The Forward Pass</h2>
+
+    <p>The <strong>forward pass</strong> is how data flows through the network to produce a prediction. You start at the input and compute layer by layer until you reach the output.</p>
+
+    <h3>The Formula</h3>
+    <p>For each layer <em>l</em> (from 1 to the final layer):</p>
+    <p class="formula">z<sup>(l)</sup> = W<sup>(l)</sup> · a<sup>(l−1)</sup> + b<sup>(l)</sup></p>
+    <p class="formula">a<sup>(l)</sup> = φ(z<sup>(l)</sup>)</p>
+    <p>Where:</p>
+    <ul>
+        <li>a<sup>(0)</sup> is the input vector</li>
+        <li>W<sup>(l)</sup> is the weight matrix for layer <em>l</em></li>
+        <li>b<sup>(l)</sup> is the bias vector for layer <em>l</em></li>
+        <li>φ is the activation function</li>
+    </ul>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">Why store both z and a?</span>
+        <div class="collapsible-content">
+            <p>We need both because during backpropagation, we need to compute the derivative of the activation function, which is φ'(z). If we only stored a (the activated output), we'd have to recompute z. If we only stored z, we'd need to recompute a for each layer. Storing both makes backpropagation efficient — we just look up the stored values.</p>
+        </div>
+    </div>
+
+    <h3>Layer by Layer</h3>
+    <ol>
+        <li><strong>Input layer:</strong> a<sup>(0)</sup> = x (the input features). No computation.</li>
+        <li><strong>Hidden layer 1:</strong> Compute z<sup>(1)</sup> = W<sup>(1)</sup>·x + b<sup>(1)</sup>, then a<sup>(1)</sup> = φ(z<sup>(1)</sup>).</li>
+        <li><strong>Hidden layer 2 (if any):</strong> Compute z<sup>(2)</sup> = W<sup>(2)</sup>·a<sup>(1)</sup> + b<sup>(2)</sup>, then a<sup>(2)</sup> = φ(z<sup>(2)</sup>).</li>
+        <li><strong>Output layer:</strong> Compute z<sup>(L)</sup> = W<sup>(L)</sup>·a<sup>(L−1)</sup> + b<sup>(L)</sup>, then a<sup>(L)</sup> = φ(z<sup>(L)</sup>).</li>
+        <li><strong>Prediction:</strong> ŷ = a<sup>(L)</sup> (the final layer's activation is the model output).</li>
+    </ol>
+
+    <div class="warning-box">
+        <strong>Warning:</strong> The activation function on the output layer depends on the task. For binary classification, use sigmoid. For multi-class, use softmax. For regression, often no activation (or ReLU). Mixing up activation functions and loss functions is a common source of bugs.
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> The forward pass computes z = W·a<sub>prev</sub> + b, then a = φ(z) at each layer, propagating from input to output. The final activation ŷ is the network's prediction. Always store both z and a for use in backpropagation.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> Forward pass: a<sup>(0)</sup>=x, then for each layer l: z<sup>(l)</sup> = W<sup>(l)</sup>·a<sup>(l−1)</sup> + b<sup>(l)</sup>, a<sup>(l)</sup> = φ(z<sup>(l)</sup>). Output = a<sup>(L)</sup> = ŷ.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 5: WORKED EXAMPLE - FORWARD PASS -->
+<!-- ============================================================ -->
+<section id="section5" data-progress-section>
+    <h2>7.5 Worked Example: Forward Pass (Step-by-Step)</h2>
+
+    <p>Let's compute a full forward pass by hand. This is the kind of calculation you should be able to do on an exam.</p>
+
+    <h3>Given Values</h3>
+    <table class="formula-table">
+        <tr><th>Parameter</th><th>Value</th></tr>
+        <tr><td>Input x₁</td><td>0.5</td></tr>
+        <tr><td>Input x₂</td><td>0.3</td></tr>
+        <tr><td>Target y</td><td>1</td></tr>
+        <tr><td>Hidden weights w₁₁, w₁₂</td><td>0.15, 0.20</td></tr>
+        <tr><td>Hidden biases b₁, b₂</td><td>0.10, 0.10</td></tr>
+        <tr><td>Hidden weights w₂₁, w₂₂</td><td>0.25, 0.30</td></tr>
+        <tr><td>Output weights w₁, w₂</td><td>0.40, 0.50</td></tr>
+        <tr><td>Output bias b₃</td><td>0.20</td></tr>
+        <tr><td>Activation</td><td>Sigmoid on both layers</td></tr>
+        <tr><td>Loss function</td><td>L = ½(ŷ − y)²</td></tr>
+    </table>
+
+    <h3>Step 1: Hidden Neuron h₁</h3>
+    <p>Compute the weighted sum (pre-activation) for the first hidden neuron:</p>
+    <p class="formula">z₁ = w₁₁·x₁ + w₁₂·x₂ + b₁</p>
+    <p class="formula">z₁ = 0.15 × 0.5 + 0.20 × 0.3 + 0.10</p>
+    <p class="formula">z₁ = 0.075 + 0.060 + 0.10 = 0.235</p>
+    <p>Apply sigmoid activation:</p>
+    <p class="formula">h₁ = σ(z₁) = 1/(1 + e<sup>−0.235</sup>)</p>
+    <p class="formula">h₁ = 1/(1 + 0.7907) = 1/1.7907 = <strong>0.5585</strong></p>
+
+    <div class="worked-example">
+        <strong>Worked Calculation Detail:</strong><br>
+        e<sup>−0.235</sup> = 0.7907 (using calculator)<br>
+        1 + 0.7907 = 1.7907<br>
+        1 / 1.7907 = 0.5585<br>
+        So h₁ = 0.5585. This means neuron h₁ is "55.85% activated."
+    </div>
+
+    <h3>Step 2: Hidden Neuron h₂</h3>
+    <p class="formula">z₂ = w₂₁·x₁ + w₂₂·x₂ + b₂</p>
+    <p class="formula">z₂ = 0.25 × 0.5 + 0.30 × 0.3 + 0.10</p>
+    <p class="formula">z₂ = 0.125 + 0.090 + 0.10 = 0.315</p>
+    <p class="formula">h₂ = σ(0.315) = 1/(1 + e<sup>−0.315</sup>)</p>
+    <p class="formula">h₂ = 1/(1 + 0.7297) = 1/1.7297 = <strong>0.5781</strong></p>
+
+    <div class="worked-example">
+        <strong>Worked Calculation Detail:</strong><br>
+        e<sup>−0.315</sup> = 0.7297<br>
+        1 + 0.7297 = 1.7297<br>
+        1 / 1.7297 = 0.5781<br>
+        So h₂ = 0.5781.
+    </div>
+
+    <h3>Step 3: Output Neuron</h3>
+    <p>The output neuron receives h₁ and h₂ as inputs:</p>
+    <p class="formula">z₃ = w₁·h₁ + w₂·h₂ + b₃</p>
+    <p class="formula">z₃ = 0.40 × 0.5585 + 0.50 × 0.5781 + 0.20</p>
+    <p class="formula">z₃ = 0.2234 + 0.2890 + 0.20 = 0.7124</p>
+    <p class="formula">ŷ = σ(0.7124) = 1/(1 + e<sup>−0.7124</sup>)</p>
+    <p class="formula">ŷ = 1/(1 + 0.4905) = 1/1.4905 = <strong>0.6710</strong></p>
+
+    <div class="worked-example">
+        <strong>Worked Calculation Detail:</strong><br>
+        e<sup>−0.7124</sup> = 0.4905<br>
+        1 + 0.4905 = 1.4905<br>
+        1 / 1.4905 = 0.6710<br>
+        The network predicts ŷ = 0.6710. The true label is y = 1.
+    </div>
+
+    <h3>Step 4: Loss</h3>
+    <p>Using the squared error loss L = ½(ŷ − y)²:</p>
+    <p class="formula">L = ½(0.6710 − 1)²</p>
+    <p class="formula">L = ½ × (−0.3290)²</p>
+    <p class="formula">L = ½ × 0.10824</p>
+    <p class="formula">L = <strong>0.05412</strong></p>
+
+    <div class="worked-example">
+        <strong>Verification:</strong> (0.6710 − 1) = −0.3290. (−0.3290)² = 0.108241. 0.108241/2 = 0.05412. ✓
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> The forward pass computed: input → hidden layer (h₁=0.5585, h₂=0.5781) → output (ŷ=0.6710) → loss (L=0.05412). The network predicts 0.6710 when the true answer is 1, so the loss is 0.05412. Now we need backpropagation to figure out how to adjust the weights to reduce this loss.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> Forward pass produced h₁=0.5585, h₂=0.5781, ŷ=0.6710, and loss L=0.05412. Each step: weighted sum → sigmoid activation → next layer.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 6: BACKPROPAGATION -->
+<!-- ============================================================ -->
+<section id="section6" data-progress-section>
+    <h2>7.6 Backpropagation</h2>
+
+    <p>We know the network made a prediction (0.6710) that's too low (target is 1). We need to figure out <strong>which weights to adjust and by how much</strong>. That's what backpropagation does.</p>
+
+    <div class="definition-box">
+        <strong>Backpropagation:</strong> An algorithm that computes the gradient of the loss with respect to every weight in the network by applying the chain rule of calculus, propagating error signals backward from the output to the input.
+    </div>
+
+    <h3>The Chain Rule</h3>
+    <p>The core idea is the <strong>chain rule</strong>. If L depends on a, which depends on z, which depends on w, then:</p>
+    <p class="formula">dL/dw = dL/da · da/dz · dz/dw</p>
+
+    <div class="analogy-box">
+        <strong>Analogy:</strong> Imagine a factory assembly line. The final product's quality (loss L) depends on the assembly step (output activation a), which depends on the machine settings (pre-activation z), which depends on the calibration knobs (weights w). To improve quality, you trace back through each step: "How much did quality change per unit of assembly output? × How much did assembly output change per unit of machine setting? × How much did machine setting change per knob turn?" The chain rule multiplies these ratios together.
+    </div>
+
+    <h3>Sigmoid Derivative</h3>
+    <p>A key property of the sigmoid function makes backpropagation elegant:</p>
+    <p class="formula">σ'(z) = σ(z) · (1 − σ(z))</p>
+    <p>This means if we already know σ(z) = a (which we stored during the forward pass), the derivative is just a(1 − a). No need for recomputation!</p>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">Proof of σ'(z) = σ(z)(1 − σ(z))</span>
+        <div class="collapsible-content">
+            <p>Start with σ(z) = 1/(1 + e⁻ᶻ) = (1 + e⁻ᶻ)⁻¹</p>
+            <p>Using the chain rule: σ'(z) = −1 · (1 + e⁻ᶻ)⁻² · (−e⁻ᶻ) = e⁻ᶻ/(1 + e⁻ᶻ)²</p>
+            <p>Factor: = [1/(1+e⁻ᶻ)] · [e⁻ᶻ/(1+e⁻ᶻ)]</p>
+            <p>= σ(z) · [(1+e⁻ᶻ) − 1]/(1+e⁻ᶻ) = σ(z) · [1 − 1/(1+e⁻ᶻ)] = σ(z)(1 − σ(z))</p>
+            <p>This beautiful property means the derivative only needs the forward pass value.</p>
+        </div>
+    </div>
+
+    <h3>Output Layer Error (δ)</h3>
+    <p>The error signal for the output neuron is:</p>
+    <p class="formula">δ<sub>out</sub> = (ŷ − y) · σ'(z₃) = (ŷ − y) · ŷ · (1 − ŷ)</p>
+
+    <h3>Computing Our Example's δ<sub>out</sub></h3>
+    <p class="formula">δ<sub>out</sub> = (0.6710 − 1) × 0.6710 × (1 − 0.6710)</p>
+    <p class="formula">δ<sub>out</sub> = (−0.3290) × 0.6710 × 0.3290</p>
+    <p class="formula">δ<sub>out</sub> = (−0.3290) × 0.2208</p>
+    <p class="formula">δ<sub>out</sub> = <strong>−0.0726</strong></p>
+
+    <div class="worked-example">
+        <strong>Step-by-step:</strong><br>
+        ŷ − y = 0.6710 − 1.0000 = −0.3290<br>
+        ŷ(1 − ŷ) = 0.6710 × 0.3290 = 0.2208 (this is σ'(z₃))<br>
+        δ<sub>out</sub> = (−0.3290) × 0.2208 = −0.0726<br>
+        The negative sign means: the output needs to increase to reduce loss.
+    </div>
+
+    <h3>Weight Gradients at Output Layer</h3>
+    <p>For a weight w connecting hidden neuron j to the output:</p>
+    <p class="formula">∂L/∂w = δ<sub>out</sub> × a<sub>j</sub> (where a<sub>j</sub> is the hidden neuron's activation)</p>
+    <p class="formula">∂L/∂b₃ = δ<sub>out</sub></p>
+
+    <div class="warning-box">
+        <strong>Warning:</strong> The gradient for the bias is simply δ (no multiplication by an input), because the bias is connected to a virtual input that's always 1. Don't multiply by any hidden activation for bias gradients.
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Backpropagation uses the chain rule to compute dL/dw = dL/da · da/dz · dz/dw. The sigmoid derivative σ'(z) = a(1−a) makes computation efficient. δ<sub>out</sub> = (ŷ−y)·ŷ·(1−ŷ) captures the output error signal, which is then used to compute weight gradients.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> Backprop = chain rule applied layer by layer. σ'(z) = a(1−a). Output error δ<sub>out</sub> = (ŷ−y)·ŷ·(1−ŷ). Weight gradient = δ × (input to that weight). Bias gradient = δ.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 7: BACKPROP WORKED EXAMPLE -->
+<!-- ============================================================ -->
+<section id="section7" data-progress-section>
+    <h2>7.7 Backpropagation Worked Example (Step-by-Step)</h2>
+
+    <p>We have δ<sub>out</sub> = −0.0726 from the previous section. Now we compute all weight gradients.</p>
+
+    <h3>Output Layer Gradients</h3>
+
+    <div class="worked-example">
+        <strong>∂L/∂w₁</strong> (weight from h₁ to output):<br>
+        ∂L/∂w₁ = δ<sub>out</sub> × h₁ = −0.0726 × 0.5585 = <strong>−0.0405</strong>
+    </div>
+
+    <div class="worked-example">
+        <strong>∂L/∂w₂</strong> (weight from h₂ to output):<br>
+        ∂L/∂w₂ = δ<sub>out</sub> × h₂ = −0.0726 × 0.5781 = <strong>−0.0420</strong>
+    </div>
+
+    <div class="worked-example">
+        <strong>∂L/∂b₃</strong> (output bias):<br>
+        ∂L/∂b₃ = δ<sub>out</sub> = <strong>−0.0726</strong>
+    </div>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">Why are these gradients negative?</span>
+        <div class="collapsible-content">
+            <p>All three output-layer gradients are negative. This means: <em>increasing</em> these weights would <em>decrease</em> the loss. Since our prediction (0.6710) is too low and the target is 1, we need to push the output higher. The negative gradients tell us exactly that: move weights in the opposite direction of the gradient (i.e., increase them) to reduce loss.</p>
+        </div>
+    </div>
+
+    <h3>Hidden Layer Error Signals</h3>
+    <p>To compute hidden layer gradients, we first need to propagate the error backward. For hidden neuron j:</p>
+    <p class="formula">δ<sub>hj</sub> = Σᵢ (w<sub>ij</sub> × δ<sub>i</sub>) × σ'(z<sub>j</sub>)</p>
+    <p>In our simple case with one output neuron:</p>
+    <p class="formula">δ<sub>hj</sub> = w<sub>j</sub> × δ<sub>out</sub> × h<sub>j</sub> × (1 − h<sub>j</sub>)</p>
+
+    <div class="worked-example">
+        <strong>δ<sub>h₁</sub></strong> (error signal for hidden neuron 1):<br>
+        δ<sub>h₁</sub> = w₁ × δ<sub>out</sub> × h₁ × (1 − h₁)<br>
+        δ<sub>h₁</sub> = 0.40 × (−0.0726) × 0.5585 × (1 − 0.5585)<br>
+        δ<sub>h₁</sub> = 0.40 × (−0.0726) × 0.5585 × 0.4415<br>
+        δ<sub>h₁</sub> = 0.40 × (−0.0726) × 0.2466<br>
+        δ<sub>h₁</sub> = <strong>−0.00716</strong>
+    </div>
+
+    <div class="worked-example">
+        <strong>δ<sub>h₂</sub></strong> (error signal for hidden neuron 2):<br>
+        δ<sub>h₂</sub> = w₂ × δ<sub>out</sub> × h₂ × (1 − h₂)<br>
+        δ<sub>h₂</sub> = 0.50 × (−0.0726) × 0.5781 × (1 − 0.5781)<br>
+        δ<sub>h₂</sub> = 0.50 × (−0.0726) × 0.5781 × 0.4219<br>
+        δ<sub>h₂</sub> = 0.50 × (−0.0726) × 0.2439<br>
+        δ<sub>h₂</sub> = <strong>−0.00885</strong>
+    </div>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">Why are hidden deltas smaller than the output delta?</span>
+        <div class="collapsible-content">
+            <p>Two reasons: (1) The hidden deltas are multiplied by the output weights (0.40 and 0.50), which are less than 1, shrinking the signal. (2) The sigmoid derivative at the hidden layer (h₁(1−h₁) and h₂(1−h₂)) further shrinks the values. This is related to the <strong>vanishing gradient problem</strong> — in deep networks, error signals can become extremely small as they propagate back through many layers, making early layers learn very slowly.</p>
+        </div>
+    </div>
+
+    <h3>Hidden Layer Weight Gradients</h3>
+    <p>Now we compute the gradients for the weights connecting the input to the hidden layer:</p>
+
+    <div class="worked-example">
+        <strong>∂L/∂w₁₁</strong> (x₁ → h₁):<br>
+        ∂L/∂w₁₁ = δ<sub>h₁</sub> × x₁ = −0.00716 × 0.5 = <strong>−0.00358</strong>
+    </div>
+
+    <div class="worked-example">
+        <strong>∂L/∂w₁₂</strong> (x₂ → h₁):<br>
+        ∂L/∂w₁₂ = δ<sub>h₁</sub> × x₂ = −0.00716 × 0.3 = <strong>−0.00215</strong>
+    </div>
+
+    <div class="worked-example">
+        <strong>∂L/∂w₂₁</strong> (x₁ → h₂):<br>
+        ∂L/∂w₂₁ = δ<sub>h₂</sub> × x₁ = −0.00885 × 0.5 = <strong>−0.00442</strong>
+    </div>
+
+    <div class="worked-example">
+        <strong>∂L/∂w₂₂</strong> (x₂ → h₂):<br>
+        ∂L/∂w₂₂ = δ<sub>h₂</sub> × x₂ = −0.00885 × 0.3 = <strong>−0.00266</strong>
+    </div>
+
+    <div class="worked-example">
+        <strong>∂L/∂b₁</strong> (bias of h₁):<br>
+        ∂L/∂b₁ = δ<sub>h₁</sub> = <strong>−0.00716</strong>
+    </div>
+
+    <div class="worked-example">
+        <strong>∂L/∂b₂</strong> (bias of h₂):<br>
+        ∂L/∂b₂ = δ<sub>h₂</sub> = <strong>−0.00885</strong>
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> We computed 9 gradients total: 3 for the output layer (2 weights + 1 bias) and 6 for the hidden layer (4 weights + 2 biases). All gradients are negative, meaning all weights should increase. The hidden layer gradients are much smaller (about 10× smaller) than the output layer gradients.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> Output gradients: ∂L/∂w₁=−0.0405, ∂L/∂w₂=−0.0420, ∂L/∂b₃=−0.0726. Hidden deltas: δ<sub>h₁</sub>=−0.00716, δ<sub>h₂</sub>=−0.00885. Hidden gradients: ∂L/∂w₁₁=−0.00358, ∂L/∂w₁₂=−0.00215, ∂L/∂w₂₁=−0.00442, ∂L/∂w₂₂=−0.00266, ∂L/∂b₁=−0.00716, ∂L/∂b₂=−0.00885.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 8: WEIGHT UPDATE TABLE -->
+<!-- ============================================================ -->
+<section id="section8" data-progress-section>
+    <h2>7.8 Weight Update Table</h2>
+
+    <p>With all gradients computed, we update the weights using gradient descent. With learning rate η = 0.5:</p>
+    <p class="formula">w<sub>new</sub> = w<sub>old</sub> − η × ∂L/∂w</p>
+
+    <h3>Complete Weight Update Table</h3>
+    <table class="formula-table">
+        <tr>
+            <th>Layer</th>
+            <th>Parameter</th>
+            <th>Old Value</th>
+            <th>Gradient (∂L/∂w)</th>
+            <th>Update (−η·grad)</th>
+            <th>New Value</th>
+        </tr>
+        <tr>
+            <td>Hidden</td>
+            <td>w₁₁</td>
+            <td>0.1500</td>
+            <td>−0.00358</td>
+            <td>+0.00179</td>
+            <td>0.15179</td>
+        </tr>
+        <tr>
+            <td>Hidden</td>
+            <td>w₁₂</td>
+            <td>0.2000</td>
+            <td>−0.00215</td>
+            <td>+0.00108</td>
+            <td>0.20108</td>
+        </tr>
+        <tr>
+            <td>Hidden</td>
+            <td>w₂₁</td>
+            <td>0.2500</td>
+            <td>−0.00442</td>
+            <td>+0.00221</td>
+            <td>0.25221</td>
+        </tr>
+        <tr>
+            <td>Hidden</td>
+            <td>w₂₂</td>
+            <td>0.3000</td>
+            <td>−0.00266</td>
+            <td>+0.00133</td>
+            <td>0.30133</td>
+        </tr>
+        <tr>
+            <td>Hidden</td>
+            <td>b₁</td>
+            <td>0.1000</td>
+            <td>−0.00716</td>
+            <td>+0.00358</td>
+            <td>0.10358</td>
+        </tr>
+        <tr>
+            <td>Hidden</td>
+            <td>b₂</td>
+            <td>0.1000</td>
+            <td>−0.00885</td>
+            <td>+0.00443</td>
+            <td>0.10443</td>
+        </tr>
+        <tr>
+            <td>Output</td>
+            <td>w₁</td>
+            <td>0.4000</td>
+            <td>−0.0405</td>
+            <td>+0.02025</td>
+            <td>0.42025</td>
+        </tr>
+        <tr>
+            <td>Output</td>
+            <td>w₂</td>
+            <td>0.5000</td>
+            <td>−0.0420</td>
+            <td>+0.02100</td>
+            <td>0.52100</td>
+        </tr>
+        <tr>
+            <td>Output</td>
+            <td>b₃</td>
+            <td>0.2000</td>
+            <td>−0.0726</td>
+            <td>+0.03630</td>
+            <td>0.23630</td>
+        </tr>
+    </table>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">Verify: why do all weights increase?</span>
+        <div class="collapsible-content">
+            <p>All gradients are negative, so the update −η×(negative) = positive. Every weight increases. This makes sense: the network predicted 0.6710 but needed 1.0. By increasing all weights and biases, we push the output higher. After one step of gradient descent, the prediction should be closer to 1 and the loss should decrease.</p>
+        </div>
+    </div>
+
+    <h3>Verification: Re-Run Forward Pass</h3>
+    <p>Let's verify that the updated weights actually reduce the loss.</p>
+
+    <div class="worked-example">
+        <strong>New Forward Pass:</strong><br><br>
+        <strong>Hidden neuron 1:</strong><br>
+        z₁ = 0.15179 × 0.5 + 0.20108 × 0.3 + 0.10358<br>
+        z₁ = 0.07590 + 0.06032 + 0.10358 = 0.23980<br>
+        h₁ = σ(0.23980) = 1/(1 + e⁻⁰·²³⁹⁸⁰) = 0.5597<br><br>
+
+        <strong>Hidden neuron 2:</strong><br>
+        z₂ = 0.25221 × 0.5 + 0.30133 × 0.3 + 0.10443<br>
+        z₂ = 0.12611 + 0.09040 + 0.10443 = 0.32094<br>
+        h₂ = σ(0.32094) = 0.5795<br><br>
+
+        <strong>Output neuron:</strong><br>
+        z₃ = 0.42025 × 0.5597 + 0.52100 × 0.5795 + 0.23630<br>
+        z₃ = 0.23516 + 0.30192 + 0.23630 = 0.77338<br>
+        ŷ = σ(0.77338) = 0.6842<br><br>
+
+        <strong>New Loss:</strong><br>
+        L = ½(0.6842 − 1)² = ½ × (−0.3158)² = ½ × 0.09973 = <strong>0.04987</strong>
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> The loss decreased from 0.05412 to approximately 0.04987 after one gradient descent step with η=0.5. The prediction moved from 0.6710 toward 0.6842 (closer to the target of 1). The network is learning! Over many more iterations, it would continue to improve.
+    </div>
+
+    <div class="warning-box">
+        <strong>Important:</strong> This is just one step. Real training involves thousands or millions of such steps across many data points. Each step nudges the weights a tiny bit in the right direction. The learning rate η controls step size — too large and you overshoot; too small and training is painfully slow.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> All 9 parameters were updated using w<sub>new</sub> = w<sub>old</sub> − η·gradient. Loss dropped from 0.05412 to 0.04987. The prediction improved from 0.6710 to 0.6842. Gradient descent works!
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 9: THE BACKPROP RECIPE -->
+<!-- ============================================================ -->
+<section id="section9" data-progress-section>
+    <h2>7.9 The Backpropagation Recipe (6 Steps)</h2>
+
+    <p>Here is the complete recipe for training a neural network on one data point. Every iteration of training follows these six steps:</p>
+
+    <h3>Step 1: Forward Pass (Store z and a)</h3>
+    <p>Pass the input through the network, computing z<sup>(l)</sup> and a<sup>(l)</sup> for each layer. <strong>Store all values</strong> — you'll need them in Step 3.</p>
+    <p class="formula">For l = 1 to L: z<sup>(l)</sup> = W<sup>(l)</sup>·a<sup>(l−1)</sup> + b<sup>(l)</sup>, a<sup>(l)</sup> = φ(z<sup>(l)</sup>)</p>
+
+    <h3>Step 2: Compute Loss</h3>
+    <p>Compare the network's output a<sup>(L)</sup> to the true label y:</p>
+    <p class="formula">L = loss(a<sup>(L)</sup>, y)</p>
+
+    <h3>Step 3: Output-Layer δ</h3>
+    <p>Compute the error signal at the output:</p>
+    <p class="formula">δ<sup>(L)</sup> = ∂L/∂a<sup>(L)</sup> × φ'(z<sup>(L)</sup>)</p>
+    <p>For squared error + sigmoid: δ<sup>(L)</sup> = (ŷ − y) · ŷ · (1 − ŷ)</p>
+
+    <h3>Step 4: Propagate δ Backwards</h3>
+    <p>For each hidden layer l (from L−1 down to 1):</p>
+    <p class="formula">δ<sup>(l)</sup> = (W<sup>(l+1)</sup>)ᵀ · δ<sup>(l+1)</sup> ⊙ φ'(z<sup>(l)</sup>)</p>
+    <p>The ⊙ denotes element-wise multiplication. We transpose the next layer's weight matrix and multiply by the next layer's error, then scale by the local activation derivative.</p>
+
+    <h3>Step 5: Compute Weight Gradients</h3>
+    <p>For each layer l:</p>
+    <p class="formula">∂L/∂W<sup>(l)</sup> = δ<sup>(l)</sup> · (a<sup>(l−1)</sup>)ᵀ</p>
+    <p class="formula">∂L/∂b<sup>(l)</sup> = δ<sup>(l)</sup></p>
+
+    <h3>Step 6: Update Weights</h3>
+    <p>Apply gradient descent:</p>
+    <p class="formula">W<sup>(l)</sup> ← W<sup>(l)</sup> − η · ∂L/∂W<sup>(l)</sup></p>
+    <p class="formula">b<sup>(l)</sup> ← b<sup>(l)</sup> − η · ∂L/∂b<sup>(l)</sup></p>
+
+    <div class="analogy-box">
+        <strong>Analogy (Full Recipe):</strong> Step 1 is "send the ball through the machine" (forward pass). Step 2 is "check if the output is good" (compute loss). Step 3 is "note how off the output is" (output error). Step 4 is "trace back through each station to see which parts contributed to the error" (propagate delta). Step 5 is "measure exactly how much each knob affected the error" (compute gradients). Step 6 is "adjust every knob slightly toward less error" (update weights). Then repeat from Step 1 with a new ball.
+    </div>
+
+    <div class="warning-box">
+        <strong>Common Exam Question:</strong> "Write out the backpropagation algorithm." Remember the 6 steps: forward pass → loss → output delta → propagate delta → compute gradients → update weights. Always mention storing z and a during the forward pass.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> The 6-step backprop recipe: (1) Forward pass, store z and a. (2) Compute loss. (3) Compute output-layer δ. (4) Propagate δ backward through hidden layers. (5) Compute weight gradients. (6) Update weights. Repeat for many iterations.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 10: COMMON MISTAKES -->
+<!-- ============================================================ -->
+<section id="section10" data-progress-section>
+    <h2>7.10 Common Mistakes</h2>
+
+    <p>These are the errors that trip up beginners (and sometimes experienced practitioners) when working with neural networks.</p>
+
+    <h3>1. Forgetting to Scale Features</h3>
+    <div class="warning-box">
+        <strong>Mistake:</strong> Feeding raw features with vastly different scales (e.g., income in thousands vs. age in tens) into a neural network without normalization.
+        <br><br>
+        <strong>Why it's bad:</strong> Features with larger magnitudes dominate the weighted sum, causing the network to learn unevenly. Gradient descent may oscillate or converge very slowly.
+        <br><br>
+        <strong>Fix:</strong> Normalize features to zero mean and unit variance, or scale to [0, 1] before training.
+    </div>
+
+    <h3>2. Initializing All Weights to Zero</h3>
+    <div class="warning-box">
+        <strong>Mistake:</strong> Setting all weights to 0 at initialization.
+        <br><br>
+        <strong>Why it's bad:</strong> <strong>Symmetry problem.</strong> If all weights in a hidden layer are equal, all neurons compute the same thing. During backprop, they all receive the same gradient and stay equal forever. You effectively have one neuron per layer, wasting the network's capacity.
+        <br><br>
+        <strong>Fix:</strong> Initialize weights randomly (e.g., small random values from a normal distribution). Common schemes: Xavier/Glorot initialization, He initialization.
+    </div>
+
+    <div class="analogy-box">
+        <strong>Analogy:</strong> Imagine an orchestra where all musicians play the exact same note. If you tell them all to "play louder" (gradient update), they all get louder together, but you still only hear one note. You need them to start with different notes (random initialization) so they can learn different parts of the music.
+    </div>
+
+    <h3>3. Learning Rate Too Large or Too Small</h3>
+    <div class="warning-box">
+        <strong>Mistake:</strong> Using a poorly chosen learning rate.
+        <br><br>
+        <strong>Too large:</strong> Loss overshoots and may oscillate or diverge. You jump past the minimum and end up worse than where you started.
+        <br><br>
+        <strong>Too small:</strong> Training is excruciatingly slow. You might need millions of iterations instead of thousands. You may also get stuck in shallow local minima.
+        <br><br>
+        <strong>Fix:</strong> Start with a moderate value (e.g., 0.01), monitor loss, and adjust. Use learning rate schedules or adaptive optimizers (Adam, RMSProp).
+    </div>
+
+    <h3>4. Mismatched Activation + Loss</h3>
+    <div class="warning-box">
+        <strong>Mistake:</strong> Combining an activation function with an incompatible loss function.
+        <br><br>
+        <strong>Example:</strong> Using sigmoid on the output (which squashes to 0–1) with mean squared error on a regression target that ranges from −100 to 100. The network physically cannot output values outside (0, 1), so it will never match the target range.
+        <br><br>
+        <strong>Fix:</strong> Match activation to task: sigmoid + binary cross-entropy for binary classification, softmax + cross-entropy for multi-class, linear (no activation) + MSE for regression.
+    </div>
+
+    <h3>5. Confusing Batch and Epoch</h3>
+    <div class="warning-box">
+        <strong>Mistake:</strong> Thinking "batch" and "epoch" mean the same thing.
+        <br><br>
+        <strong>Epoch:</strong> One complete pass through the <em>entire</em> training dataset.
+        <br><br>
+        <strong>Batch:</strong> A subset of the training data processed in one forward/backward pass. If you have 1000 samples and batch size = 100, one epoch = 10 weight updates.
+        <br><br>
+        <strong>Fix:</strong> Remember: epoch = full dataset, batch = one mini-batch. Multiple batches per epoch.
+    </div>
+
+    <h3>6. Trusting Training Loss Alone</h3>
+    <div class="warning-box">
+        <strong>Mistake:</strong> Looking only at training loss and concluding the model is good.
+        <br><br>
+        <strong>Why it's bad:</strong> The model may be <strong>overfitting</strong> — memorizing the training data perfectly but failing on new, unseen data. Training loss will keep decreasing even as generalization gets worse.
+        <br><br>
+        <strong>Fix:</strong> Always evaluate on a held-out validation set. Monitor both training and validation loss. If training loss drops but validation loss rises, you're overfitting.
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> The six most common mistakes are: (1) not scaling features, (2) zero initialization causing symmetry, (3) bad learning rate, (4) activation/loss mismatch, (5) confusing batch and epoch, (6) only monitoring training loss. Being aware of these will save you hours of debugging.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> Scale features, initialize randomly, tune learning rate, match activation to loss, distinguish batch from epoch, and always check validation performance. These are the foundations of practical neural network debugging.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FLASHCARDS -->
+<!-- ============================================================ -->
+<section id="flashcards-section" data-progress-section>
+    <h2>Flashcards</h2>
+    <div class="flashcard-container" id="flashcard-container">
+        <div class="flashcard" data-card="0">
+            <div class="flashcard-front">
+                <strong>Neural Network</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                A computational model inspired by biological neurons, composed of layers of interconnected nodes (neurons) that learn to map inputs to outputs by adjusting connection weights through training.
+            </div>
+        </div>
+        <div class="flashcard" data-card="1">
+            <div class="flashcard-front">
+                <strong>MLP (Multi-Layer Perceptron)</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                A neural network with an input layer, one or more hidden layers, and an output layer. All connections are fully connected (every neuron connects to every neuron in the next layer). Uses non-linear activation functions.
+            </div>
+        </div>
+        <div class="flashcard" data-card="2">
+            <div class="flashcard-front">
+                <strong>Forward Pass</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                The process of passing input data through the network from input to output, computing z = W·a + b and a = φ(z) at each layer, to produce a prediction ŷ.
+            </div>
+        </div>
+        <div class="flashcard" data-card="3">
+            <div class="flashcard-front">
+                <strong>Backpropagation</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                An algorithm that efficiently computes the gradient of the loss with respect to every weight by applying the chain rule, propagating error signals backward from output to input layers.
+            </div>
+        </div>
+        <div class="flashcard" data-card="4">
+            <div class="flashcard-front">
+                <strong>Chain Rule</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                A calculus rule: dL/dw = dL/da · da/dz · dz/dw. If a variable depends on intermediate variables, the derivative is the product of derivatives through each intermediate step. Foundation of backpropagation.
+            </div>
+        </div>
+        <div class="flashcard" data-card="5">
+            <div class="flashcard-front">
+                <strong>Activation Function</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                A non-linear function applied to the weighted sum z to produce the neuron's output a = φ(z). Introduces non-linearity enabling networks to learn complex patterns. Examples: sigmoid, ReLU, tanh.
+            </div>
+        </div>
+        <div class="flashcard" data-card="6">
+            <div class="flashcard-front">
+                <strong>Weights</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                Parameters that determine the strength of connection between neurons. Each weight multiplies its corresponding input before summation. Learned during training via gradient descent to minimize loss.
+            </div>
+        </div>
+        <div class="flashcard" data-card="7">
+            <div class="flashcard-front">
+                <strong>Bias</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                An additional parameter in each neuron added to the weighted sum: z = w·x + b. Allows the activation function to shift left/right, enabling the network to fit data that doesn't pass through the origin.
+            </div>
+        </div>
+        <div class="flashcard" data-card="8">
+            <div class="flashcard-front">
+                <strong>Hidden Layer</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                A layer of neurons between the input and output layers. Hidden layers transform inputs into increasingly abstract representations. The number and size of hidden layers define the network's capacity.
+            </div>
+        </div>
+        <div class="flashcard" data-card="9">
+            <div class="flashcard-front">
+                <strong>Epoch</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                One complete pass through the entire training dataset during training. Multiple epochs are needed for convergence. One epoch may involve many weight updates if using mini-batches.
+            </div>
+        </div>
+        <div class="flashcard" data-card="10">
+            <div class="flashcard-front">
+                <strong>Learning Rate (η)</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                A hyperparameter controlling the step size of weight updates: w ← w − η·∂L/∂w. Too large causes instability/divergence; too small causes slow convergence. Often denoted η or α.
+            </div>
+        </div>
+        <div class="flashcard" data-card="11">
+            <div class="flashcard-front">
+                <strong>Vanishing Gradient</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                A problem where gradients become extremely small as they propagate backward through many layers, causing early layers to learn very slowly or not at all. Common with sigmoid/tanh activations in deep networks. Solved partly by ReLU and techniques like batch normalization.
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- QUIZ SECTION -->
+<!-- ============================================================ -->
+<section id="quiz-section" data-progress-section>
+    <h2>Quiz</h2>
+
+    <div class="quiz-container" id="quiz-container">
+
+        <div class="quiz-question" data-question="0">
+            <p><strong>Q1.</strong> Why can't a linear model solve the XOR problem?</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q0" value="a"> It doesn't have enough parameters.</label>
+                <label><input type="radio" name="q0" value="b"> XOR requires a non-linear decision boundary, and linear models can only produce linear boundaries.</label>
+                <label><input type="radio" name="q0" value="c"> Linear models can only handle binary inputs.</label>
+                <label><input type="radio" name="q0" value="d"> The sigmoid function is needed for XOR.</label>
+            </div>
+            <div class="quiz-feedback" data-correct="b">
+                <p><strong>Correct!</strong> The XOR problem requires a non-linear decision boundary. No straight line can separate the 1s from the 0s in the XOR truth table.</p>
+                <p><strong>Incorrect.</strong> The correct answer is B. XOR requires a non-linear decision boundary, and linear models produce only straight-line boundaries.</p>
+            </div>
+        </div>
+
+        <div class="quiz-question" data-question="1">
+            <p><strong>Q2.</strong> In the notation w<sub>ij</sub><sup>(l)</sup>, what does the superscript (l) represent?</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q1" value="a"> The epoch number</label>
+                <label><input type="radio" name="q1" value="b"> The layer number</label>
+                <label><input type="radio" name="q1" value="c"> The batch number</label>
+                <label><input type="radio" name="q1" value="d"> The neuron index</label>
+            </div>
+            <div class="quiz-feedback" data-correct="b">
+                <p><strong>Correct!</strong> The superscript (l) denotes the layer number. w<sub>ij</sub><sup>(l)</sup> is the weight from neuron j in layer (l−1) to neuron i in layer l.</p>
+                <p><strong>Incorrect.</strong> The correct answer is B. The superscript (l) represents the layer number.</p>
+            </div>
+        </div>
+
+        <div class="quiz-question" data-question="2">
+            <p><strong>Q3.</strong> During the forward pass, why should you store both z (pre-activation) and a (post-activation)?</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q2" value="a"> To save memory for visualization purposes</label>
+                <label><input type="radio" name="q2" value="b"> Because backpropagation needs z to compute σ'(z) = a(1−a)</label>
+                <label><input type="radio" name="q2" value="c"> To enable the network to skip layers</label>
+                <label><input type="radio" name="q2" value="d"> Because the loss function requires both values</label>
+            </div>
+            <div class="quiz-feedback" data-correct="b">
+                <p><strong>Correct!</strong> Backpropagation needs the stored z values to compute activation derivatives σ'(z). Since σ'(z) = a(1−a), having stored a avoids recomputation.</p>
+                <p><strong>Incorrect.</strong> The correct answer is B. Backpropagation needs z to compute the activation derivative σ'(z) = a(1−a).</p>
+            </div>
+        </div>
+
+        <div class="quiz-question" data-question="3">
+            <p><strong>Q4.</strong> What happens if you initialize all weights in a hidden layer to the same value (e.g., all zeros)?</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q3" value="a"> The network trains faster because it's a good starting point</label>
+                <label><input type="radio" name="q3" value="b"> All neurons in that layer compute the same thing and receive the same gradients — the symmetry is never broken</label>
+                <label><input type="radio" name="q3" value="c"> The network immediately overfits</label>
+                <label><input type="radio" name="q3" value="d"> The activation function produces all zeros</label>
+            </div>
+            <div class="quiz-feedback" data-correct="b">
+                <p><strong>Correct!</strong> This is the symmetry problem. All neurons compute identical outputs and receive identical gradients, so they remain identical throughout training — wasting the layer's capacity.</p>
+                <p><strong>Incorrect.</strong> The correct answer is B. Equal weights mean all neurons compute the same thing and receive the same gradients — symmetry is never broken.</p>
+            </div>
+        </div>
+
+        <div class="quiz-question" data-question="4">
+            <p><strong>Q5.</strong> In the worked example, what is the gradient ∂L/∂w₁ (output weight from h₁ to output)?</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q4" value="a"> −0.00358</label>
+                <label><input type="radio" name="q4" value="b"> −0.0420</label>
+                <label><input type="radio" name="q4" value="c"> −0.0405</label>
+                <label><input type="radio" name="q4" value="d"> −0.0726</label>
+            </div>
+            <div class="quiz-feedback" data-correct="c">
+                <p><strong>Correct!</strong> ∂L/∂w₁ = δ<sub>out</sub> × h₁ = −0.0726 × 0.5585 = −0.0405.</p>
+                <p><strong>Incorrect.</strong> The correct answer is C: −0.0405. This equals δ<sub>out</sub> × h₁ = −0.0726 × 0.5585.</p>
+            </div>
+        </div>
+
+        <div class="quiz-question" data-question="5">
+            <p><strong>Q6.</strong> What is the sigmoid derivative σ'(z) in terms of σ(z)?</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q5" value="a"> σ(z) + (1 − σ(z))</label>
+                <label><input type="radio" name="q5" value="b"> 1 / σ(z)</label>
+                <label><input type="radio" name="q5" value="c"> σ(z) × (1 − σ(z))</label>
+                <label><input type="radio" name="q5" value="d"> −σ(z)²</label>
+            </div>
+            <div class="quiz-feedback" data-correct="c">
+                <p><strong>Correct!</strong> σ'(z) = σ(z)(1 − σ(z)). This elegant property means you can compute the derivative using only the already-computed forward pass value.</p>
+                <p><strong>Incorrect.</strong> The correct answer is C: σ'(z) = σ(z) × (1 − σ(z)).</p>
+            </div>
+        </div>
+
+        <div class="quiz-question" data-question="6">
+            <p><strong>Q7.</strong> After one gradient descent step in our worked example (η=0.5), what happened to the loss?</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q6" value="a"> It increased from 0.05412 to 0.06100</label>
+                <label><input type="radio" name="q6" value="b"> It stayed the same at 0.05412</label>
+                <label><input type="radio" name="q6" value="c"> It decreased from 0.05412 to approximately 0.04987</label>
+                <label><input type="radio" name="q6" value="d"> It dropped to exactly 0</label>
+            </div>
+            <div class="quiz-feedback" data-correct="c">
+                <p><strong>Correct!</strong> After updating all weights with η=0.5, the new forward pass produced ŷ≈0.6842 and loss≈0.04987, a decrease from 0.05412.</p>
+                <p><strong>Incorrect.</strong> The correct answer is C. The loss decreased from 0.05412 to approximately 0.04987.</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FILL IN THE BLANKS -->
+<!-- ============================================================ -->
+<section id="fill-blank-section" data-progress-section>
+    <h2>Fill in the Blanks</h2>
+
+    <div class="fill-blank-container" id="fill-blank-container">
+
+        <div class="fill-blank-question" data-question="0">
+            <p><strong>1.</strong> The weighted sum at a neuron is computed as z = w₁x₁ + w₂x₂ + b, where b is the __________.</p>
+            <input type="text" class="fill-blank-input" data-answer="bias" placeholder="Type your answer...">
+            <div class="fill-blank-feedback">
+                <span class="correct-text">Correct! The bias allows the activation function to shift, enabling the network to fit data not centered at the origin.</span>
+                <span class="incorrect-text">Incorrect. The answer is "bias". The bias is an extra parameter added to the weighted sum.</span>
+            </div>
+        </div>
+
+        <div class="fill-blank-question" data-question="1">
+            <p><strong>2.</strong> In backpropagation, the __________ rule allows us to compute the derivative of the loss with respect to weights by multiplying intermediate derivatives.</p>
+            <input type="text" class="fill-blank-input" data-answer="chain" placeholder="Type your answer...">
+            <div class="fill-blank-feedback">
+                <span class="correct-text">Correct! The chain rule (dL/dw = dL/da · da/dz · dz/dw) is the mathematical foundation of backpropagation.</span>
+                <span class="incorrect-text">Incorrect. The answer is "chain". The chain rule of calculus enables computing derivatives through compositions of functions.</span>
+            </div>
+        </div>
+
+        <div class="fill-blank-question" data-question="2">
+            <p><strong>3.</strong> A neural network with __________ hidden layer(s) can approximate any continuous function, according to the Universal Approximation Theorem.</p>
+            <input type="text" class="fill-blank-input" data-answer="one" placeholder="Type your answer...">
+            <div class="fill-blank-feedback">
+                <span class="correct-text">Correct! A single hidden layer with sufficient neurons can approximate any continuous function on a compact set.</span>
+                <span class="incorrect-text">Incorrect. The answer is "one" (or "a single"). The Universal Approximation Theorem guarantees this for one hidden layer with enough neurons.</span>
+            </div>
+        </div>
+
+        <div class="fill-blank-question" data-question="3">
+            <p><strong>4.</strong> The sigmoid derivative can be computed as σ'(z) = σ(z) × (1 − __________).</p>
+            <input type="text" class="fill-blank-input" data-answer="sigma(z)" placeholder="Type your answer...">
+            <div class="fill-blank-feedback">
+                <span class="correct-text">Correct! σ'(z) = σ(z)(1 − σ(z)). This elegant property lets us compute the derivative from the forward pass output.</span>
+                <span class="incorrect-text">Incorrect. The answer is "σ(z)". The formula is σ'(z) = σ(z) × (1 − σ(z)).</span>
+            </div>
+        </div>
+
+        <div class="fill-blank-question" data-question="4">
+            <p><strong>5.</strong> If you have 1000 training samples and a batch size of 200, one __________ consists of 5 weight updates.</p>
+            <input type="text" class="fill-blank-input" data-answer="epoch" placeholder="Type your answer...">
+            <div class="fill-blank-feedback">
+                <span class="correct-text">Correct! One epoch = one complete pass through all 1000 samples. With batch size 200, that's 1000/200 = 5 batches = 5 weight updates per epoch.</span>
+                <span class="incorrect-text">Incorrect. The answer is "epoch". One epoch processes all 1000 samples, which means 1000/200 = 5 batches.</span>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCENARIO-BASED QUESTION -->
+<!-- ============================================================ -->
+<section id="scenario-section" data-progress-section>
+    <h2>Scenario-Based Question</h2>
+
+    <div class="quiz-container">
+
+        <div class="quiz-question" data-question="scenario1">
+            <p><strong>Scenario:</strong> You've trained a neural network for 50 epochs. The training loss has dropped to 0.001 (excellent), but the validation loss has been increasing since epoch 20 and is now at 0.15. Your colleague says, "The model is working great — the loss is basically zero!"</p>
+            <p><strong>What is wrong with this conclusion, and what should you do?</strong></p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q-scenario1" value="a"> The colleague is right — 0.001 loss is excellent and you should deploy the model.</label>
+                <label><input type="radio" name="q-scenario1" value="b"> The model is overfitting — it memorized the training data but can't generalize. You should stop training earlier (around epoch 20), add regularization, or get more training data.</label>
+                <label><input type="radio" name="q-scenario1" value="c"> The learning rate is too high, causing the validation loss to oscillate.</label>
+                <label><input type="radio" name="q-scenario1" value="d"> You need to increase the number of hidden layers.</label>
+            </div>
+            <div class="quiz-feedback" data-correct="b">
+                <p><strong>Correct!</strong> This is a classic overfitting scenario. Training loss is very low (model memorized training data) but validation loss is increasing (model fails on unseen data). Solutions: early stopping, regularization (L2, dropout), more data, or simpler architecture.</p>
+                <p><strong>Incorrect.</strong> The correct answer is B. The diverging training and validation losses indicate overfitting. The model memorized training data but can't generalize. Solutions include early stopping, regularization, or more data.</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+</main>
+
+<script src="script.js"></script>
+
+<script>
+// Flashcard functionality
+document.querySelectorAll('.flashcard').forEach(card => {
+    card.addEventListener('click', function() {
+        this.classList.toggle('flipped');
+    });
+});
+
+// Quiz functionality
+document.querySelectorAll('.quiz-question').forEach(question => {
+    const options = question.querySelectorAll('input[type="radio"]');
+    const feedback = question.querySelector('.quiz-feedback');
+    const correctAnswer = feedback.dataset.correct;
+
+    options.forEach(option => {
+        option.addEventListener('change', function() {
+            const allFeedbacks = question.querySelectorAll('.quiz-feedback p');
+            allFeedbacks.forEach(f => f.style.display = 'none');
+
+            if (this.value === correctAnswer) {
+                feedback.querySelector('p:first-child').style.display = 'block';
+                feedback.querySelector('p:last-child').style.display = 'none';
+                feedback.style.display = 'block';
+                feedback.style.borderColor = '#27ae60';
+                feedback.style.backgroundColor = '#d4edda';
+            } else {
+                feedback.querySelector('p:first-child').style.display = 'none';
+                feedback.querySelector('p:last-child').style.display = 'block';
+                feedback.style.display = 'block';
+                feedback.style.borderColor = '#e74c3c';
+                feedback.style.backgroundColor = '#f8d7da';
+            }
+        });
+    });
+});
+
+// Fill in the blank functionality
+document.querySelectorAll('.fill-blank-input').forEach(input => {
+    input.addEventListener('blur', function() {
+        const correctAnswer = this.dataset.answer.toLowerCase().trim();
+        const userAnswer = this.value.toLowerCase().trim();
+        const feedback = this.parentElement.querySelector('.fill-blank-feedback');
+
+        if (userAnswer === correctAnswer) {
+            feedback.querySelector('.correct-text').style.display = 'inline';
+            feedback.querySelector('.incorrect-text').style.display = 'none';
+            this.style.borderColor = '#27ae60';
+        } else {
+            feedback.querySelector('.correct-text').style.display = 'none';
+            feedback.querySelector('.incorrect-text').style.display = 'inline';
+            this.style.borderColor = '#e74c3c';
+        }
+        feedback.style.display = 'block';
+    });
+});
+
+// Progress tracking
+function updateProgress() {
+    const sections = document.querySelectorAll('[data-progress-section]');
+    const total = sections.length;
+    let completed = 0;
+
+    sections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.5) {
+            completed++;
+        }
+    });
+
+    const percent = Math.round((completed / total) * 100);
+    document.getElementById('progress-fill').style.width = percent + '%';
+    document.getElementById('progress-percent').textContent = percent + '%';
+}
+
+window.addEventListener('scroll', updateProgress);
+window.addEventListener('load', updateProgress);
+</script>
+
+</body>
+</html>

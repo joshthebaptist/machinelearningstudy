@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 1: Introduction to Machine Learning - TTTC2453</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <div class="top-nav">
+    <a href="index.html" class="logo">&#8592; TTTC2453 ML Hub</a>
+    <div class="nav-links">
+      <a href="index.html">All Topics</a>
+      <a href="topic1.html">Topic 1</a>
+    </div>
+  </div>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle">
+    <span class="icon">&#9728;</span>
+    <span class="label-text">Toggle Theme</span>
+  </button>
+
+  <!-- Mobile Sidebar Toggle -->
+  <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+
+  <!-- Sidebar -->
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-title">Sections</div>
+    <a class="nav-item active" data-section="section-paradigm" href="#section-paradigm">
+      <span class="nav-emoji">&#128260;</span> The Paradigm Shift
+    </a>
+    <a class="nav-item" data-section="section-why-ml" href="#section-why-ml">
+      <span class="nav-emoji">&#128161;</span> Why ML Now?
+    </a>
+    <a class="nav-item" data-section="section-hierarchy" href="#section-hierarchy">
+      <span class="nav-emoji">&#128279;</span> AI &gt; ML &gt; DL
+    </a>
+    <a class="nav-item" data-section="section-neuron" href="#section-neuron">
+      <span class="nav-emoji">&#129504;</span> Biological vs Artificial Neuron
+    </a>
+    <a class="nav-item" data-section="section-perceptron" href="#section-perceptron">
+      <span class="nav-emoji">&#128295;</span> Anatomy of a Perceptron
+    </a>
+    <a class="nav-item" data-section="section-activation" href="#section-activation">
+      <span class="nav-emoji">&#9889;</span> Activation Functions
+    </a>
+    <a class="nav-item" data-section="section-weight-update" href="#section-weight-update">
+      <span class="nav-emoji">&#128257;</span> The Weight Update Loop
+    </a>
+    <a class="nav-item" data-section="section-methods" href="#section-methods">
+      <span class="nav-emoji">&#128230;</span> Classification of Methods
+    </a>
+    <a class="nav-item" data-section="section-roadmap" href="#section-roadmap">
+      <span class="nav-emoji">&#128205;</span> Course Roadmap
+    </a>
+    <a class="nav-item" data-section="section-flashcards" href="#section-flashcards">
+      <span class="nav-emoji">&#128179;</span> Flashcards
+    </a>
+    <a class="nav-item" data-section="section-quiz" href="#section-quiz">
+      <span class="nav-emoji">&#128220;</span> Quiz
+    </a>
+    <a class="nav-item" data-section="section-fill" href="#section-fill">
+      <span class="nav-emoji">&#9997;</span> Fill in the Blank
+    </a>
+    <a class="nav-item" data-section="section-scenario" href="#section-scenario">
+      <span class="nav-emoji">&#127919;</span> Scenario Challenge
+    </a>
+
+    <div class="sidebar-progress">
+      <div class="progress-label">Topic Progress</div>
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" style="width:0%"></div>
+      </div>
+      <div class="progress-pct" style="font-size:0.82rem;color:var(--text-muted);margin-top:4px;">0%</div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <h1>Topic 1: Introduction to Machine Learning</h1>
+    <p style="color:var(--text-muted); font-size:0.92rem; margin-bottom:32px;">TTTC2453 &mdash; The foundational concepts that everything else in this course builds upon.</p>
+
+    <!-- ========================================================
+         SECTION 1: THE PARADIGM SHIFT
+    ======================================================== -->
+    <div id="section-paradigm" class="content-section" data-progress-section="s-paradigm">
+      <div class="section-header">
+        <span class="emoji">&#128260;</span>
+        <h2>The Paradigm Shift</h2>
+      </div>
+
+      <p>For decades, if you wanted a computer to do something, you had to tell it <em>exactly</em> what to do, step by step. That is <strong>traditional programming</strong>: a human writes explicit rules, the computer follows them, and out comes the answer.</p>
+
+      <div class="formula">
+        <span class="label">Traditional Programming</span>
+        INPUT + RULES &rarr; OUTPUT
+      </div>
+
+      <p>For example, if you wanted to classify emails as spam or not, you would write rules like: <em>"If the subject contains 'FREE MONEY', mark as spam. If the sender is in contacts, mark as not spam."</em> The problem? Real life is messy. Spammers change their wording. New patterns emerge. You would spend forever writing and updating rules.</p>
+
+      <div class="definition-box">
+        <div class="label">Machine Learning (Core Idea)</div>
+        <p>Instead of writing rules yourself, you give the computer <strong>examples</strong> (data) and it <strong>discovers the rules on its own</strong>. You flip the equation around.</p>
+      </div>
+
+      <div class="formula">
+        <span class="label">Machine Learning</span>
+        INPUT + OUTPUT (labeled examples) &rarr; RULES (learned model)
+      </div>
+
+      <p>So with spam: you show the computer thousands of emails that are already labeled "spam" or "not spam," and it figures out what patterns distinguish them &mdash; patterns no human would think to write rules for.</p>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: Learning to Cook</div>
+        <p><strong>Traditional programming</strong> is like following a recipe exactly: <em>"Add 2 tsp salt, bake at 180&deg;C for 25 minutes."</em> The recipe is the rules; the dish is the output.</p>
+        <p><strong>Machine learning</strong> is like a chef who tastes hundreds of dishes, notices patterns (<em>"salty dishes usually had this much salt relative to the meat"</em>), and develops an intuition for what makes a dish good. Nobody wrote the recipe &mdash; the chef <em>learned</em> it from examples.</p>
+        <p><strong>Mapping:</strong> The hundreds of dishes tasted = <em>training data</em>. The chef's developing intuition = <em>the learned model</em>. Tasting a new dish and rating it = <em>making a prediction</em>.</p>
+      </div>
+
+      <div class="takeaway-box">
+        <div class="label">Key Takeaway</div>
+        <p>Traditional programming: you write the rules. Machine learning: the computer <em>learns</em> the rules from data. This is the single most important conceptual shift in modern computing.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 1B: WHY ML NOW?
+    ======================================================== -->
+    <div id="section-why-ml" class="content-section" data-progress-section="s-why-ml">
+      <div class="section-header">
+        <span class="emoji">&#128161;</span>
+        <h2>Why ML Now?</h2>
+      </div>
+
+      <p>Machine learning as a concept has existed since the 1950s. So why did it explode in the last decade? Three things came together at the right time:</p>
+
+      <h3>1. Data Abundance</h3>
+      <p>The world generates <strong>2.5 quintillion bytes</strong> of data every day. Every social media post, online purchase, GPS ping, and medical scan adds to the pile. ML algorithms are hungry for data &mdash; the more they see, the better they learn. Without big data, ML would still be a curiosity. With it, it is a superpower.</p>
+
+      <h3>2. Compute Power</h3>
+      <p>Training an ML model means doing millions (or billions) of matrix multiplications. In the 1990s this took weeks on a single computer. Today, <strong>GPUs</strong> (originally designed for rendering video games) can do thousands of these calculations in parallel. Cloud computing means anyone can rent a powerful GPU by the hour for a few dollars.</p>
+
+      <h3>3. Algorithmic Maturity</h3>
+      <p>Key breakthroughs &mdash; like backpropagation (1986), support vector machines (1990s), and deep learning (2012, AlexNet) &mdash; gave us algorithms that actually <em>work</em>. Libraries like scikit-learn, TensorFlow, and PyTorch made these algorithms accessible to anyone who can write a few lines of Python.</p>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: The Perfect Storm</div>
+        <p>Think of ML like a rocket. <strong>Data</strong> is the fuel. <strong>Compute power</strong> is the engine. <strong>Algorithms</strong> are the navigation system. All three existed separately for decades, but only when they converged did ML take off.</p>
+        <p><strong>Mapping:</strong> Fuel = data (you need enough of it). Engine = GPU/cloud compute (raw power to process it). Navigation = mature algorithms (methods that actually work well).</p>
+      </div>
+
+      <div class="takeaway-box">
+        <div class="label">Key Takeaway</div>
+        <p>ML is not new &mdash; but the convergence of massive data, powerful hardware, and proven algorithms made it practical for the first time in the 2010s. That is why this course exists now and not 20 years ago.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 1C: AI > ML > DL HIERARCHY
+    ======================================================== -->
+    <div id="section-hierarchy" class="content-section" data-progress-section="s-hierarchy">
+      <div class="section-header">
+        <span class="emoji">&#128279;</span>
+        <h2>The Hierarchy: AI &gt; ML &gt; DL</h2>
+      </div>
+
+      <p>People often use AI, ML, and deep learning interchangeably, but they are <strong>nested categories</strong>, like Russian dolls:</p>
+
+      <table>
+        <tr>
+          <th>Level</th>
+          <th>What It Is</th>
+          <th>Example</th>
+        </tr>
+        <tr>
+          <td><strong>Artificial Intelligence (AI)</strong></td>
+          <td>The broadest umbrella: any technique that enables machines to mimic human intelligence.</td>
+          <td>Expert systems, search algorithms, robotics, ML, logic-based AI</td>
+        </tr>
+        <tr>
+          <td><strong>Machine Learning (ML)</strong></td>
+          <td>A <em>subset</em> of AI: systems that learn from data rather than following hard-coded rules.</td>
+          <td>Linear regression, decision trees, random forests, K-means</td>
+        </tr>
+        <tr>
+          <td><strong>Deep Learning (DL)</strong></td>
+          <td>A <em>subset</em> of ML: models with many layers of artificial neurons (deep neural networks).</td>
+          <td>CNNs for images, RNNs for text, Transformers for everything</td>
+        </tr>
+      </table>
+
+      <div class="warning-box">
+        <div class="label">Common Misconception</div>
+        <p>Not all AI is machine learning. A chess engine that uses a brute-force search tree is AI but <em>not</em> ML &mdash; it has no learning from data. Similarly, not all ML is deep learning. A decision tree is ML but not DL.</p>
+      </div>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: Vehicles</div>
+        <p><strong>AI</strong> = all vehicles. <strong>ML</strong> = cars (a specific type of vehicle). <strong>DL</strong> = electric cars (a specific type of car). Every electric car is a car, and every car is a vehicle &mdash; but not every vehicle is a car.</p>
+        <p><strong>Mapping:</strong> Vehicles = AI (broadest). Cars = ML (learn from data). Electric cars = DL (use deep neural networks).</p>
+      </div>
+
+      <div class="takeaway-box">
+        <div class="label">Key Takeaway</div>
+        <p>AI is the big picture (machines acting intelligently). ML is the main tool within AI that uses data to learn. DL is the current state-of-the-art technique within ML, using layered neural networks. In this course, we focus primarily on ML, which gives us the tools to understand DL later.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 2: THE CORE MECHANISM — BIOLOGICAL VS ARTIFICIAL NEURON
+    ======================================================== -->
+    <div id="section-neuron" class="content-section" data-progress-section="s-neuron">
+      <div class="section-header">
+        <span class="emoji">&#129504;</span>
+        <h2>Biological Neuron vs Artificial Neuron</h2>
+      </div>
+
+      <p>Machine learning is loosely inspired by how the brain works. Let us look at both sides to understand the analogy and its limits.</p>
+
+      <h3>The Biological Neuron</h3>
+      <p>A neuron in your brain has three key parts:</p>
+      <ol>
+        <li><strong>Dendrites</strong> &mdash; branches that <em>receive</em> electrical signals from other neurons.</li>
+        <li><strong>Cell body (soma)</strong> &mdash; <em>processes</em> the incoming signals. If the combined input exceeds a certain threshold, the neuron "fires."</li>
+        <li><strong>Axon</strong> &mdash; a long tail that <em>transmits</em> the output signal to the next neurons.</li>
+      </ol>
+
+      <h3>The Artificial Neuron (Perceptron)</h3>
+      <p>In 1958, Frank Rosenblatt created the <strong>perceptron</strong> &mdash; a mathematical model inspired by the biological neuron:</p>
+      <ol>
+        <li><strong>Inputs (X)</strong> &mdash; numerical values (like dendrites receiving signals).</li>
+        <li><strong>Weights (W)</strong> &mdash; each input is multiplied by a weight. A higher weight means that input matters more. This is like the <em>synaptic strength</em> of a biological connection.</li>
+        <li><strong>Bias (b)</strong> &mdash; an extra number added to shift the threshold. This is like how some neurons are naturally more likely to fire.</li>
+        <li><strong>Summation + Activation</strong> &mdash; all weighted inputs are summed up, and an <em>activation function</em> decides whether the neuron "fires" (produces an output).</li>
+      </ol>
+
+      <div class="warning-box">
+        <div class="label">Important Limitation</div>
+        <p>Artificial neurons are a very rough <em>analogy</em> to biological neurons. Real neurons are vastly more complex (chemical signals, dendrite trees, timing, plasticity). Do not take the analogy too literally &mdash; it is a useful starting point, not a faithful replica.</p>
+      </div>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: A Voting Panel</div>
+        <p>Imagine 5 judges scoring a diving competition. Each judge gives a score (input). Some judges' opinions carry more weight (weight). The referee adds an adjustment factor to set the baseline (bias). The total is calculated, and if it passes a threshold, the diver gets a medal (activation fires).</p>
+        <p><strong>Mapping:</strong> Judges' scores = inputs (X). Judge importance = weights (W). Baseline adjustment = bias (b). Threshold check = activation function. Medal decision = output.</p>
+      </div>
+
+      <div class="takeaway-box">
+        <div class="label">Key Takeaway</div>
+        <p>An artificial neuron takes in numerical inputs, multiplies each by a weight, adds a bias, and passes the result through an activation function. It is a simplified mathematical model inspired by biology, but it is the fundamental building block of all neural networks.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 2B: ANATOMY OF A PERCEPTRON (FORMULA)
+    ======================================================== -->
+    <div id="section-perceptron" class="content-section" data-progress-section="s-perceptron">
+      <div class="section-header">
+        <span class="emoji">&#128295;</span>
+        <h2>Anatomy of a Perceptron</h2>
+      </div>
+
+      <p>Let us formalize exactly what happens inside a single perceptron. This is one of the most important formulas in machine learning.</p>
+
+      <div class="formula">
+        <span class="label">The Perceptron Formula</span>
+        z = w&#8321;&middot;x&#8321; + w&#8322;&middot;x&#8322; + w&#8323;&middot;x&#8323; + ... + w<sub>n</sub>&middot;x<sub>n</sub> + b
+      </div>
+
+      <p>Or more compactly using summation notation:</p>
+
+      <div class="formula">
+        <span class="label">Compact Form</span>
+        z = &Sigma;(w<sub>i</sub> &middot; x<sub>i</sub>) + b &nbsp;&nbsp;for i = 1 to n
+      </div>
+
+      <p class="formula-note">
+        <strong>Where:</strong><br>
+        x<sub>i</sub> = the i-th input feature<br>
+        w<sub>i</sub> = the weight (importance) of the i-th input<br>
+        b = bias (a constant offset)<br>
+        z = the weighted sum (the "pre-activation" value)<br>
+        n = the total number of input features
+      </p>
+
+      <h3>What Each Component Does</h3>
+      <table>
+        <tr><th>Component</th><th>Role</th><th>Biological Equivalent</th></tr>
+        <tr><td>Inputs (x)</td><td>Raw data values fed into the neuron</td><td>Signals received by dendrites</td></tr>
+        <tr><td>Weights (w)</td><td>Determine how important each input is. Higher weight = more influence.</td><td>Synaptic strength of connections</td></tr>
+        <tr><td>Bias (b)</td><td>Shifts the activation threshold. Allows the neuron to fire even if all inputs are zero.</td><td>Intrinsic excitability of the neuron</td></tr>
+        <tr><td>Summation (&Sigma;)</td><td>Combines all weighted inputs + bias into one number (z)</td><td>Integration at the cell body</td></tr>
+        <tr><td>Activation f(z)</td><td>Decides the final output based on z. Determines if/when the neuron "fires."</td><td>Firing threshold</td></tr>
+      </table>
+
+      <div class="worked-example">
+        <div class="example-title">Worked Example: A Perceptron with 3 Inputs</div>
+
+        <div class="step">
+          <span class="step-num">1</span>
+          <span class="step-title">Define the inputs, weights, and bias</span>
+          <div class="step-content">
+            x&#8321; = 2, x&#8322; = 4, x&#8323; = -1<br>
+            w&#8321; = 0.5, w&#8322; = -0.3, w&#8323; = 0.8<br>
+            b = 1.0
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">2</span>
+          <span class="step-title">Multiply each input by its weight</span>
+          <div class="step-content">
+            w&#8321;&middot;x&#8321; = 0.5 &times; 2 = 1.0<br>
+            w&#8322;&middot;x&#8322; = -0.3 &times; 4 = -1.2<br>
+            w&#8323;&middot;x&#8323; = 0.8 &times; (-1) = -0.8
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">3</span>
+          <span class="step-title">Sum the weighted inputs and add bias</span>
+          <div class="step-content">
+            z = 1.0 + (-1.2) + (-0.8) + 1.0<br>
+            z = 1.0 - 1.2 - 0.8 + 1.0<br>
+            z = 0.0
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">4</span>
+          <span class="step-title">Interpret the result</span>
+          <div class="step-content">
+            z = 0.0 means the neuron is exactly at the threshold.<br>
+            With a step function (fires if z &ge; 0): output = 1<br>
+            With a sigmoid: output = 1/(1+e^0) = 0.5<br>
+            The negative weight on x&#8322; dragged the sum down &mdash; that feature <em>reduces</em> the neuron's output.
+          </div>
+        </div>
+      </div>
+
+      <div class="recap-box">
+        <div class="label">Plain-English Recap</div>
+        <p>The perceptron is a tiny decision-making unit. It takes in a bunch of numbers (inputs), multiplies each by how important it is (weight), adds a baseline adjustment (bias), sums everything up into one number (z), and then decides whether to "fire" or not (activation function). The magic is that during training, we adjust the weights and bias until the perceptron makes the right decisions. That learning process is the heart of machine learning.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 2C: ACTIVATION FUNCTIONS
+    ======================================================== -->
+    <div id="section-activation" class="content-section" data-progress-section="s-activation">
+      <div class="section-header">
+        <span class="emoji">&#9889;</span>
+        <h2>Activation Functions</h2>
+      </div>
+
+      <p>Without an activation function, a perceptron would just be a fancy linear equation: z = W&middot;X + b. That can only draw straight lines. Activation functions introduce <strong>non-linearity</strong>, allowing the network to learn complex, curved decision boundaries.</p>
+
+      <h3>1. Step Function (Heaviside)</h3>
+      <p>The simplest activation. It outputs 0 or 1 &mdash; a hard yes/no.</p>
+
+      <div class="formula">
+        <span class="label">Step Function</span>
+        f(z) = { 1 if z &ge; 0, &nbsp; 0 if z &lt; 0 }
+      </div>
+
+      <p>This is what Rosenblatt's original perceptron used. It works for simple binary decisions, but it is not differentiable (you cannot measure how much a tiny change in z affects the output), which makes it impossible to use with modern training algorithms like gradient descent.</p>
+
+      <h3>2. Sigmoid Function</h3>
+      <p>The sigmoid "squashes" any real number into a value between 0 and 1, making it perfect for probability-like outputs.</p>
+
+      <div class="formula">
+        <span class="label">Sigmoid Function</span>
+        &sigma;(z) = 1 / (1 + e<sup>-z</sup>)
+      </div>
+
+      <div class="worked-example">
+        <div class="example-title">Worked Example: Sigmoid Calculation</div>
+
+        <div class="step">
+          <span class="step-num">1</span>
+          <span class="step-title">Suppose z = 2.0</span>
+          <div class="step-content">
+            &sigma;(2.0) = 1 / (1 + e<sup>-2.0</sup>)
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">2</span>
+          <span class="step-title">Calculate e<sup>-2.0</sup></span>
+          <div class="step-content">
+            e<sup>-2.0</sup> &asymp; 0.1353
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">3</span>
+          <span class="step-title">Compute the result</span>
+          <div class="step-content">
+            &sigma;(2.0) = 1 / (1 + 0.1353) = 1 / 1.1353 &asymp; 0.881<br>
+            So the neuron outputs ~0.88, which we could interpret as 88% confidence.
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">4</span>
+          <span class="step-title">Try a negative input: z = -3.0</span>
+          <div class="step-content">
+            e<sup>-(-3.0)</sup> = e<sup>3.0</sup> &asymp; 20.086<br>
+            &sigma;(-3.0) = 1 / (1 + 20.086) = 1 / 21.086 &asymp; 0.047<br>
+            Very low output &mdash; the neuron is "not firing."
+          </div>
+        </div>
+      </div>
+
+      <div class="warning-box">
+        <div class="label">Key Property of Sigmoid</div>
+        <p>When z is very large and positive, &sigma;(z) approaches 1. When z is very large and negative, &sigma;(z) approaches 0. When z = 0, &sigma;(z) = 0.5 exactly. This S-shaped curve makes it behave like a smooth probability estimate.</p>
+      </div>
+
+      <h3>Why Not Just Use Step?</h3>
+      <p>The step function has a fatal flaw: it is not <em>differentiable</em>. To train a network, we need to know: <em>"If I nudge this weight a tiny bit, how does the output change?"</em> That requires a derivative. The sigmoid has a nice, smooth derivative everywhere, making gradient-based training possible. This is why sigmoid (and later ReLU, softmax, etc.) replaced the step function in modern ML.</p>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: Light Switch vs Dimmer</div>
+        <p>The step function is like a light switch &mdash; on or off, nothing in between. The sigmoid is like a dimmer knob &mdash; you can smoothly go from dark (0) to bright (1), with every brightness level in between. The dimmer is more useful because you can fine-tune it, not just toggle.</p>
+        <p><strong>Mapping:</strong> Light switch = step function (binary output). Dimmer knob = sigmoid (continuous output between 0 and 1). Fine-tuning = gradient descent adjusting weights smoothly.</p>
+      </div>
+
+      <div class="takeaway-box">
+        <div class="label">Key Takeaway</div>
+        <p>Activation functions add non-linearity so neural networks can learn complex patterns. The step function is the simplest (on/off) but not trainable. The sigmoid squashes output to (0, 1) and is differentiable, making it a workhorse of early neural networks.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 2D: THE WEIGHT UPDATE LOOP
+    ======================================================== -->
+    <div id="section-weight-update" class="content-section" data-progress-section="s-weight-update">
+      <div class="section-header">
+        <span class="emoji">&#128257;</span>
+        <h2>The Weight Update Loop</h2>
+      </div>
+
+      <p>Here is how a perceptron actually <em>learns</em>. The process is beautifully simple:</p>
+
+      <ol>
+        <li><strong>Make a prediction</strong> &mdash; Feed an input through the perceptron (compute z, apply activation). Get an output.</li>
+        <li><strong>Calculate the error</strong> &mdash; Compare the prediction to the correct answer (the "label"). Error = Actual - Predicted (or some loss function).</li>
+        <li><strong>Nudge the weights</strong> &mdash; If the prediction was too high, reduce the weights. If too low, increase them. The bigger the error, the bigger the nudge.</li>
+        <li><strong>Repeat</strong> &mdash; Do this for every training example, thousands of times, until the errors get small.</li>
+      </ol>
+
+      <div class="formula">
+        <span class="label">Weight Update Rule (Simplified)</span>
+        w<sub>new</sub> = w<sub>old</sub> + &eta; &middot; error &middot; x<sub>i</sub>
+      </div>
+
+      <p class="formula-note">
+        Where &eta; (eta) is the <strong>learning rate</strong> &mdash; a small number like 0.01 that controls how big each nudge is. Too big = overshoot and never converge. Too small = learn painfully slowly.
+      </p>
+
+      <div class="worked-example">
+        <div class="example-title">Worked Example: One Weight Update</div>
+
+        <div class="step">
+          <span class="step-num">1</span>
+          <span class="step-title">Setup: A perceptron with 1 input</span>
+          <div class="step-content">
+            x = 3.0, w = 0.2, b = 0.0<br>
+            True label = 1 (this is a positive example)
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">2</span>
+          <span class="step-title">Forward pass (prediction)</span>
+          <div class="step-content">
+            z = w &middot; x + b = 0.2 &times; 3.0 + 0.0 = 0.6<br>
+            Using step function: z &ge; 0, so prediction = 1<br>
+            (Correct! No update needed in this case.)
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">3</span>
+          <span class="step-title">Now try a negative example: x = -2.0, label = 0</span>
+          <div class="step-content">
+            z = 0.2 &times; (-2.0) + 0.0 = -0.4<br>
+            Step function: z &lt; 0, so prediction = 0<br>
+            (Also correct!)
+          </div>
+        </div>
+
+        <div class="step">
+          <span class="step-num">4</span>
+          <span class="step-title">A wrong prediction: x = 2.0, label = 0, current w = 0.2</span>
+          <div class="step-content">
+            z = 0.2 &times; 2.0 = 0.4<br>
+            Step function: z &ge; 0, so prediction = 1 (WRONG!)<br>
+            error = actual - predicted = 0 - 1 = -1<br>
+            Let &eta; = 0.1<br>
+            w_new = 0.2 + 0.1 &times; (-1) &times; 2.0<br>
+            w_new = 0.2 - 0.2 = 0.0<br>
+            The weight decreased! The perceptron learned that x=2 should NOT fire.
+          </div>
+        </div>
+      </div>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: Learning to Shoot Arrows</div>
+        <p>Imagine shooting an arrow at a target, but blindfolded. After each shot, someone tells you "too far left" or "too far right" (the error). You adjust your aim (update the weight) and shoot again. Over many shots, you zero in on the bullseye.</p>
+        <p><strong>Mapping:</strong> Arrow shot = prediction. Target = actual label. Feedback ("too far left") = error. Adjusting aim = weight update. Blindfold = you don't know the rules; you learn from feedback. The learning rate = how aggressively you adjust after each shot.</p>
+      </div>
+
+      <div class="warning-box">
+        <div class="label">Common Misconception</div>
+        <p>Students sometimes think the perceptron "understands" what it is doing. It does not. It is just iteratively adjusting numbers (weights) to minimize errors. The "intelligence" is in the data and the learning algorithm, not in any conscious understanding by the model.</p>
+      </div>
+
+      <div class="recap-box">
+        <div class="label">Plain-English Recap</div>
+        <p>A perceptron learns by making predictions, measuring how wrong it was, and nudging its weights in the right direction. It does this thousands of times with thousands of examples. The learning rate controls how aggressive each nudge is. Over time, the weights settle into values that make the perceptron get the right answer most of the time. This feedback loop &mdash; predict, measure error, update, repeat &mdash; is the foundation of ALL machine learning training.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 3: CLASSIFICATION OF METHODS
+    ======================================================== -->
+    <div id="section-methods" class="content-section" data-progress-section="s-methods">
+      <div class="section-header">
+        <span class="emoji">&#128230;</span>
+        <h2>Classification of ML Methods</h2>
+      </div>
+
+      <p>Machine learning methods fall into three main categories. The key question that determines which one you use is: <em>"Do I have labeled data?"</em></p>
+
+      <h3>1. Supervised Learning</h3>
+      <p>You have a dataset where every example comes with a <strong>correct answer (label)</strong>. The algorithm learns a mapping from inputs to outputs.</p>
+
+      <div class="definition-box">
+        <div class="label">Supervised Learning</div>
+        <p>Training on <strong>labeled data</strong> (input-output pairs) to learn a function that can predict outputs for new, unseen inputs. The "supervision" comes from the labels &mdash; they tell the model whether its predictions are right or wrong.</p>
+      </div>
+
+      <p>Supervised learning splits into two sub-types:</p>
+
+      <table>
+        <tr>
+          <th>Type</th>
+          <th>Output Type</th>
+          <th>Goal</th>
+          <th>Examples</th>
+        </tr>
+        <tr>
+          <td><strong>Classification</strong></td>
+          <td>Discrete categories (classes)</td>
+          <td>Which category does this belong to?</td>
+          <td>Spam vs not spam, cat vs dog image, pass vs fail</td>
+        </tr>
+        <tr>
+          <td><strong>Regression</strong></td>
+          <td>Continuous number</td>
+          <td>What is the predicted value?</td>
+          <td>House price, temperature, stock price, salary</td>
+        </tr>
+      </table>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: Studying with an Answer Key</div>
+        <p>Supervised learning is like studying with an answer key. You do practice questions (training data), check your answers against the key (labels), and learn from your mistakes. Eventually, you can answer new questions correctly even without the key.</p>
+        <p><strong>Classification</strong> = answering multiple choice (the answer is one of A, B, C, D). <strong>Regression</strong> = answering open-ended math problems (the answer is a number).</p>
+      </div>
+
+      <h3>2. Unsupervised Learning</h3>
+      <p>You have data but <strong>no labels</strong>. The algorithm must find structure in the data on its own.</p>
+
+      <div class="definition-box">
+        <div class="label">Unsupervised Learning</div>
+        <p>Finding <strong>hidden patterns or groupings</strong> in unlabeled data. Nobody tells the model what the right answer is &mdash; it discovers structure by itself.</p>
+      </div>
+
+      <p>Common unsupervised tasks:</p>
+      <ul>
+        <li><strong>Clustering</strong> &mdash; Group similar data points together. Example: K-Means groups customers into segments based on purchasing behavior.</li>
+        <li><strong>Dimensionality Reduction</strong> &mdash; Compress many features into fewer while preserving important information. Example: PCA (Principal Component Analysis) reduces 100 features to 10 for visualization.</li>
+      </ul>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: Sorting a Pile of Mixed Coins</div>
+        <p>Imagine someone dumps a bag of mixed coins on a table. Nobody tells you which are Malaysian, US, or Euro coins. You just start grouping them by similarity &mdash; size, color, markings. That is clustering. You found the groups without anyone labeling them.</p>
+        <p><strong>Mapping:</strong> Coins = data points. Similarity features (size, color) = input features. Groups you form = clusters. Nobody gave you labels = unsupervised.</p>
+      </div>
+
+      <h3>3. Reinforcement Learning</h3>
+      <p>An <strong>agent</strong> learns by interacting with an <strong>environment</strong>. It takes actions and receives <strong>rewards</strong> (or penalties). The goal is to learn a strategy (policy) that maximizes total reward over time.</p>
+
+      <div class="analogy-box">
+        <div class="label">Analogy: Training a Dog</div>
+        <p>You tell the dog to sit. If it sits, you give it a treat (reward). If it barks instead, nothing (or a gentle "no" = penalty). Over time, the dog learns which actions lead to treats. It does not understand language &mdash; it learns from trial, error, and feedback.</p>
+        <p><strong>Mapping:</strong> Dog = agent. Room/commands = environment. Sit/bark/stay = actions. Treat = positive reward. "No" = negative reward. Training over many sessions = learning over many episodes.</p>
+      </div>
+
+      <h3>When to Go Deep: Feature Engineering Bottleneck</h3>
+      <p>In traditional ML (like linear regression or decision trees), a human expert must <strong>select and create features</strong> from raw data. For example, to classify images, you might need to manually extract edge detectors, color histograms, and texture features. This is called <strong>feature engineering</strong>, and it is often the hardest and most time-consuming part.</p>
+
+      <div class="takeaway-box">
+        <div class="label">Key Takeaway</div>
+        <p>Deep learning shines when feature engineering is a bottleneck. Instead of hand-crafting features, you feed raw data (pixels, text, audio) directly into a deep neural network, and it learns the features itself. This is why DL dominates in image recognition, natural language processing, and speech &mdash; domains where raw data is high-dimensional and features are hard to define manually.</p>
+      </div>
+
+      <div class="recap-box">
+        <div class="label">Plain-English Recap</div>
+        <p><strong>Supervised learning</strong> = learning with labeled examples (answer key provided). It splits into classification (which category?) and regression (what number?). <strong>Unsupervised learning</strong> = finding hidden patterns in data without labels (like grouping similar customers). <strong>Reinforcement learning</strong> = learning by trial and error with rewards (like training a pet). Deep learning enters the picture when feature engineering becomes too difficult for humans &mdash; the network learns its own features from raw data.</p>
+      </div>
+    </div>
+
+    <!-- ========================================================
+         SECTION 4: COURSE ROADMAP
+    ======================================================== -->
+    <div id="section-roadmap" class="content-section" data-progress-section="s-roadmap">
+      <div class="section-header">
+        <span class="emoji">&#128205;</span>
+        <h2>Course Roadmap</h2>
+      </div>
+
+      <p>This course (TTTC2453) is structured around three core competencies, mapped to <strong>CLO3</strong>: <em>"Implement, Analyze, and Improve machine learning models."</em></p>
+
+      <h3>CLO3: Implement &rarr; Analyze &rarr; Improve</h3>
+      <table>
+        <tr>
+          <th>Phase</th>
+          <th>What It Means</th>
+          <th>Skills You Will Build</th>
+        </tr>
+        <tr>
+          <td><strong>Implement</strong></td>
+          <td>Build ML models from scratch or using libraries. Know what each parameter does.</td>
+          <td>Python, scikit-learn, Google Colab, data loading, model training, prediction</td>
+        </tr>
+        <tr>
+          <td><strong>Analyze</strong></td>
+          <td>Evaluate model performance. Understand why it works or fails.</td>
+          <td>Accuracy, precision, recall, confusion matrix, loss curves, cross-validation</td>
+        </tr>
+        <tr>
+          <td><strong>Improve</strong></td>
+          <td>Tune hyperparameters, reduce overfitting, try new architectures.</td>
+          <td>Regularization, grid search, feature selection, ensemble methods</td>
+        </tr>
+      </table>
+
+      <h3>Software Stack: Google Colab</h3>
+      <p>All practical work in this course is done on <strong>Google Colab</strong> &mdash; a free, browser-based Jupyter notebook environment. You do not need to install anything on your computer.</p>
+
+      <ul>
+        <li><strong>Zero setup</strong> &mdash; Works in any browser. No Python installation needed.</li>
+        <li><strong>Free GPU access</strong> &mdash; Go to Runtime &rarr; Change runtime type &rarr; GPU.</li>
+        <li><strong>Pre-installed libraries</strong> &mdash; NumPy, pandas, scikit-learn, TensorFlow, and PyTorch come pre-installed.</li>
+        <li><strong>Shareable</strong> &mdash; Like Google Docs, notebooks can be shared via link.</li>
+      </ul>
+
+      <div class="takeaway-box">
+        <div class="label">Key Takeaway</div>
+        <p>This course follows a progression: first you learn to <strong>implement</strong> models, then <strong>analyze</strong> whether they work well, and finally <strong>improve</strong> them. Everything is done in Google Colab, so you can focus on learning ML concepts without fighting with installation issues.</p>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ========================================================
+         FLASHCARDS
+    ======================================================== -->
+    <div id="section-flashcards" class="flashcard-container" data-progress-section="s-flashcards">
+      <div class="section-header">
+        <span class="emoji">&#128179;</span>
+        <h2>Flashcards</h2>
+      </div>
+
+      <div class="flashcard-controls">
+        <button class="btn btn-sm btn-secondary flash-prev">Previous</button>
+        <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
+        <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
+        <button class="btn btn-sm btn-secondary flash-next">Next</button>
+      </div>
+      <div class="flashcard-counter"></div>
+
+      <!-- Card 1 -->
+      <div class="flashcard" data-progress-section="s-flash-1">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Machine Learning</div>
+          <div class="flashcard-back">
+            A subset of AI where systems learn patterns from data to make predictions or decisions, rather than following explicitly programmed rules.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="flashcard" data-progress-section="s-flash-2">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Perceptron</div>
+          <div class="flashcard-back">
+            The simplest neural network unit: takes inputs, multiplies by weights, adds a bias, and applies an activation function. It is the building block of all neural networks.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="flashcard" data-progress-section="s-flash-3">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Activation Function</div>
+          <div class="flashcard-back">
+            A mathematical function applied to the weighted sum of inputs in a neuron to introduce non-linearity, enabling the network to learn complex patterns. Examples: step, sigmoid, ReLU.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="flashcard" data-progress-section="s-flash-4">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Sigmoid Function</div>
+          <div class="flashcard-back">
+            &sigma;(z) = 1/(1+e<sup>-z</sup>). Squashes any real number into the range (0, 1). Used as an activation function to produce probability-like outputs. It is differentiable, enabling gradient-based learning.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="flashcard" data-progress-section="s-flash-5">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Bias</div>
+          <div class="flashcard-back">
+            An additional learnable parameter in a neuron, added to the weighted sum of inputs. It shifts the activation threshold, allowing the model to fit data even when all inputs are zero.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="flashcard" data-progress-section="s-flash-6">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Weights</div>
+          <div class="flashcard-back">
+            Learnable parameters that determine how much influence each input has on a neuron's output. During training, weights are adjusted to minimize prediction errors. High weight = high importance.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 7 -->
+      <div class="flashcard" data-progress-section="s-flash-7">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Supervised Learning</div>
+          <div class="flashcard-back">
+            Training a model on labeled data (input-output pairs) to learn a mapping function. The model learns from its mistakes using the provided labels. Subtypes: classification and regression.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 8 -->
+      <div class="flashcard" data-progress-section="s-flash-8">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Unsupervised Learning</div>
+          <div class="flashcard-back">
+            Finding hidden patterns or groupings in data without labels. The model discovers structure on its own. Common methods: K-Means clustering, PCA for dimensionality reduction.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 9 -->
+      <div class="flashcard" data-progress-section="s-flash-9">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Overfitting</div>
+          <div class="flashcard-back">
+            When a model learns the training data too well, including its noise and quirks, and fails to generalize to new, unseen data. It memorizes instead of learning the underlying pattern.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 10 -->
+      <div class="flashcard" data-progress-section="s-flash-10">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">Underfitting</div>
+          <div class="flashcard-back">
+            When a model is too simple to capture the underlying pattern in the data. It performs poorly on both training data and new data. Often caused by insufficient features or an overly simple model.
+            <button class="btn btn-sm btn-success btn-known" style="margin-top:12px">I know this</button>
+            <button class="btn btn-sm btn-danger btn-unknown" style="margin-top:12px;margin-left:8px">Still learning</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ========================================================
+         QUIZ
+    ======================================================== -->
+    <div id="section-quiz" data-progress-section="s-quiz">
+      <div class="section-header">
+        <span class="emoji">&#128220;</span>
+        <h2>Knowledge Check Quiz</h2>
+      </div>
+
+      <div class="quiz-container" data-quiz-id="q1" data-progress-section="s-quiz-q1">
+        <h3>Question 1</h3>
+        <div class="quiz-question">
+          <div class="q-num">Question 1 of 5</div>
+          <div class="q-text">In machine learning, the relationship between traditional programming and ML is best described as:</div>
+          <div class="quiz-option" data-correct="false">A. Traditional programming uses data; ML uses rules</div>
+          <div class="quiz-option" data-correct="false">B. ML replaces the need for any data</div>
+          <div class="quiz-option" data-correct="true">C. Traditional programming: Input + Rules &rarr; Output; ML: Input + Output &rarr; Rules</div>
+          <div class="quiz-option" data-correct="false">D. Traditional programming and ML use the same approach</div>
+          <div class="quiz-feedback">In traditional programming, the programmer provides rules and data to get output. In ML, the machine is given input-output pairs and must discover the rules (the model) on its own.</div>
+        </div>
+      </div>
+
+      <div class="quiz-container" data-quiz-id="q2" data-progress-section="s-quiz-q2">
+        <div class="quiz-question">
+          <div class="q-num">Question 2 of 5</div>
+          <div class="q-text">What is the purpose of the <strong>activation function</strong> in a perceptron?</div>
+          <div class="quiz-option" data-correct="false">A. To multiply inputs by their weights</div>
+          <div class="quiz-option" data-correct="false">B. To store the bias value</div>
+          <div class="quiz-option" data-correct="true">C. To introduce non-linearity and decide the neuron's output</div>
+          <div class="quiz-option" data-correct="false">D. To calculate the error between prediction and label</div>
+          <div class="quiz-feedback">The activation function is applied to the weighted sum (z) to introduce non-linearity. Without it, a neural network would just be a linear model, no matter how many layers it has. It determines the final output of the neuron.</div>
+        </div>
+      </div>
+
+      <div class="quiz-container" data-quiz-id="q3" data-progress-section="s-quiz-q3">
+        <div class="quiz-question">
+          <div class="q-num">Question 3 of 5</div>
+          <div class="q-text">Given a perceptron with inputs x&#8321;=4, x&#8322;=-2, weights w&#8321;=0.5, w&#8322;=1.0, and bias b=-1, what is the weighted sum z?</div>
+          <div class="quiz-option" data-correct="false">A. z = 3</div>
+          <div class="quiz-option" data-correct="true">B. z = -1</div>
+          <div class="quiz-option" data-correct="false">C. z = 1</div>
+          <div class="quiz-option" data-correct="false">D. z = 5</div>
+          <div class="quiz-feedback">z = (0.5 &times; 4) + (1.0 &times; -2) + (-1) = 2 + (-2) + (-1) = -1. Each input is multiplied by its weight, then all values (including bias) are summed.</div>
+        </div>
+      </div>
+
+      <div class="quiz-container" data-quiz-id="q4" data-progress-section="s-quiz-q4">
+        <div class="quiz-question">
+          <div class="q-num">Question 4 of 5</div>
+          <div class="q-text">Which of the following is a supervised learning task?</div>
+          <div class="quiz-option" data-correct="false">A. K-Means clustering of customer segments</div>
+          <div class="quiz-option" data-correct="false">B. PCA for dimensionality reduction</div>
+          <div class="quiz-option" data-correct="true">C. Predicting house prices from square footage</div>
+          <div class="quiz-option" data-correct="false">D. An agent learning to play chess through rewards</div>
+          <div class="quiz-feedback">Predicting house prices is regression (a supervised learning task) because you have labeled training data: house features paired with known prices. K-Means and PCA are unsupervised (no labels). Chess via rewards is reinforcement learning.</div>
+        </div>
+      </div>
+
+      <div class="quiz-container" data-quiz-id="q5" data-progress-section="s-quiz-q5">
+        <div class="quiz-question">
+          <div class="q-num">Question 5 of 5</div>
+          <div class="q-text">What are the three main pillars of machine learning?</div>
+          <div class="quiz-option" data-correct="false">A. Classification, Regression, Clustering</div>
+          <div class="quiz-option" data-correct="false">B. Training, Validation, Testing</div>
+          <div class="quiz-option" data-correct="true">C. Supervised Learning, Unsupervised Learning, Reinforcement Learning</div>
+          <div class="quiz-option" data-correct="false">D. Overfitting, Underfitting, Generalization</div>
+          <div class="quiz-feedback">The three main categories of ML are: Supervised (learn from labeled data), Unsupervised (find patterns in unlabeled data), and Reinforcement (learn through trial and error with rewards). Classification/regression are subtypes of supervised learning, and the others are concepts within ML, not the main categories.</div>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ========================================================
+         FILL IN THE BLANK
+    ======================================================== -->
+    <div id="section-fill" data-progress-section="s-fill">
+      <div class="section-header">
+        <span class="emoji">&#9997;</span>
+        <h2>Fill in the Blank</h2>
+      </div>
+
+      <div class="fill-blank-container" data-answer="weights" data-alt-answers="weight|w" data-fill-id="f1" data-progress-section="s-fill-f1">
+        <p>The learnable parameters that determine how much influence each input has on a neuron's output are called <strong>___</strong>.</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+      </div>
+
+      <div class="fill-blank-container" data-answer="sigmoid" data-alt-answers="" data-fill-id="f2" data-progress-section="s-fill-f2">
+        <p>The activation function &sigma;(z) = 1/(1+e<sup>-z</sup>) is called the <strong>___</strong> function.</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+      </div>
+
+      <div class="fill-blank-container" data-answer="supervised" data-alt-answers="" data-fill-id="f3" data-progress-section="s-fill-f3">
+        <p>Learning from labeled data (input-output pairs) is called <strong>___</strong> learning.</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+      </div>
+
+      <div class="fill-blank-container" data-answer="bias" data-alt-answers="" data-fill-id="f4" data-progress-section="s-fill-f4">
+        <p>The additional parameter added to the weighted sum to shift the activation threshold is called the <strong>___</strong>.</p>
+        <input type="text" class="fill-blank-input" placeholder="Type your answer">
+        <button class="btn btn-sm btn-primary btn-check" style="margin-left:8px">Check</button>
+        <div class="fill-blank-feedback"></div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- ========================================================
+         SCENARIO CHALLENGE
+    ======================================================== -->
+    <div id="section-scenario" class="content-section" data-progress-section="s-scenario">
+      <div class="section-header">
+        <span class="emoji">&#127919;</span>
+        <h2>Scenario Challenge</h2>
+      </div>
+
+      <div class="collapsible">
+        <div class="collapsible-header">
+          Scenario: Choosing the Right ML Approach
+          <span class="arrow">&#9660;</span>
+        </div>
+        <div class="collapsible-body">
+          <p><strong>Scenario:</strong> You work at a hospital. A doctor asks you to help with two different problems:</p>
+          <ol>
+            <li><strong>Problem A:</strong> Given a patient's medical history (age, blood pressure, cholesterol, BMI, etc.), predict whether they are at risk of diabetes (yes/no). You have 10,000 past patient records with known diabetes diagnoses.</li>
+            <li><strong>Problem B:</strong> You have 50,000 anonymous patient records with no labels. The doctor wants to know if there are natural groupings of patients that might reveal subtypes of a disease nobody has categorized yet.</li>
+          </ol>
+
+          <h4>Questions to Answer:</h4>
+          <ol>
+            <li>Which ML category (supervised, unsupervised, reinforcement) would you use for Problem A? Why?</li>
+            <li>Would Problem A be classification or regression? Explain.</li>
+            <li>Which ML category for Problem B? Why?</li>
+            <li>What specific algorithm might you use for Problem B?</li>
+            <li>The doctor asks: "Can you use the same model for both problems?" What do you say?</li>
+          </ol>
+
+          <button class="btn btn-sm btn-primary reveal-btn" style="margin-top:16px;">Click to reveal answer</button>
+          <div class="collapsible-body" style="padding-top:12px;">
+            <p><strong>1. Problem A &rarr; Supervised Learning.</strong> You have labeled data: 10,000 records where each patient has known features AND a known diagnosis (yes/no). The model learns from these labels.</p>
+            <p><strong>2. Classification.</strong> The output is a discrete category: "diabetes" or "no diabetes." This is binary classification (two classes). If instead the doctor asked "what is the probability score?" it could still be framed as classification with probability output.</p>
+            <p><strong>3. Problem B &rarr; Unsupervised Learning.</strong> You have no labels &mdash; the doctor does not even know what the groupings are. The algorithm must discover hidden structure on its own.</p>
+            <p><strong>4. K-Means Clustering</strong> would be a natural choice. You specify K (the number of clusters, e.g., 3 or 5), and the algorithm groups patients based on feature similarity. You could then have a medical expert examine each cluster to see if they correspond to disease subtypes.</p>
+            <p><strong>5. No, you cannot use the same model.</strong> Problem A requires labels (supervised) while Problem B has no labels (unsupervised). They are fundamentally different learning paradigms. You could, however, use the clusters from Problem B as features for a supervised model later &mdash; a technique called <em>feature engineering</em>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+
+    <!-- Footer -->
+    <div style="text-align:center; padding:40px 0 20px; color:var(--text-muted); font-size:0.85rem;">
+      TTTC2453 Machine Learning &mdash; Topic 1 of 11<br>
+      <a href="index.html" style="margin-right:12px;">&larr; Back to All Topics</a>
+      <a href="topic2.html">Next Topic: Linear Regression &rarr;</a>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

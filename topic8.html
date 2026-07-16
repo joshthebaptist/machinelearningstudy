@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic 8: Deep Neural Architectures</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav class="top-nav">
+    <a href="index.html" class="home-link">← Back to Home</a>
+    <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span class="icon">&#9728;</span> Toggle Theme</button>
+</nav>
+
+<div class="sidebar" id="sidebar">
+    <h2>Topic 8: Deep Neural Architectures</h2>
+    <nav class="section-nav">
+        <a href="#section1">8.1 Bridge from Week 7</a>
+        <a href="#section2">8.2 The Collapse Problem</a>
+        <a href="#section3">8.3 Vanishing Gradients</a>
+        <a href="#section4">8.4 ReLU Activation</a>
+        <a href="#section5">8.5 Dying ReLU Problem</a>
+        <a href="#section6">8.6 Softmax for Multi-Class</a>
+        <a href="#section7">8.7 Softmax + CCE Loss</a>
+        <a href="#section8">8.8 Decision Guide Table</a>
+        <a href="#section9">8.9 Overfitting in Deep Networks</a>
+        <a href="#section10">8.10 Regularisation Techniques</a>
+        <a href="#section11">8.11 Combining Regularisers</a>
+        <a href="#section12">8.12 Design Checklist</a>
+        <a href="#section13">8.13 Common Pitfalls</a>
+        <a href="#flashcards-section">Flashcards</a>
+        <a href="#quiz-section">Quiz</a>
+        <a href="#fill-blank-section">Fill in the Blanks</a>
+        <a href="#scenario-section">Scenario</a>
+    </nav>
+    <div class="progress-container">
+        <div class="progress-label">Progress</div>
+        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <div class="progress-percent" id="progress-percent">0%</div>
+    </div>
+</div>
+
+<main class="content">
+
+<!-- ============================================================ -->
+<!-- SECTION 1: BRIDGE FROM WEEK 7 -->
+<!-- ============================================================ -->
+<section id="section1" data-progress-section>
+    <h2>8.1 Bridge from Week 7</h2>
+
+    <p>Last week we built the foundation: a Multi-Layer Perceptron (MLP) is a stack of linear transformations interspersed with activation functions. Let's quickly recap the key pieces before we extend them into deep architectures.</p>
+
+    <h3>The MLP in One Sentence</h3>
+    <p>An MLP computes a series of transformations from input to output. Each layer performs a weighted sum, adds a bias, and then applies a non-linear activation function:</p>
+    <p class="formula">z<sup>(l)</sup> = W<sup>(l)</sup> · a<sup>(l−1)</sup> + b<sup>(l)</sup> &nbsp;&nbsp;&nbsp; then &nbsp;&nbsp;&nbsp; a<sup>(l)</sup> = φ(z<sup>(l)</sup>)</p>
+    <p class="formula-note">Where a<sup>(0)</sup> = x (the input), W<sup>(l)</sup> is the weight matrix for layer l, b<sup>(l)</sup> is the bias vector, and φ is the activation function.</p>
+
+    <h3>Forward Pass Recap</h3>
+    <p>Data flows forward through the network: input → layer 1 → layer 2 → ... → output. At each layer we compute the pre-activation z, then the post-activation a. The final output ŷ = a<sup>(L)</sup> is the network's prediction.</p>
+
+    <div class="analogy-box">
+        <strong>Analogy:</strong> Think of the forward pass as an assembly line in a factory. Raw materials (input) enter at one end. Each station (layer) transforms the product — cutting, painting, assembling. At each station, two things happen: the product is measured and modified (weighted sum + bias), then inspected and approved or rejected (activation). The finished product (output) emerges at the end.
+    </div>
+
+    <h3>Backpropagation Recap</h3>
+    <p>Training works by computing the loss, then propagating the error <em>backward</em> through the network using the chain rule. For each layer, we compute:</p>
+    <ol>
+        <li>The error signal δ<sup>(l)</sup> = ∂L/∂z<sup>(l)</sup> (how much the loss changes with respect to the pre-activation)</li>
+        <li>The weight gradient ∂L/∂W<sup>(l)</sup> = δ<sup>(l)</sup> · (a<sup>(l−1)</sup>)<sup>T</sup></li>
+        <li>The bias gradient ∂L/∂b<sup>(l)</sup> = δ<sup>(l)</sup></li>
+        <li>Update: W ← W − η · ∂L/∂W</li>
+    </ol>
+
+    <div class="definition-box">
+        <strong>Key Insight:</strong> Backpropagation is just the chain rule applied repeatedly. The gradient at layer l depends on the gradient at layer l+1, multiplied by the local derivative of the activation function at layer l. This means <em>every activation function's derivative</em> participates in the gradient chain. If any derivative is small, the entire chain shrinks.
+    </div>
+
+    <h3>Sigmoid: Week 7's Activation</h3>
+    <p>In Week 7, we used the sigmoid function φ(z) = 1/(1 + e<sup>−z</sup>) in our MLP. Sigmoid squashes any real number into the range (0, 1), which is useful for binary classification output layers. But as we'll see, sigmoid has serious problems when used in hidden layers of deep networks.</p>
+    <p class="formula">σ(z) = 1 / (1 + e<sup>−z</sup>) &nbsp;&nbsp;&nbsp; σ'(z) = σ(z) · (1 − σ(z))</p>
+
+    <div class="warning-box">
+        <strong>Warning:</strong> The sigmoid derivative σ'(z) = σ(z)(1 − σ(z)) has a maximum value of 0.25 (when z = 0). For large |z|, the derivative approaches 0. This property — called saturation — is the root cause of the vanishing gradient problem, which we'll tackle next.
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> An MLP is a stack of linear transforms (z = Wa + b) with non-linear activations (a = φ(z)). Forward pass computes predictions; backpropagation propagates error backward using the chain rule. Every activation derivative multiplies into the gradient chain — choosing the right activation function is critical for deep networks.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> MLP = layers of z = Wa + b followed by a = φ(z). Forward pass: input to output. Backprop: loss to input via chain rule. Sigmoid works but has derivative ≤ 0.25, which causes problems in deep networks.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 2: THE COLLAPSE PROBLEM -->
+<!-- ============================================================ -->
+<section id="section2" data-progress-section>
+    <h2>8.2 The Collapse Problem</h2>
+
+    <p>Before discussing which activation to use, let's understand <em>why</em> activation functions matter at all. What happens if we remove them?</p>
+
+    <h3>Two Layers Without Activation</h3>
+    <p>Consider a two-layer network with no activation function (or equivalently, a linear activation φ(z) = z):</p>
+    <p class="formula">Layer 1: z₁ = W₁x + b₁ &nbsp;&nbsp; a₁ = z₁</p>
+    <p class="formula">Layer 2: z₂ = W₂a₁ + b₂ = W₂(W₁x + b₁) + b₂ = (W₂W₁)x + (W₂b₁ + b₂)</p>
+    <p class="formula">Let W' = W₂W₁ and b' = W₂b₁ + b₂</p>
+    <p class="formula">Result: ŷ = W'x + b' — a single linear map!</p>
+
+    <div class="analogy-box">
+        <strong>Analogy:</strong> Imagine you have two cameras stacked together. Camera 1 applies a zoom. Camera 2 applies a rotation. The combined effect is just one zoomed-and-rotated image. Stacking linear operations is still linear — you can't create curves by stacking straight lines, no matter how many you stack. You need a lens that distorts (a non-linearity) to break the pattern.
+    </div>
+
+    <h3>The Mathematical Proof (2 Layers)</h3>
+    <p>With L layers, all linear:</p>
+    <p class="formula">ŷ = W<sub>L</sub>(W<sub>L−1</sub>(…(W₁x + b₁)… + b<sub>L−1</sub>) + b<sub>L</sub></p>
+    <p class="formula">= (W<sub>L</sub> · W<sub>L−1</sub> · … · W₁)x + (combined biases)</p>
+    <p class="formula">= W<sub>total</sub> · x + b<sub>total</sub></p>
+
+    <p>No matter how many layers you stack, without non-linear activations, the entire network collapses to a <strong>single linear transformation</strong>. A 100-layer network with linear activations is mathematically identical to a single-layer network. All that extra computation buys you nothing.</p>
+
+    <div class="warning-box">
+        <strong>Critical Insight:</strong> Activations are the <em>only</em> source of expressive power in a neural network. Without them, you're just doing linear regression with extra steps. The non-linearity is what allows the network to learn curved decision boundaries, complex mappings, and hierarchical features.
+    </div>
+
+    <h3>What Makes a Good Activation Function?</h3>
+    <p>An ideal activation function should satisfy these properties:</p>
+    <table>
+        <tr><th>Property</th><th>Why It Matters</th></tr>
+        <tr><td><strong>Non-linear</strong></td><td>Without this, the network collapses to a single linear map (as shown above).</td></tr>
+        <tr><td><strong>Differentiable</strong></td><td>Backpropagation needs gradients. The activation must have a well-defined derivative everywhere (or almost everywhere).</td></tr>
+        <tr><td><strong>Computationally cheap</strong></td><td>Activations are applied to every neuron in every forward pass. Expensive functions (e.g., involving large exponentials) slow training dramatically.</td></tr>
+        <tr><td><strong>Gradient-friendly</strong></td><td>The derivative should not vanish for typical input ranges. A gradient of 0 means the neuron can't learn. A gradient that's always 1 (like ReLU) ensures gradients flow freely.</td></tr>
+    </table>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">Could we use sin(z) or z² as activations?</span>
+        <div class="collapsible-content">
+            <p>Technically, any non-linear function could work as an activation. sin(z) is periodic and smooth, and z² is simple and differentiable. However, sin(z) causes oscillating gradients that make training unstable, and z² grows without bound, causing exploding activations in deep networks. ReLU succeeds because it's simple, bounded on one side, and has a constant gradient on the positive side. Practical considerations like these are why certain activations dominate.</p>
+        </div>
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Without non-linear activations, a deep network collapses to a single linear transformation: W'x + b'. Activations are the ONLY source of expressive power. Good activations are non-linear, differentiable, computationally cheap, and have gradient-friendly derivatives.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> Stacking linear layers without activation produces ŷ = W'x + b' — one linear map regardless of depth. Activations add non-linearity, enabling curved decision boundaries. A good activation is non-linear, differentiable, cheap, and gradient-friendly.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 3: THE SIGMOID PROBLEM — VANISHING GRADIENTS -->
+<!-- ============================================================ -->
+<section id="section3" data-progress-section>
+    <h2>8.3 The Sigmoid Problem — Vanishing Gradients</h2>
+
+    <p>We established that non-linear activations are essential. Sigmoid (σ) was one of the first widely used activations. But it has a致命 flaw that cripples deep networks: the <strong>vanishing gradient problem</strong>.</p>
+
+    <h3>Sigmoid's Derivative Is Tiny</h3>
+    <p>The sigmoid derivative is:</p>
+    <p class="formula">σ'(z) = σ(z) · (1 − σ(z))</p>
+    <p>This function is a bell-shaped curve centered at z = 0, with a <strong>maximum value of 0.25</strong>. For any input z, the derivative is always in the range [0, 0.25].</p>
+
+    <table>
+        <tr><th>z</th><th>σ(z)</th><th>σ'(z) = σ(z)(1−σ(z))</th></tr>
+        <tr><td>−5.0</td><td>0.007</td><td>0.007</td></tr>
+        <tr><td>−2.0</td><td>0.119</td><td>0.105</td></tr>
+        <tr><td>0.0</td><td>0.500</td><td>0.250 <span class="badge badge-amber">MAX</span></td></tr>
+        <tr><td>+2.0</td><td>0.881</td><td>0.105</td></tr>
+        <tr><td>+5.0</td><td>0.993</td><td>0.007</td></tr>
+    </table>
+
+    <div class="analogy-box">
+        <strong>Analogy:</strong> Imagine you're playing a game of telephone (Chinese whispers). Message 1 starts clear. After each person whispers to the next, the message gets slightly muffled. By the time it reaches the 10th person, it's barely audible. That's what happens to gradients in a deep sigmoid network — each layer's derivative (≤ 0.25) mutes the gradient a little more, and after several layers, the gradient is essentially zero. The early layers hear nothing and can't learn.
+    </div>
+
+    <h3>Stacking Sigmoids: Gradient Shrinkage</h3>
+    <p>In backpropagation through L layers with sigmoid activations, the gradient at layer 1 depends on the product of all intermediate derivatives:</p>
+    <p class="formula">∂L/∂W₁ ∝ σ'(z₁) · σ'(z₂) · … · σ'(z<sub>L−1</sub>) · δ<sub>out</sub></p>
+    <p>Each σ'(z) ≤ 0.25. So the product of L sigmoid derivatives is bounded by:</p>
+    <p class="formula">(0.25)<sup>L</sup></p>
+    <p>For a 10-layer network: (0.25)<sup>10</sup> ≈ 0.000000954 — less than one millionth of the original gradient!</p>
+
+    <table>
+        <tr><th>Network Depth (L)</th><th>Max Gradient Scale (0.25)<sup>L</sup></th><th>Practical Effect</th></tr>
+        <tr><td>2</td><td>0.0625</td><td>Manageable — slow but possible</td></tr>
+        <tr><td>5</td><td>0.00098</td><td>Very slow learning in early layers</td></tr>
+        <tr><td>10</td><td>≈ 10<sup>−6</sup></td><td>Early layers effectively frozen</td></tr>
+        <tr><td>20</td><td>≈ 10<sup>−12</sup></td><td>Impossible — gradients are numerical noise</td></tr>
+    </table>
+
+    <div class="warning-box">
+        <strong>The Vanishing Gradient Problem:</strong> When gradients shrink toward zero as they propagate backward through many layers, the early layers (which learn low-level features like edges, textures) receive almost no learning signal. The network cannot train these layers effectively, regardless of how long you train. This is why deep sigmoid networks were considered impossible before modern activations.
+    </div>
+
+    <h3>Why This Happens: The Chain Rule Bottleneck</h3>
+    <p>The chain rule multiplies derivatives across layers. When each factor is ≤ 0.25, the product decays exponentially with depth. It's like compound interest in reverse — instead of growing, the gradient shrinks multiplicatively at every step.</p>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">Why does saturation make gradients vanish?</span>
+        <div class="collapsible-content">
+            <p>"Saturation" means the activation function's output is stuck near its extreme values (0 or 1 for sigmoid). When σ(z) ≈ 0 or σ(z) ≈ 1, the derivative σ'(z) = σ(z)(1−σ(z)) ≈ 0. In deep networks, most neurons' inputs are far from 0 (they accumulate through layers), so most neurons are saturated. This means most gradient contributions are near zero. Even when z ≈ 0 (the maximum gradient of 0.25), stacking 10+ layers still kills the gradient. Sigmoid has no regime where its derivative is close to 1, so there's no "safe zone" for gradient flow.</p>
+        </div>
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Sigmoid's derivative is at most 0.25. Stacking L sigmoid layers produces a gradient shrinkage of (0.25)^L — exponentially small for deep networks. Early layers can't learn. This is the vanishing gradient problem, and it motivated the shift to ReLU.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> σ'(z) ≤ 0.25 for all z. In deep networks, gradient ∝ ∏σ'(z<sub>i</sub>), which shrinks exponentially with depth. After 10+ layers, gradients are near zero. Early layers cannot learn. Solution: use activations with larger derivatives (e.g., ReLU).
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 4: RELU ACTIVATION -->
+<!-- ============================================================ -->
+<section id="section4" data-progress-section>
+    <h2>8.4 ReLU Activation</h2>
+
+    <p>The Rectified Linear Unit (ReLU) is the most widely used activation function in deep learning. It solved the vanishing gradient problem and enabled the training of networks with dozens or hundreds of layers.</p>
+
+    <h3>Definition</h3>
+    <p class="formula">ReLU(z) = max(0, z) = { z &nbsp;if z > 0, &nbsp;0 &nbsp;if z ≤ 0 }</p>
+    <p>That's it. ReLU simply outputs the input if it's positive, and outputs 0 otherwise.</p>
+
+    <div class="analogy-box">
+        <strong>Analogy:</strong> Think of ReLU as a bouncer at a club. Positive values get in (passed through unchanged). Negative values are turned away (output zero). Zero is right at the door — also turned away. There's no gradual fading or complex decision — it's a hard gate: positive or nothing. This simplicity is exactly what makes it work so well.
+    </div>
+
+    <h3>Why ReLU Works: Properties</h3>
+    <table>
+        <tr><th>Property</th><th>Value</th><th>Why It Matters</th></tr>
+        <tr><td>Gradient for z &gt; 0</td><td><strong>1</strong></td><td>Constant gradient of 1 means gradients flow through unchanged — no vanishing!</td></tr>
+        <tr><td>Gradient for z &lt; 0</td><td><strong>0</strong></td><td>Dead zone — outputs and gradients are zero for negative inputs.</td></tr>
+        <tr><td>Range</td><td>[0, ∞)</td><td>Unbounded on the positive side — no saturation for positive inputs.</td></tr>
+        <tr><td>Computational cost</td><td>Comparison + identity</td><td>Incredibly cheap: just check if z &gt; 0. No exponentials, no divisions.</td></tr>
+        <tr><td>Sparsity</td><td>~50% of neurons output 0</td><td>Sparse representations are more efficient and can improve generalization.</td></tr>
+    </table>
+
+    <div class="definition-box">
+        <strong>Why gradient = 1 matters:</strong> When the gradient is 1, multiplying by it during backpropagation doesn't shrink the gradient at all. If the loss gradient arriving at a ReLU neuron is δ, the gradient passed to the previous layer is also δ (for positive inputs). This means gradients can propagate through arbitrarily deep networks without shrinking — completely solving the vanishing gradient problem.
+    </div>
+
+    <h3>Worked Example: Forward Pass Through ReLU</h3>
+    <p>Given input vector x = [2.0, −1.5, 3.0, −0.5, 0.0], compute ReLU(x) element by element:</p>
+
+    <div class="worked-example">
+        <div class="example-title">Worked Example: ReLU Forward Pass</div>
+        <div class="step">
+            <span class="step-num">1</span>
+            <span class="step-title">Element 1: x₁ = 2.0</span>
+            <div class="step-content">2.0 > 0, so ReLU(2.0) = 2.0</div>
+        </div>
+        <div class="step">
+            <span class="step-num">2</span>
+            <span class="step-title">Element 2: x₂ = −1.5</span>
+            <div class="step-content">−1.5 ≤ 0, so ReLU(−1.5) = 0.0</div>
+        </div>
+        <div class="step">
+            <span class="step-num">3</span>
+            <span class="step-title">Element 3: x₃ = 3.0</span>
+            <div class="step-content">3.0 > 0, so ReLU(3.0) = 3.0</div>
+        </div>
+        <div class="step">
+            <span class="step-num">4</span>
+            <span class="step-title">Element 4: x₄ = −0.5</span>
+            <div class="step-content">−0.5 ≤ 0, so ReLU(−0.5) = 0.0</div>
+        </div>
+        <div class="step">
+            <span class="step-num">5</span>
+            <span class="step-title">Element 5: x₅ = 0.0</span>
+            <div class="step-content">0.0 ≤ 0, so ReLU(0.0) = 0.0</div>
+        </div>
+        <div class="step">
+            <span class="step-num">✓</span>
+            <span class="step-title">Result</span>
+            <div class="step-content">ReLU([2.0, −1.5, 3.0, −0.5, 0.0]) = [2.0, 0.0, 3.0, 0.0, 0.0]</div>
+        </div>
+    </div>
+
+    <h3>ReLU Derivative</h3>
+    <p class="formula">ReLU'(z) = { 1 &nbsp;if z &gt; 0, &nbsp;0 &nbsp;if z &lt; 0, &nbsp;undefined at z = 0 }</p>
+    <p>In practice, the derivative at z = 0 is set to 0 (or 1, depending on the framework). Since z = 0 is a single point, it almost never occurs in practice, so this doesn't cause issues.</p>
+
+    <div class="worked-example">
+        <div class="example-title">Worked Example: ReLU Derivative</div>
+        <div class="step">
+            <span class="step-num">1</span>
+            <span class="step-title">Derivative of ReLU(2.0)</span>
+            <div class="step-content">2.0 > 0 → ReLU'(2.0) = 1. Gradient passes through unchanged.</div>
+        </div>
+        <div class="step">
+            <span class="step-num">2</span>
+            <span class="step-title">Derivative of ReLU(−1.5)</span>
+            <div class="step-content">−1.5 < 0 → ReLU'(−1.5) = 0. Gradient is killed — this neuron doesn't learn from this input.</div>
+        </div>
+        <div class="step">
+            <span class="step-num">3</span>
+            <span class="step-title">Derivative of ReLU(0.0)</span>
+            <div class="step-content">z = 0 → ReLU'(0) = 0 (by convention). Rarely encountered in practice.</div>
+        </div>
+    </div>
+
+    <h3>Historical Note: AlexNet (2012)</h3>
+    <p>Before 2012, sigmoid and tanh were the default activations. Alex Krizhevsky's AlexNet won the ImageNet competition in 2012 using ReLU activations, demonstrating dramatically faster training (6× speedup over sigmoid) and better performance. This single result triggered the deep learning revolution and made ReLU the standard activation for hidden layers.</p>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">Why was ReLU faster to train than sigmoid?</span>
+        <div class="collapsible-content">
+            <p>Three reasons: (1) Computation — ReLU is a simple comparison (if z > 0, output z), while sigmoid requires an exponential and a division. For millions of neurons, this adds up. (2) Gradient flow — ReLU's gradient of 1 for positive inputs means gradients don't shrink, so early layers learn quickly. With sigmoid, early layers get vanishingly small gradients and learn very slowly. (3) Sparsity — ReLU outputs many zeros, creating sparse activations that are computationally efficient and can improve generalization by reducing redundancy.</p>
+        </div>
+    </div>
+
+    <div class="warning-box">
+        <strong>Warning:</strong> ReLU is NOT suitable for output layers in most tasks. For regression, use a linear output (no activation). For binary classification, use sigmoid. For multi-class, use softmax. ReLU is for hidden layers only.
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> ReLU(z) = max(0, z). Gradient = 1 for z > 0 (no vanishing), gradient = 0 for z < 0 (dead zone). Computationally trivial, produces sparse activations. Popularized by AlexNet 2012. Use ReLU in hidden layers; use task-specific activations in output layers.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> ReLU(z) = max(0, z). Gradient is 1 when active, 0 when inactive. No saturation for positive inputs → gradients flow freely through deep networks. Cheap to compute. AlexNet 2012 made it the standard. Use in hidden layers, not output layers.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 5: DYING RELU PROBLEM -->
+<!-- ============================================================ -->
+<section id="section5" data-progress-section>
+    <h2>8.5 The Dying ReLU Problem</h2>
+
+    <p>ReLU's simplicity has a downside: neurons can "die" — getting stuck in the negative region where the gradient is always 0, never updating again.</p>
+
+    <h3>How a Neuron Dies</h3>
+    <p>When a neuron's weighted sum z = Wx + b is negative for ALL training examples, the neuron outputs 0 for everything. Its gradient is also 0 (since ReLU'(z) = 0 for z < 0). With zero gradient, the weights never update. The neuron is permanently dead.</p>
+
+    <div class="analogy-box">
+        <strong>Analogy:</strong> Imagine a light switch that only turns on when voltage is positive. If the voltage drops below zero, the switch turns off and the bulb goes dark. Now imagine the switch also disables its own wiring when it turns off — no current can flow to repair it. Once off, it stays off forever. That's a dying ReLU neuron: negative input → zero output → zero gradient → no weight update → stays negative forever.
+    </div>
+
+    <h3>Common Causes</h3>
+    <table>
+        <tr><th>Cause</th><th>Why It Kills Neurons</th></tr>
+        <tr><td><strong>Large negative bias initialization</strong></td><td>If b is initialized very negative, z = Wx + b is negative for most inputs → neuron starts dead and never recovers.</td></tr>
+        <tr><td><strong>High learning rate</strong></td><td>A large weight update can push z from slightly positive to deeply negative, killing the neuron in one step.</td></tr>
+        <tr><td><strong>Poor weight initialisation</strong></td><td>Weights that are too large or too small can cause most neurons to output 0 initially, leading to widespread neuron death.</td></tr>
+        <tr><td><strong>Data with many negative pre-activations</strong></td><td>If the data distribution naturally produces negative z values for many neurons, those neurons will be permanently inactive.</td></tr>
+    </table>
+
+    <div class="warning-box">
+        <strong>Warning:</strong> In practice, with proper initialisation (He init) and moderate learning rates, only a small percentage of ReLU neurons die. But with poor hyperparameters, up to 50% of neurons can become permanently dead — effectively halving your network's capacity.
+    </div>
+
+    <h3>ReLU Variants: Solving the Dying Problem</h3>
+
+    <h4>Leaky ReLU</h4>
+    <p class="formula">LeakyReLU(z) = { z &nbsp;if z &gt; 0, &nbsp;αz &nbsp;if z ≤ 0 } &nbsp;&nbsp;&nbsp; (typically α = 0.01)</p>
+    <p>Instead of outputting 0 for negative inputs, Leaky ReLU outputs a small fraction (αz). This ensures the gradient is always non-zero (α for negative inputs, 1 for positive), so neurons can always learn.</p>
+
+    <h4>ELU (Exponential Linear Unit)</h4>
+    <p class="formula">ELU(z) = { z &nbsp;if z &gt; 0, &nbsp;α(e<sup>z</sup> − 1) &nbsp;if z ≤ 0 }</p>
+    <p>ELU smoothly approaches −α for large negative inputs, keeping the mean activation closer to zero (which helps training). More computationally expensive than ReLU due to the exponential.</p>
+
+    <h4>GELU (Gaussian Error Linear Unit)</h4>
+    <p class="formula">GELU(z) = z · Φ(z) &nbsp;&nbsp;&nbsp; where Φ(z) is the CDF of the standard normal distribution</p>
+    <p>GELU weights inputs by their probability of being positive under a Gaussian distribution. Used in modern architectures like GPT and BERT. It's a smooth approximation of ReLU that allows small negative values through.</p>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">When should I use Leaky ReLU vs standard ReLU?</span>
+        <div class="collapsible-content">
+            <p>Start with standard ReLU — it's the default for a reason and works well in most cases. Switch to Leaky ReLU if you notice significant neuron death (you can monitor the fraction of zero activations). Leaky ReLU adds minimal overhead and ensures no neuron is permanently dead. In practice, the difference is often small, but Leaky ReLU is a safe fallback when training is unstable or the network seems to have reduced capacity.</p>
+        </div>
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Dying ReLU = neurons stuck in negative region with gradient = 0, never updating. Caused by large biases, high learning rates, or poor init. Solutions: Leaky ReLU (small slope for z < 0), ELU (smooth exponential for z < 0), GELU (probabilistic gating).
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> Dying ReLU: neurons permanently output 0 because z < 0 for all inputs → gradient = 0 → no updates. Causes: bad init, high LR, large biases. Fixes: Leaky ReLU (αz for z < 0), ELU, GELU. Monitor fraction of dead neurons during training.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 6: SOFTMAX FOR MULTI-CLASS -->
+<!-- ============================================================ -->
+<section id="section6" data-progress-section>
+    <h2>8.6 Softmax for Multi-Class Classification</h2>
+
+    <p>So far we've discussed hidden layer activations (sigmoid, ReLU). Now let's look at <strong>output layer activations</strong> — specifically, how to handle tasks with more than two classes.</p>
+
+    <h3>From Binary to K Classes</h3>
+    <p>In binary classification, we used a single sigmoid output neuron producing a probability p(y=1|x). But what if we have K classes? We need K output neurons, each representing the probability of its class. The problem: K raw outputs (logits) z₁, z₂, ..., z<sub>K</sub> aren't probabilities — they can be negative, they don't sum to 1, and they're hard to interpret.</p>
+
+    <div class="analogy-box">
+        <strong>Analogy:</strong> Imagine you're judging a 4-way cooking competition. Each chef gives you a "raw score" (the logit): Chef A: 2.0, Chef B: 1.0, Chef C: 0.5, Chef D: −1.0. These raw scores aren't probabilities — they don't sum to 1 and Chef D's negative score doesn't mean "negative probability." Softmax converts these into proper probabilities: [0.488, 0.180, 0.109, 0.022]. Now they sum to 1, and Chef A has a 48.8% chance of winning.
+    </div>
+
+    <h3>The Softmax Function</h3>
+    <p class="formula">softmax(z<sub>k</sub>) = e<sup>z<sub>k</sub></sup> / Σ<sub>j=1..K</sub> e<sup>z<sub>j</sub></sup></p>
+    <p>For each class k: exponentiate the logit z<sub>k</sub>, then divide by the sum of all exponentials. This produces a valid probability distribution.</p>
+
+    <h3>Properties of Softmax</h3>
+    <table>
+        <tr><th>Property</th><th>What It Means</th><th>Why It Matters</th></tr>
+        <tr><td><strong>Valid probability distribution</strong></td><td>All outputs ∈ (0, 1) and sum to exactly 1</td><td>We can interpret outputs as class probabilities</td></tr>
+        <tr><td><strong>Translation invariant</strong></td><td>softmax(z + c) = softmax(z) for any constant c</td><td>Adding the same value to all logits doesn't change the output — only relative differences matter</td></tr>
+        <tr><td><strong>Differentiable</strong></td><td>Smooth function with well-defined gradients</td><td>Enables backpropagation through the output layer</td></tr>
+        <tr><td><strong>Monotonic</strong></td><td>Higher logit → higher probability</td><td>Preserves the ranking of logits</td></tr>
+    </table>
+
+    <h3>Visual Example: 4-Class Output Layer</h3>
+    <div class="worked-example">
+        <div class="example-title">Worked Example: Softmax on 4-Class Output</div>
+        <div class="step">
+            <span class="step-num">1</span>
+            <span class="step-title">Raw logits from the network</span>
+            <div class="step-content">z = [2.0, 1.0, 0.5, −1.0]</div>
+        </div>
+        <div class="step">
+            <span class="step-num">2</span>
+            <span class="step-title">Exponentiate each logit</span>
+            <div class="step-content">e² = 7.389, e¹ = 2.718, e⁰·⁵ = 1.649, e⁻¹ = 0.368</div>
+        </div>
+        <div class="step">
+            <span class="step-num">3</span>
+            <span class="step-title">Sum of exponentials</span>
+            <div class="step-content">7.389 + 2.718 + 1.649 + 0.368 = 12.124</div>
+        </div>
+        <div class="step">
+            <span class="step-num">4</span>
+            <span class="step-title">Divide each by the sum</span>
+            <div class="step-content">P(class 0) = 7.389/12.124 = 0.609<br>P(class 1) = 2.718/12.124 = 0.224<br>P(class 2) = 1.649/12.124 = 0.136<br>P(class 3) = 0.368/12.124 = 0.030</div>
+        </div>
+        <div class="step">
+            <span class="step-num">✓</span>
+            <span class="step-title">Verification</span>
+            <div class="step-content">0.609 + 0.224 + 0.136 + 0.030 = 0.999 ≈ 1.0 ✓ (rounding)</div>
+        </div>
+    </div>
+
+    <h3>Numerical Stability Trick</h3>
+    <p>In practice, computing e<sup>z<sub>k</sub></sup> for large z<sub>k</sub> can overflow (e<sup>1000</sup> = ∞). The solution: subtract the maximum logit before exponentiating:</p>
+    <p class="formula">softmax(z<sub>k</sub>) = e<sup>z<sub>k</sub> − max(z)</sup> / Σ<sub>j</sub> e<sup>z<sub>j</sub> − max(z)</sup></p>
+    <p>This doesn't change the output (translation invariance) but prevents overflow. Every deep learning framework implements this automatically.</p>
+
+    <div class="warning-box">
+        <strong>Critical Rule:</strong> NEVER use softmax in hidden layers. Softmax is designed specifically for output layers in multi-class classification. Using it in hidden layers destroys the network's ability to learn because it forces all outputs to sum to 1 (competing outputs) and produces gradients that behave unpredictably. Use ReLU (or variants) in hidden layers; use softmax only at the output.
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Softmax converts K raw logits into a valid probability distribution: softmax(z<sub>k</sub>) = e<sup>z<sub>k</sub></sup>/Σe<sup>z<sub>j</sub></sup>. Properties: sums to 1, all values in (0,1), differentiable, translation invariant. Use softmax at the output layer for multi-class classification. NEVER use it in hidden layers.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> Softmax(z<sub>k</sub>) = e<sup>z<sub>k</sub></sup>/Σe<sup>z<sub>j</sub></sup>. Produces valid probabilities from logits. Used for K-class output layers. Never in hidden layers. Subtract max(z) for numerical stability. Exponentiation amplifies differences between logits.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 7: SOFTMAX + CATEGORICAL CROSS-ENTROPY -->
+<!-- ============================================================ -->
+<section id="section7" data-progress-section>
+    <h2>8.7 Softmax + Categorical Cross-Entropy Loss</h2>
+
+    <p>Softmax produces probabilities. But how do we measure how wrong those probabilities are? We need a loss function. The natural pairing for softmax is <strong>categorical cross-entropy (CCE)</strong>.</p>
+
+    <h3>Binary Cross-Entropy (BCE) Recap</h3>
+    <p>For binary classification with sigmoid output (single neuron, output p = σ(z)):</p>
+    <p class="formula">BCE = −[y · log(p) + (1 − y) · log(1 − p)]</p>
+    <p>Where y ∈ {0, 1} is the true label and p ∈ (0, 1) is the predicted probability. This loss is 0 when the prediction is perfect, and → ∞ when the prediction is confidently wrong.</p>
+
+    <div class="definition-box">
+        <strong>Why log?</strong> The logarithm penalizes confident wrong predictions much more than incorrect predictions. If y = 1 and p = 0.9, the loss is −log(0.9) ≈ 0.105 (small). If y = 1 and p = 0.01, the loss is −log(0.01) ≈ 4.605 (large). This encourages the model to be both correct AND confident.
+    </div>
+
+    <h3>Categorical Cross-Entropy (CCE)</h3>
+    <p>For multi-class classification with K softmax output neurons (probabilities p₁, p₂, ..., p<sub>K</sub>):</p>
+    <p class="formula">CCE = −Σ<sub>k=1..K</sub> y<sub>k</sub> · log(p<sub>k</sub>)</p>
+    <p>Where y<sub>k</sub> is 1 for the true class and 0 for all others (one-hot encoding). This simplifies to:</p>
+    <p class="formula">CCE = −log(p<sub>true class</sub>)</p>
+    <p>The loss is simply the negative log probability assigned to the correct class.</p>
+
+    <div class="worked-example">
+        <div class="example-title">Worked Example: CCE Loss</div>
+        <div class="step">
+            <span class="step-num">1</span>
+            <span class="step-title">True label: class 2 (one-hot: [0, 0, 1, 0])</span>
+            <div class="step-content">The true class is class 2 out of 4 classes.</div>
+        </div>
+        <div class="step">
+            <span class="step-num">2</span>
+            <span class="step-title">Softmax output: [0.1, 0.2, 0.6, 0.1]</span>
+            <div class="step-content">The model assigns 60% probability to class 2.</div>
+        </div>
+        <div class="step">
+            <span class="step-num">3</span>
+            <span class="step-title">CCE = −log(0.6) = 0.511</span>
+            <div class="step-content">Only the true class contributes: CCE = −(0·log(0.1) + 0·log(0.2) + 1·log(0.6) + 0·log(0.1)) = −log(0.6)</div>
+        </div>
+        <div class="step">
+            <span class="step-num">4</span>
+            <span class="step-title">If the model were more confident: p₂ = 0.9</span>
+            <div class="step-content">CCE = −log(0.9) = 0.105 — much lower loss for a better prediction.</div>
+        </div>
+        <div class="step">
+            <span class="step-num">5</span>
+            <span class="step-title">If the model were wrong: p₂ = 0.01</span>
+            <div class="step-content">CCE = −log(0.01) = 4.605 — high penalty for confident wrong prediction.</div>
+        </div>
+    </div>
+
+    <h3>Why Softmax + CCE Works Well Together</h3>
+    <p>When you combine softmax output with CCE loss, the gradient has a remarkably clean form:</p>
+    <p class="formula">∂L/∂z<sub>k</sub> = p<sub>k</sub> − y<sub>k</sub></p>
+    <p>This is the predicted probability minus the true label. For the correct class, if p < 1, the gradient is negative (pushing z up). For incorrect classes, if p > 0, the gradient is positive (pushing z down). The gradient is intuitive and well-behaved.</p>
+
+    <div class="warning-box">
+        <strong>Don't mix and match carelessly:</strong> Softmax + CCE is a matched pair. Sigmoid + BCE is another matched pair. Using sigmoid + CCE or softmax + BCE will produce incorrect gradients and poor training. Always pair them correctly (see Decision Guide in Section 8).
+    </div>
+
+    <h3>Output Layer Comparison</h3>
+    <table>
+        <tr><th>Task</th><th>Output Neurons</th><th>Output Activation</th><th>Loss Function</th></tr>
+        <tr><td>Binary classification</td><td>1 neuron</td><td>Sigmoid</td><td>Binary Cross-Entropy (BCE)</td></tr>
+        <tr><td>Multi-class (K classes)</td><td>K neurons</td><td>Softmax</td><td>Categorical Cross-Entropy (CCE)</td></tr>
+        <tr><td>Multi-label</td><td>K neurons</td><td>K separate Sigmoids</td><td>BCE per output (averaged)</td></tr>
+        <tr><td>Regression</td><td>1 neuron</td><td>Linear (none)</td><td>MSE or MAE</td></tr>
+    </table>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> CCE = −Σy<sub>k</sub>·log(p<sub>k</sub>) = −log(p<sub>true class</sub>). Measures how much the true class probability deviates from 1. Pair softmax + CCE for multi-class, sigmoid + BCE for binary. The combined gradient is simply p − y, which is clean and intuitive.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> CCE loss for multi-class = −log(p<sub>true</sub>). Paired with softmax output. BCE for binary = −[y·log(p) + (1−y)·log(1−p)], paired with sigmoid. Gradient of softmax+CCE is p − y. Don't mix activation/loss pairs.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 8: DECISION GUIDE TABLE -->
+<!-- ============================================================ -->
+<section id="section8" data-progress-section>
+    <h2>8.8 Decision Guide: Choosing Output Activation &amp; Loss</h2>
+
+    <p>One of the most common exam mistakes is mixing up activation functions and loss functions. This section gives you a clear decision framework.</p>
+
+    <table>
+        <tr>
+            <th>Task Type</th>
+            <th>Output Neurons</th>
+            <th>Output Activation</th>
+            <th>Loss Function</th>
+            <th>Example</th>
+        </tr>
+        <tr>
+            <td><strong>Binary Classification</strong></td>
+            <td>1</td>
+            <td>Sigmoid</td>
+            <td>Binary Cross-Entropy (BCE)</td>
+            <td>Spam vs. not spam</td>
+        </tr>
+        <tr>
+            <td><strong>Multi-class (mutually exclusive)</strong></td>
+            <td>K</td>
+            <td>Softmax</td>
+            <td>Categorical Cross-Entropy (CCE)</td>
+            <td>Digit recognition (0–9)</td>
+        </tr>
+        <tr>
+            <td><strong>Multi-label (non-exclusive)</strong></td>
+            <td>K</td>
+            <td>K independent Sigmoids</td>
+            <td>BCE per output (mean)</td>
+            <td>Image tagging (can be multiple)</td>
+        </tr>
+        <tr>
+            <td><strong>Regression</strong></td>
+            <td>1 (or K)</td>
+            <td>Linear (none)</td>
+            <td>MSE or MAE</td>
+            <td>Predicting house price</td>
+        </tr>
+    </table>
+
+    <div class="analogy-box">
+        <strong>Analogy:</strong> Think of it like ordering at a restaurant. Binary classification = "Would you like dessert? Yes/No" (one question, one answer). Multi-class = "Which of these 5 desserts would you like? Pick exactly one" (mutually exclusive). Multi-label = "Which of these toppings would you like? Check all that apply" (non-exclusive). Regression = "How much would you like to pay?" (continuous number). Each question type needs a different scoring system (loss function).
+    </div>
+
+    <div class="definition-box">
+        <strong>Multi-class vs Multi-label — the key distinction:</strong><br>
+        <strong>Multi-class:</strong> Exactly one class is correct. The classes are mutually exclusive (a digit is either 3 or 7, never both). Use softmax (outputs sum to 1, so choosing one class reduces the probability of others).<br><br>
+        <strong>Multi-label:</strong> Multiple classes can be correct simultaneously. An image can contain both a cat and a tree. Use independent sigmoids (each output is an independent probability, no competition between outputs).
+    </div>
+
+    <h3>Decision Flowchart</h3>
+    <div class="worked-example">
+        <div class="example-title">How to Choose: Step by Step</div>
+        <div class="step">
+            <span class="step-num">1</span>
+            <span class="step-title">Is the output a continuous number?</span>
+            <div class="step-content">YES → Regression: Linear output + MSE/MAE loss<br>NO → Go to step 2</div>
+        </div>
+        <div class="step">
+            <span class="step-num">2</span>
+            <span class="step-title">How many classes?</span>
+            <div class="step-content">2 → Binary: Sigmoid output (1 neuron) + BCE loss<br>More than 2 → Go to step 3</div>
+        </div>
+        <div class="step">
+            <span class="step-num">3</span>
+            <span class="step-title">Are classes mutually exclusive?</span>
+            <div class="step-content">YES (exactly one correct) → Softmax (K neurons) + CCE loss<br>NO (multiple correct) → K Sigmoids + BCE per output</div>
+        </div>
+    </div>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">Why can't I use sigmoid for multi-class?</span>
+        <div class="collapsible-content">
+            <p>You technically can — and some older systems did. But sigmoid for K outputs treats each class independently. The K outputs don't sum to 1, so they aren't probabilities (they could sum to 1.5 or 0.3). This means: (1) you can't interpret them as a proper probability distribution, (2) the model can be simultaneously very confident about multiple conflicting classes, and (3) the gradient doesn't encourage competition between classes. Softmax forces the outputs to compete (higher probability for one means lower for others), which naturally fits mutually exclusive classification.</p>
+        </div>
+    </div>
+
+    <div class="warning-box">
+        <strong>Common Exam Mistake:</strong> Using sigmoid with 10 output neurons for digit classification. This is wrong because: (1) sigmoid outputs are independent — they don't sum to 1, so they aren't a valid probability distribution. (2) You should use softmax with K=10 outputs + CCE loss. (3) Or if you insist on sigmoid, you'd need to manually normalise the outputs, which is non-standard and error-prone.
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Binary → Sigmoid + BCE + 1 output. Multi-class → Softmax + CCE + K outputs. Multi-label → K Sigmoids + BCE per output. Regression → Linear + MSE/MAE. Always pair the correct activation and loss function.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> Decision guide: (1) Regression → Linear + MSE. (2) Binary → Sigmoid + BCE. (3) Multi-class → Softmax + CCE. (4) Multi-label → K Sigmoids + BCE each. Never mix mismatched pairs.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 9: OVERFITTING IN DEEP NETWORKS -->
+<!-- ============================================================ -->
+<section id="section9" data-progress-section>
+    <h2>8.9 Overfitting in Deep Networks</h2>
+
+    <p>Deep neural networks have enormous capacity — they can learn incredibly complex patterns. But this capacity is a double-edged sword: they can also memorise training data instead of learning generalisable features.</p>
+
+    <h3>Why Deep Networks Overfit Easily</h3>
+    <p>A deep network with millions of parameters can fit the training data perfectly — even if the labels are random noise. The more parameters relative to the amount of training data, the更容易 the network memorises rather than generalises.</p>
+
+    <div class="analogy-box">
+        <strong>Analogy:</strong> Imagine a student preparing for an exam. A good student understands the concepts (generalises) and can answer new questions they've never seen. A bad student memorises the exact answers to the practice questions (overfits) but can't handle any variation. A deep network with too many parameters is like giving the student the answer key — they'll ace the practice test (training loss → 0) but fail the real exam (validation loss → ∞).
+    </div>
+
+    <h3>Signs of Overfitting</h3>
+    <table>
+        <tr><th>Sign</th><th>What You See</th><th>Why It Happens</th></tr>
+        <tr><td><strong>Training loss falls, validation loss rises</strong></td><td>The classic "U-shape" in validation loss while training loss keeps decreasing</td><td>Model memorises training data but fails on unseen data</td></tr>
+        <tr><td><strong>Large weight magnitudes</strong></td><td>Weights grow very large to fit noisy patterns</td><td>Model creates extreme decision boundaries to accommodate outliers</td></tr>
+        <tr><td><strong>Confident wrong predictions</strong></td><td>Model outputs probabilities like 0.99 for wrong class</td><td>Model has overfit to specific patterns in training data</td></tr>
+        <tr><td><strong>Train accuracy ≈ 100%, val accuracy much lower</strong></td><td>Large gap between train and validation metrics</td><td>Model perfectly fits training distribution but can't generalise</td></tr>
+    </table>
+
+    <h3>The Capacity-Generalisation Trade-off</h3>
+    <p>More capacity (layers, neurons, parameters) = ability to learn more complex patterns. But also = higher risk of memorising noise. The goal is to find the sweet spot: enough capacity to capture the true pattern, but not so much that the model memorises the noise.</p>
+
+    <div class="warning-box">
+        <strong>Warning:</strong> Overfitting doesn't mean the model is "bad" — it means the model has learned the training data too well, including its noise and idiosyncrasies. A model that overfits is actually very powerful — it just needs to be constrained (regularised) to focus on the signal rather than the noise.
+    </div>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">Can a model underfit AND overfit at the same time?</span>
+        <div class="collapsible-content">
+            <p>Not simultaneously on the same data, but different parts of the model can exhibit different behaviors. For example, early layers might underfit (not learning useful low-level features) while later layers overfit (memorising high-level patterns). This is one reason why different regularisation strategies are applied to different parts of the network — e.g., dropout on later layers, batch norm throughout.</p>
+        </div>
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Deep networks have enormous capacity, making them prone to overfitting (memorising training data). Signs: training loss ↓ while validation loss ↑, large weights, confident wrong predictions. The solution is regularisation — constraining the model to learn generalisable patterns.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> Overfitting = model memorises training data, fails on new data. Signs: train loss ↓, val loss ↑; large weights; confident wrong predictions. Deep networks overfit easily due to high capacity. Regularisation is the solution.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 10: REGULARISATION TECHNIQUES -->
+<!-- ============================================================ -->
+<section id="section10" data-progress-section>
+    <h2>8.10 Regularisation Techniques</h2>
+
+    <p>Regularisation is any technique that constrains the model to reduce overfitting without significantly reducing its ability to learn. Here are the most important techniques for deep networks.</p>
+
+    <h3>1. L2 Regularisation (Ridge / Weight Decay)</h3>
+    <p>Add a penalty proportional to the square of each weight to the loss function:</p>
+    <p class="formula">L<sub>regularised</sub> = L<sub>original</sub> + λ · Σw<sub>i</sub>²</p>
+    <p>The λ (lambda) hyperparameter controls the strength. L2 penalises large weights, pushing them toward zero. This discourages the model from relying too heavily on any single feature.</p>
+
+    <div class="definition-box">
+        <strong>Why L2 helps:</strong> Large weights mean the model is very sensitive to small changes in input features — a hallmark of overfitting. By penalising large weights, L2 forces the model to distribute its reliance across many features, producing smoother decision boundaries that generalise better. In gradient descent, L2 adds −2λw to each weight gradient, effectively pulling weights toward 0 at every step (hence "weight decay").
+    </div>
+
+    <h3>2. L1 Regularisation (Lasso)</h3>
+    <p>Add a penalty proportional to the absolute value of each weight:</p>
+    <p class="formula">L<sub>regularised</sub> = L<sub>original</sub> + λ · Σ|w<sub>i</sub>|</p>
+    <p>L1 pushes many weights to exactly zero (not just small), effectively performing <strong>feature selection</strong>. This produces sparse models that are easier to interpret.</p>
+
+    <table>
+        <tr><th></th><th>L2 (Ridge)</th><th>L1 (Lasso)</th></tr>
+        <tr><td>Penalty</td><td>λ · Σw²</td><td>λ · Σ|w|</td></tr>
+        <tr><td>Effect on weights</td><td>Shrinks toward 0 (rarely exactly 0)</td><td>Pushes to exactly 0 (sparse)</td></tr>
+        <tr><td>Feature selection</td><td>No — keeps all features</td><td>Yes — zeros out irrelevant features</td></tr>
+        <tr><td>Best for</td><td>When all features are useful</td><td>When many features are irrelevant</td></tr>
+    </table>
+
+    <h3>3. Dropout</h3>
+    <p>During each training step, randomly "drop" (set to 0) a fraction p of neurons. Typically p = 0.2 to 0.5.</p>
+    <p class="formula">During training: each neuron is "off" with probability p</p>
+    <p class="formula">During inference: all neurons active (but outputs scaled by 1 − p)</p>
+
+    <div class="analogy-box">
+        <strong>Analogy:</strong> Imagine a team working on a project, but each day, some team members call in sick randomly. The team can't rely on any specific person always being there, so everyone learns to be more versatile and the team develops redundant capabilities. At test time, everyone shows up, and the team is stronger because each member is more capable. Dropout forces the same principle: neurons can't rely on specific other neurons always being active, so each neuron learns more robust features.
+    </div>
+
+    <div class="definition-box">
+        <strong>Why dropout works:</strong><br>
+        <strong>1. Prevents co-adaptation:</strong> Without dropout, neurons can specialise together (neuron A only works when neuron B is also active). Dropout forces each neuron to learn features that are useful independently.<br>
+        <strong>2. Implicit ensemble:</strong> Each training step uses a different sub-network. At test time, using all neurons approximates averaging the predictions of exponentially many sub-networks — an implicit ensemble of 2<sup>N</sup> models (where N is the number of neurons).
+    </div>
+
+    <div class="warning-box">
+        <strong>Warning:</strong> Dropout is only active during training. During evaluation/testing, ALL neurons must be active. Forgetting to set the model to eval mode (e.g., model.eval() in PyTorch) keeps dropout active during inference, producing random, degraded predictions. This is one of the most common debugging mistakes in deep learning.
+    </div>
+
+    <h3>4. Early Stopping</h3>
+    <p>Monitor validation loss during training. Stop when validation loss stops decreasing (or starts increasing), even if training loss is still falling.</p>
+    <p class="formula">Stop training when val_loss has not improved for "patience" epochs</p>
+    <p>The patience parameter (e.g., 5, 10, 20) determines how many epochs to wait for improvement before stopping. This prevents the model from training long enough to overfit.</p>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">Why is early stopping the simplest regulariser?</span>
+        <div class="collapsible-content">
+            <p>Early stopping requires no changes to the model architecture or loss function. You just monitor the validation loss and stop training when it starts to rise. It's like knowing when to stop studying — continuing to review the same material won't help and might give you false confidence. The patience parameter adds robustness: small fluctuations in validation loss won't trigger premature stopping. Early stopping is almost always worth using, even alongside other regularisation techniques.</p>
+        </div>
+    </div>
+
+    <h3>5. Batch Normalisation</h3>
+    <p>Normalise the activations of each layer to have zero mean and unit variance within each mini-batch:</p>
+    <p class="formula">ẑ = (z − μ<sub>batch</sub>) / √(σ²<sub>batch</sub> + ε) &nbsp;&nbsp;&nbsp; then &nbsp;&nbsp;&nbsp; z̃ = γ · ẑ + β</p>
+    <p>Where γ and β are learnable parameters (scale and shift) that allow the network to undo the normalisation if needed.</p>
+
+    <div class="definition-box">
+        <strong>Why batch norm helps:</strong><br>
+        <strong>1. Reduces internal covariate shift:</strong> Each layer receives inputs that change distribution as earlier layers update. Batch norm stabilises these distributions.<br>
+        <strong>2. Smooths the loss landscape:</strong> Gradients become more predictable, allowing higher learning rates and faster convergence.<br>
+        <strong>3. Mild regularisation effect:</strong> Since normalisation is computed per mini-batch, there's inherent noise from the batch statistics, which acts as a regulariser similar to dropout.
+    </div>
+
+    <h3>6. Data Augmentation</h3>
+    <p>Create additional training examples by applying realistic transformations to existing data:</p>
+    <table>
+        <tr><th>Data Type</th><th>Augmentation Techniques</th></tr>
+        <tr><td><strong>Images</strong></td><td>Random rotation, flip, crop, colour jitter, cutout, mixup</td></tr>
+        <tr><td><strong>Audio</strong></td><td>Add noise, time stretch, pitch shift, time shift</td></tr>
+        <tr><td><strong>Text</strong></td><td>Synonym replacement, random insertion/deletion, back-translation</td></tr>
+        <tr><td><strong>Tabular</strong></td><td>SMOTE (synthetic minority oversampling), noise injection</td></tr>
+    </table>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Regularisation prevents overfitting. Key techniques: L2 (penalises large weights), L1 (penalises large weights, creates sparsity), Dropout (randomly zeros neurons, prevents co-adaptation), Early Stopping (stop when val loss rises), Batch Norm (normalises activations, smooths loss landscape), Data Augmentation (creates synthetic training data).
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> L2: +λΣw², weight decay. L1: +λΣ|w|, sparse models. Dropout: random p fraction off during training, all on at test. Early stopping: monitor val loss, patience. Batch norm: normalise per batch. Data augmentation: synthetic transforms.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 11: COMBINING REGULARISERS -->
+<!-- ============================================================ -->
+<section id="section11" data-progress-section>
+    <h2>8.11 Combining Regularisation Techniques</h2>
+
+    <p>In practice, you don't choose just one regularisation technique — you combine several. Each addresses a different aspect of overfitting.</p>
+
+    <table>
+        <tr>
+            <th>Technique</th>
+            <th>What It Addresses</th>
+            <th>Typical Setting</th>
+            <th>Key Consideration</th>
+        </tr>
+        <tr>
+            <td><strong>L2 Weight Decay</strong></td>
+            <td>Large weights</td>
+            <td>λ = 1e-4 to 1e-2</td>
+            <td>Applied to all layers; λ is the main hyperparameter</td>
+        </tr>
+        <tr>
+            <td><strong>Dropout</strong></td>
+            <td>Co-adaptation, ensemble</td>
+            <td>p = 0.2–0.5</td>
+            <td>Higher p = more regularisation; reduce if underfitting</td>
+        </tr>
+        <tr>
+            <td><strong>Early Stopping</strong></td>
+            <td>Training too long</td>
+            <td>patience = 5–20 epochs</td>
+            <td>Always use; cheapest regulariser</td>
+        </tr>
+        <tr>
+            <td><strong>Batch Normalisation</strong></td>
+            <td>Internal covariate shift, loss landscape</td>
+            <td>After each linear layer, before activation</td>
+            <td>Also acts as mild regulariser; allows higher LR</td>
+        </tr>
+        <tr>
+            <td><strong>Data Augmentation</strong></td>
+            <td>Small dataset, invariances</td>
+            <td>Task-specific transforms</td>
+            <td>Only use realistic transforms; can multiply dataset size 5–10×</td>
+        </tr>
+    </table>
+
+    <h3>Common Regularisation Baselines</h3>
+    <div class="worked-example">
+        <div class="example-title">Recommended Starting Configuration</div>
+        <div class="step">
+            <span class="step-num">1</span>
+            <span class="step-title">Always include</span>
+            <div class="step-content">Early stopping (patience=10) + L2 weight decay (λ=1e-4) as your baseline. These are low-risk and almost always help.</div>
+        </div>
+        <div class="step">
+            <span class="step-num">2</span>
+            <span class="step-title">Add if overfitting persists</span>
+            <div class="step-content">Dropout (p=0.2 in later layers, p=0.5 for large fully-connected layers). Start with low dropout and increase if needed.</div>
+        </div>
+        <div class="step">
+            <span class="step-num">3</span>
+            <span class="step-title">Add for training stability</span>
+            <div class="step-content">Batch norm after linear layers. Helps with convergence speed and provides mild regularisation.</div>
+        </div>
+        <div class="step">
+            <span class="step-num">4</span>
+            <span class="step-title">Add if data is limited</span>
+            <div class="step-content">Data augmentation appropriate to the domain. Most impactful when dataset is small relative to model capacity.</div>
+        </div>
+    </div>
+
+    <div class="warning-box">
+        <strong>Warning:</strong> Too much regularisation is just as bad as too little. If you apply aggressive dropout (p=0.7) + heavy L2 (λ=0.1) + very short training (patience=1), the model will underfit — it won't have enough capacity or training time to learn the true pattern. Start with minimal regularisation and increase only if validation performance degrades.
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Combine regularisers for best results. Start with early stopping + L2 as baseline. Add dropout if overfitting persists. Add batch norm for training stability. Add data augmentation if data is limited. Too much regularisation causes underfitting.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> Multiple regularisers address different aspects of overfitting. Baseline: early stopping + L2. Add dropout, batch norm, data augmentation as needed. Tune gradually — too much regularisation causes underfitting.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 12: COMPLETE NETWORK DESIGN CHECKLIST -->
+<!-- ============================================================ -->
+<section id="section12" data-progress-section>
+    <h2>8.12 Complete Network Design Checklist</h2>
+
+    <p>When designing a neural network, there are many decisions to make. Here's a comprehensive checklist that covers architecture, activation, loss, regularisation, and training.</p>
+
+    <table>
+        <tr><th>Component</th><th>Decision</th><th>Recommendation</th></tr>
+        <tr>
+            <td><strong>Hidden layer activation</strong></td>
+            <td>Which activation for hidden layers?</td>
+            <td>ReLU (default). Leaky ReLU if dead neurons detected. GELU for transformers.</td>
+        </tr>
+        <tr>
+            <td><strong>Output activation</strong></td>
+            <td>Which activation for output layer?</td>
+            <td>Task-dependent: Sigmoid (binary), Softmax (multi-class), Linear (regression).</td>
+        </tr>
+        <tr>
+            <td><strong>Loss function</strong></td>
+            <td>Which loss to use?</td>
+            <td>Must pair correctly: BCE (sigmoid), CCE (softmax), MSE/MAE (linear).</td>
+        </tr>
+        <tr>
+            <td><strong>Regularisation baseline</strong></td>
+            <td>What regularisation to start with?</td>
+            <td>Early stopping (patience=10) + L2 weight decay (λ=1e-4).</td>
+        </tr>
+        <tr>
+            <td><strong>Normalisation</strong></td>
+            <td>Should I use batch norm?</td>
+            <td>Yes, after each linear layer and before activation. Improves training stability.</td>
+        </tr>
+        <tr>
+            <td><strong>Weight initialisation</strong></td>
+            <td>How to initialise weights?</td>
+            <td>He init for ReLU (W ~ N(0, √(2/n<sub>in</sub>))). Xavier/Glorot for tanh/sigmoid.</td>
+        </tr>
+        <tr>
+            <td><strong>Optimiser</strong></td>
+            <td>Which optimiser?</td>
+            <td>Adam (default). SGD+momentum if you need best generalisation and have time to tune LR.</td>
+        </tr>
+        <tr>
+            <td><strong>Monitoring</strong></td>
+            <td>What to track during training?</td>
+            <td>Both training AND validation loss curves. The gap indicates overfitting.</td>
+        </tr>
+    </table>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">Why He init for ReLU and Xavier for tanh?</span>
+        <div class="collapsible-content">
+            <p>He initialisation (W ~ N(0, 2/n<sub>in</sub>)) ensures that the variance of activations is preserved through ReLU layers. Since ReLU zeros out ~50% of neurons, we need the remaining ones to have twice the variance to compensate — hence the factor of 2. Xavier initialisation (W ~ N(0, 2/(n<sub>in</sub> + n<sub>out</sub>))) is designed for tanh/sigmoid, which preserve variance differently because they're symmetric and don't zero out activations. Using the wrong initialisation can cause activations to explode or vanish even before training begins.</p>
+        </div>
+    </div>
+
+    <h3>The Complete Training Pipeline</h3>
+    <div class="worked-example">
+        <div class="example-title">Step-by-Step: From Data to Trained Model</div>
+        <div class="step">
+            <span class="step-num">1</span>
+            <span class="step-title">Design architecture</span>
+            <div class="step-content">Choose layers, neurons, activations (ReLU hidden, task-specific output). Apply He init.</div>
+        </div>
+        <div class="step">
+            <span class="step-num">2</span>
+            <span class="step-title">Choose loss + regularisation</span>
+            <div class="step-content">Pair loss with output activation. Add L2, dropout, batch norm as appropriate.</div>
+        </div>
+        <div class="step">
+            <span class="step-num">3</span>
+            <span class="step-title">Train with Adam</span>
+            <div class="step-content">Use Adam optimiser. Monitor train + val loss curves. Apply early stopping.</div>
+        </div>
+        <div class="step">
+            <span class="step-num">4</span>
+            <span class="step-title">Evaluate and tune</span>
+            <div class="step-content">If val loss >> train loss: increase regularisation. If both high: increase capacity or decrease regularisation.</div>
+        </div>
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Design checklist: ReLU in hidden layers, task-specific output activation, paired loss function, early stopping + L2 baseline, batch norm for stability, He init for ReLU, Adam optimiser, monitor train + val curves. The gap between train and val loss tells you whether to regularise more or less.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> Hidden: ReLU. Output: task-dependent (sigmoid/softmax/linear). Loss: paired correctly. Regularisation: early stopping + L2 + dropout as needed. Batch norm for stability. He init for ReLU. Adam optimiser. Monitor both loss curves.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SECTION 13: COMMON PITFALLS -->
+<!-- ============================================================ -->
+<section id="section13" data-progress-section>
+    <h2>8.13 Common Pitfalls</h2>
+
+    <p>These are the mistakes that students (and practitioners) make most frequently. Understanding them will save you hours of debugging.</p>
+
+    <div class="warning-box">
+        <strong>Pitfall 1: Softmax on a hidden layer</strong><br>
+        Using softmax as the activation in a hidden layer forces all outputs to sum to 1, making them compete. This destroys the network's ability to learn distributed representations. Hidden layers should use ReLU (or variants). Softmax is ONLY for the output layer in multi-class classification.
+    </div>
+
+    <div class="warning-box">
+        <strong>Pitfall 2: Heavy dropout on small networks</strong><br>
+        Applying dropout with p = 0.5 to a network with only 32 neurons in a hidden layer means, on average, only 16 neurons are active per training step. This can cripple the network's capacity, causing underfitting. Reserve heavy dropout for large networks (256+ neurons). For small networks, use lighter dropout (p = 0.1–0.2) or rely on other regularisers.
+    </div>
+
+    <div class="warning-box">
+        <strong>Pitfall 3: Sigmoid on a 10-class output</strong><br>
+        Using sigmoid with 10 output neurons for digit classification treats each class independently. The outputs don't sum to 1, so they aren't probabilities. Use softmax with K=10 outputs for mutually exclusive multi-class classification, paired with CCE loss.
+    </div>
+
+    <div class="warning-box">
+        <strong>Pitfall 4: ReLU on a regression output</strong><br>
+        Using ReLU as the output activation for regression restricts predictions to ≥ 0. If your target values can be negative (e.g., temperature in Celsius, financial returns), ReLU will never predict them. Use a linear (identity) output for regression.
+    </div>
+
+    <div class="warning-box">
+        <strong>Pitfall 5: Forgetting train/eval mode with dropout</strong><br>
+        Dropout randomly zeros neurons during training. If you forget to switch the model to eval mode (model.eval() in PyTorch, model.training = False in TensorFlow), dropout remains active during inference. This produces random, degraded predictions. Always set eval mode before testing and train mode before training.
+    </div>
+
+    <div class="warning-box">
+        <strong>Pitfall 6: L2 with sigmoid output and no batch norm</strong><br>
+        L2 weight decay penalises large weights. But sigmoid outputs are computed as σ(Wx + b), where the scale of W directly affects how "sharp" the sigmoid is. Heavy L2 can flatten the sigmoid, making all outputs ≈ 0.5 — the model loses discriminative power. Batch norm after the linear layer but before sigmoid helps maintain proper scaling. Alternatively, use lighter L2 on the output layer.
+    </div>
+
+    <div class="collapsible" onclick="toggleCollapsible(this)">
+        <span class="collapsible-header">How do I debug a network that's not learning?</span>
+        <div class="collapsible-content">
+            <p>Check these in order: (1) Is the loss decreasing at all? If not, the learning rate might be too high or too low. (2) Are the gradients reasonable? Check for NaN or very large values (exploding gradients). (3) Are most activations zero? Check for dying ReLU (too many dead neurons). (4) Is the output activation correct for the task? (5) Is the loss function paired correctly with the output activation? (6) Are you in the right train/eval mode? (7) Is the data normalised? Neural networks are sensitive to input scale — inputs should typically be standardised (zero mean, unit variance).</p>
+        </div>
+    </div>
+
+    <div class="takeaway-box">
+        <strong>Key Takeaway:</strong> Common pitfalls: softmax in hidden layers, heavy dropout on small nets, sigmoid for multi-class output, ReLU for regression output, forgetting train/eval mode with dropout, L2 with sigmoid without batch norm. Always verify: activation choice, loss pairing, train/eval mode, and data normalisation.
+    </div>
+
+    <div class="recap-box">
+        <strong>Recap:</strong> Top 6 pitfalls: (1) Softmax in hidden layers, (2) Heavy dropout on small nets, (3) Sigmoid for 10-class, (4) ReLU on regression output, (5) Forgetting eval mode, (6) L2 + sigmoid without batch norm. Debug methodically: check loss, gradients, activations, output activation, loss pairing, modes, normalisation.
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FLASHCARDS -->
+<!-- ============================================================ -->
+<section id="flashcards-section" data-progress-section>
+    <h2>Flashcards</h2>
+
+    <div class="flashcard-container">
+
+        <div class="flashcard-controls">
+            <button class="btn btn-sm btn-secondary flash-prev">← Previous</button>
+            <button class="btn btn-sm btn-secondary flash-next">Next →</button>
+            <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
+            <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
+        </div>
+        <div class="flashcard-counter"></div>
+
+        <div class="flashcard" data-card="0">
+            <div class="flashcard-front">
+                <strong>What happens to a deep network without activation functions?</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                It collapses to a single linear transformation: ŷ = W'x + b'. No matter how many layers you stack, the composition of linear functions is still linear. Activations are the ONLY source of expressive power.
+            </div>
+        </div>
+
+        <div class="flashcard" data-card="1">
+            <div class="flashcard-front">
+                <strong>What is the maximum value of the sigmoid derivative σ'(z)?</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                0.25 (at z = 0). For all other values, σ'(z) < 0.25. This means gradients shrink by at least 75% at each sigmoid layer, causing vanishing gradients in deep networks.
+            </div>
+        </div>
+
+        <div class="flashcard" data-card="2">
+            <div class="flashcard-front">
+                <strong>Define ReLU and its derivative.</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                ReLU(z) = max(0, z). Derivative: 1 if z > 0, 0 if z < 0, undefined (use 0) at z = 0. Gradient = 1 for active neurons means no vanishing — the key advantage over sigmoid.
+            </div>
+        </div>
+
+        <div class="flashcard" data-card="3">
+            <div class="flashcard-front">
+                <strong>What is the "dying ReLU" problem?</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                When a ReLU neuron's weighted sum is negative for ALL training examples, it outputs 0 and has gradient 0 — so its weights never update. The neuron is permanently dead. Caused by large negative biases, high learning rates, or poor initialisation.
+            </div>
+        </div>
+
+        <div class="flashcard" data-card="4">
+            <div class="flashcard-front">
+                <strong>Write the softmax formula and state its key properties.</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                softmax(z<sub>k</sub>) = e<sup>z<sub>k</sub></sup> / Σ<sub>j</sub> e<sup>z<sub>j</sub></sup>. Properties: (1) outputs sum to 1 (valid probability distribution), (2) all outputs in (0,1), (3) translation invariant (softmax(z+c) = softmax(z)), (4) differentiable. Use for multi-class output layers only.
+            </div>
+        </div>
+
+        <div class="flashcard" data-card="5">
+            <div class="flashcard-front">
+                <strong>What is categorical cross-entropy (CCE) loss?</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                CCE = −Σ<sub>k</sub> y<sub>k</sub> · log(p<sub>k</sub>) = −log(p<sub>true class</sub>). Measures how wrong the predicted probability for the true class is. Paired with softmax output. Combined gradient: ∂L/∂z<sub>k</sub> = p<sub>k</sub> − y<sub>k</sub>.
+            </div>
+        </div>
+
+        <div class="flashcard" data-card="6">
+            <div class="flashcard-front">
+                <strong>Which activation/loss pair is correct for binary classification?</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                Sigmoid output (1 neuron) + Binary Cross-Entropy (BCE) loss. The sigmoid maps the logit to (0,1), and BCE measures the deviation from the binary label. Don't use softmax for binary — it's equivalent but wasteful.
+            </div>
+        </div>
+
+        <div class="flashcard" data-card="7">
+            <div class="flashcard-front">
+                <strong>How does dropout prevent overfitting?</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                Two mechanisms: (1) Prevents co-adaptation — neurons can't rely on specific other neurons always being active, so each learns more robust features. (2) Implicit ensemble — each training step uses a different sub-network, approximating the average of 2<sup>N</sup> models at test time.
+            </div>
+        </div>
+
+        <div class="flashcard" data-card="8">
+            <div class="flashcard-front">
+                <strong>What is the difference between L1 and L2 regularisation?</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                L2 (Ridge): penalty = λΣw², shrinks weights toward 0 but rarely to exactly 0. Keeps all features. L1 (Lasso): penalty = λΣ|w|, pushes many weights to exactly 0, performing feature selection. L1 produces sparse models; L2 produces small but non-zero weights.
+            </div>
+        </div>
+
+        <div class="flashcard" data-card="9">
+            <div class="flashcard-front">
+                <strong>Why is batch normalisation helpful?</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                Batch norm: (1) Reduces internal covariate shift — stabilises the distribution of inputs to each layer. (2) Smooths the loss landscape — allows higher learning rates and faster convergence. (3) Provides mild regularisation — batch statistics add noise during training.
+            </div>
+        </div>
+
+        <div class="flashcard" data-card="10">
+            <div class="flashcard-front">
+                <strong>Which weight initialisation should you use with ReLU?</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                He initialisation: W ~ N(0, √(2/n<sub>in</sub>)). The factor of 2 compensates for ReLU zeroing out ~50% of neurons, preserving activation variance through layers. Use Xavier/Glorot init for tanh or sigmoid activations instead.
+            </div>
+        </div>
+
+        <div class="flashcard" data-card="11">
+            <div class="flashcard-front">
+                <strong>What are the signs of overfitting in a neural network?</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                (1) Training loss decreases while validation loss increases. (2) Large gap between training and validation accuracy. (3) Large weight magnitudes. (4) Confident wrong predictions (high probability for incorrect class). The diverging loss curves are the most reliable indicator.
+            </div>
+        </div>
+
+        <div class="flashcard" data-card="12">
+            <div class="flashcard-front">
+                <strong>What is the translation invariance property of softmax?</strong>
+                <p class="flashcard-hint">Click to reveal</p>
+            </div>
+            <div class="flashcard-back">
+                softmax(z + c) = softmax(z) for any constant c. Adding the same value to all logits doesn't change the output probabilities. This is why we can subtract max(z) before computing softmax for numerical stability without affecting the result.
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- QUIZ SECTION -->
+<!-- ============================================================ -->
+<section id="quiz-section" data-progress-section>
+    <h2>Quiz</h2>
+
+    <div class="quiz-container" id="quiz-container">
+
+        <div class="quiz-question" data-question="0">
+            <p><strong>Q1.</strong> A 5-layer network with sigmoid activations in every hidden layer has a maximum possible gradient scale of approximately:</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q0" value="a"> 0.25</label>
+                <label><input type="radio" name="q0" value="b"> 0.00098</label>
+                <label><input type="radio" name="q0" value="c"> 1.0</label>
+                <label><input type="radio" name="q0" value="d"> 0.0625</label>
+            </div>
+            <div class="quiz-feedback" data-correct="b">
+                <p><strong>Correct!</strong> Maximum gradient scale = (0.25)⁵ = 0.000976 ≈ 0.00098. Each sigmoid layer contributes at most 0.25 to the product, so 5 layers shrink the gradient by a factor of ~1000.</p>
+                <p><strong>Incorrect.</strong> The correct answer is B: ≈ 0.00098. The gradient through L sigmoid layers is bounded by (0.25)^L. For L=5: (0.25)⁵ ≈ 0.00098.</p>
+            </div>
+        </div>
+
+        <div class="quiz-question" data-question="1">
+            <p><strong>Q2.</strong> What is ReLU(z) when z = −3.5?</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q1" value="a"> −3.5</label>
+                <label><input type="radio" name="q1" value="b"> 3.5</label>
+                <label><input type="radio" name="q1" value="c"> 0</label>
+                <label><input type="radio" name="q1" value="d"> 1</label>
+            </div>
+            <div class="quiz-feedback" data-correct="c">
+                <p><strong>Correct!</strong> ReLU(z) = max(0, z). Since −3.5 < 0, ReLU(−3.5) = 0. The gradient is also 0 for this input.</p>
+                <p><strong>Incorrect.</strong> The correct answer is C: 0. ReLU outputs 0 for any negative input. ReLU(z) = max(0, z) = 0 when z < 0.</p>
+            </div>
+        </div>
+
+        <div class="quiz-question" data-question="2">
+            <p><strong>Q3.</strong> Which of the following is TRUE about softmax outputs?</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q2" value="a"> Outputs can be negative</label>
+                <label><input type="radio" name="q2" value="b"> Outputs sum to K (number of classes)</label>
+                <label><input type="radio" name="q2" value="c"> Outputs always sum to 1</label>
+                <label><input type="radio" name="q2" value="d"> Outputs are independent of each other</label>
+            </div>
+            <div class="quiz-feedback" data-correct="c">
+                <p><strong>Correct!</strong> Softmax outputs always sum to exactly 1, forming a valid probability distribution. Each output is in (0, 1), and the sum is exactly 1 by construction (each output is e<sup>z<sub>k</sub></sup> / Σe<sup>z<sub>j</sub></sup>).</p>
+                <p><strong>Incorrect.</strong> The correct answer is C. Softmax outputs always sum to 1. They are always positive (in (0,1)) and form a valid probability distribution.</p>
+            </div>
+        </div>
+
+        <div class="quiz-question" data-question="3">
+            <p><strong>Q4.</strong> You have a dataset with 5 classes where each sample can belong to multiple classes simultaneously. Which output configuration should you use?</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q3" value="a"> 1 sigmoid output</label>
+                <label><input type="radio" name="q3" value="b"> 5 softmax outputs with CCE loss</label>
+                <label><input type="radio" name="q3" value="c"> 5 independent sigmoid outputs with BCE per output</label>
+                <label><input type="radio" name="q3" value="d"> 1 linear output with MSE loss</label>
+            </div>
+            <div class="quiz-feedback" data-correct="c">
+                <p><strong>Correct!</strong> Multi-label classification requires independent sigmoid outputs (one per class) with BCE applied to each output. Softmax forces competition between classes (outputs sum to 1), which is wrong for multi-label where multiple classes can be simultaneously active.</p>
+                <p><strong>Incorrect.</strong> The correct answer is C. For multi-label (multiple classes can be correct simultaneously), use K independent sigmoids with BCE per output. Softmax is only for mutually exclusive classes.</p>
+            </div>
+        </div>
+
+        <div class="quiz-question" data-question="4">
+            <p><strong>Q5.</strong> Dropout is applied during which phase(s)?</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q4" value="a"> Training only</label>
+                <label><input type="radio" name="q4" value="b"> Inference only</label>
+                <label><input type="radio" name="q4" value="c"> Both training and inference</label>
+                <label><input type="radio" name="q4" value="d"> Neither — dropout is a data preprocessing step</label>
+            </div>
+            <div class="quiz-feedback" data-correct="a">
+                <p><strong>Correct!</strong> Dropout is active ONLY during training. During inference/testing, all neurons are active (with outputs scaled by 1−p if needed). Forgetting to disable dropout during inference is a common bug that causes random, degraded predictions.</p>
+                <p><strong>Incorrect.</strong> The correct answer is A: training only. Dropout randomly zeros neurons during training to prevent co-adaptation. During inference, all neurons are active.</p>
+            </div>
+        </div>
+
+        <div class="quiz-question" data-question="5">
+            <p><strong>Q6.</strong> What is the gradient of the softmax + CCE loss combination with respect to the logit z<sub>k</sub>?</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q5" value="a"> y<sub>k</sub> − p<sub>k</sub></label>
+                <label><input type="radio" name="q5" value="b"> p<sub>k</sub> − y<sub>k</sub></label>
+                <label><input type="radio" name="q5" value="c"> p<sub>k</sub> · (1 − p<sub>k</sub>)</label>
+                <label><input type="radio" name="q5" value="d"> y<sub>k</sub> · log(p<sub>k</sub>)</label>
+            </div>
+            <div class="quiz-feedback" data-correct="b">
+                <p><strong>Correct!</strong> The gradient of softmax + CCE is ∂L/∂z<sub>k</sub> = p<sub>k</sub> − y<sub>k</sub>. This elegant result means the gradient is simply the prediction error — positive if the model overestimated, negative if it underestimated.</p>
+                <p><strong>Incorrect.</strong> The correct answer is B: p<sub>k</sub> − y<sub>k</sub>. The combined gradient of softmax output with CCE loss simplifies to the predicted probability minus the true label.</p>
+            </div>
+        </div>
+
+        <div class="quiz-question" data-question="6">
+            <p><strong>Q7.</strong> Which weight initialisation should be used for a hidden layer with ReLU activation and 256 input features?</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q6" value="a"> Xavier/Glorot: W ~ N(0, 1/256)</label>
+                <label><input type="radio" name="q6" value="b"> He: W ~ N(0, √(2/256))</label>
+                <label><input type="radio" name="q6" value="c"> All zeros</label>
+                <label><input type="radio" name="q6" value="d"> All ones</label>
+            </div>
+            <div class="quiz-feedback" data-correct="b">
+                <p><strong>Correct!</strong> He initialisation: W ~ N(0, √(2/n<sub>in</sub>)) = N(0, √(2/256)). The √(2/n<sub>in</sub>) compensates for ReLU zeroing out ~50% of activations, preserving variance through the layer.</p>
+                <p><strong>Incorrect.</strong> The correct answer is B: He init, W ~ N(0, √(2/256)). He initialisation is specifically designed for ReLU activations to preserve activation variance.</p>
+            </div>
+        </div>
+
+        <div class="quiz-question" data-question="7">
+            <p><strong>Q8.</strong> Your model achieves 99.5% training accuracy but only 62% validation accuracy. What is most likely happening?</p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q7" value="a"> The model is underfitting</label>
+                <label><input type="radio" name="q7" value="b"> The model is overfitting — it memorised the training data</label>
+                <label><input type="radio" name="q7" value="c"> The learning rate is too high</label>
+                <label><input type="radio" name="q7" value="d"> The model needs more hidden layers</label>
+            </div>
+            <div class="quiz-feedback" data-correct="b">
+                <p><strong>Correct!</strong> A large gap between training accuracy (99.5%) and validation accuracy (62%) is a textbook sign of overfitting. The model has memorised the training data but can't generalise to unseen data. Solutions: add regularisation (dropout, L2), get more data, or simplify the architecture.</p>
+                <p><strong>Incorrect.</strong> The correct answer is B: overfitting. The 37.5 percentage point gap between train and validation accuracy indicates the model memorised training data rather than learning generalisable patterns.</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FILL IN THE BLANKS -->
+<!-- ============================================================ -->
+<section id="fill-blank-section" data-progress-section>
+    <h2>Fill in the Blanks</h2>
+
+    <div class="fill-blank-container" id="fill-blank-container">
+
+        <div class="fill-blank-question" data-question="0">
+            <p><strong>1.</strong> Without activation functions, a deep network with L layers collapses to a single __________ transformation: ŷ = W'x + b'.</p>
+            <input type="text" class="fill-blank-input" data-answer="linear" placeholder="Type your answer...">
+            <div class="fill-blank-feedback">
+                <span class="correct-text">Correct! The composition of linear functions is still linear, regardless of how many layers you stack.</span>
+                <span class="incorrect-text">Incorrect. The answer is "linear". Without non-linear activations, a deep network collapses to a single linear transformation.</span>
+            </div>
+        </div>
+
+        <div class="fill-blank-question" data-question="1">
+            <p><strong>2.</strong> ReLU(z) = max(0, z). The gradient of ReLU is __________ when z &gt; 0.</p>
+            <input type="text" class="fill-blank-input" data-answer="1" placeholder="Type your answer...">
+            <div class="fill-blank-feedback">
+                <span class="correct-text">Correct! ReLU'(z) = 1 for z > 0. This constant gradient of 1 is why ReLU doesn't suffer from vanishing gradients in the positive region.</span>
+                <span class="incorrect-text">Incorrect. The answer is "1". The ReLU derivative is 1 for z > 0 and 0 for z < 0.</span>
+            </div>
+        </div>
+
+        <div class="fill-blank-question" data-question="2">
+            <p><strong>3.</strong> The softmax function converts K raw logits into a valid __________ distribution where all outputs sum to 1.</p>
+            <input type="text" class="fill-blank-input" data-answer="probability" placeholder="Type your answer...">
+            <div class="fill-blank-feedback">
+                <span class="correct-text">Correct! Softmax produces a valid probability distribution: all values in (0,1) and summing to exactly 1.</span>
+                <span class="incorrect-text">Incorrect. The answer is "probability". Softmax outputs form a valid probability distribution.</span>
+            </div>
+        </div>
+
+        <div class="fill-blank-question" data-question="3">
+            <p><strong>4.</strong> Dropout randomly sets a fraction p of neurons to zero during __________ only; during inference, all neurons are active.</p>
+            <input type="text" class="fill-blank-input" data-answer="training" placeholder="Type your answer...">
+            <div class="fill-blank-feedback">
+                <span class="correct-text">Correct! Dropout is only active during training. During inference/evaluation, all neurons are active (with appropriate scaling).</span>
+                <span class="incorrect-text">Incorrect. The answer is "training". Dropout is applied only during training, never during inference.</span>
+            </div>
+        </div>
+
+        <div class="fill-blank-question" data-question="4">
+            <p><strong>5.</strong> The categorical cross-entropy loss simplifies to CCE = −log(p<sub>__________ class</sub>), where only the true class contributes.</p>
+            <input type="text" class="fill-blank-input" data-answer="true" placeholder="Type your answer...">
+            <div class="fill-blank-feedback">
+                <span class="correct-text">Correct! CCE = −Σ y_k · log(p_k). Since y_k = 1 only for the true class and 0 otherwise, it simplifies to −log(p_true).</span>
+                <span class="incorrect-text">Incorrect. The answer is "true". CCE = −log(p_true class) because the one-hot encoding means only the true class has y_k = 1.</span>
+            </div>
+        </div>
+
+        <div class="fill-blank-question" data-question="5">
+            <p><strong>6.</strong> For a ReLU hidden layer with n<sub>in</sub> = 128 input features, He initialisation sets weights from W ~ N(0, __________).</p>
+            <input type="text" class="fill-blank-input" data-answer="sqrt(2/128)" placeholder="Type your answer...">
+            <div class="fill-blank-feedback">
+                <span class="correct-text">Correct! He initialisation: W ~ N(0, √(2/n_in)) = N(0, √(2/128)). The √2 compensates for ReLU zeroing out half the activations.</span>
+                <span class="incorrect-text">Incorrect. The answer is "sqrt(2/128)" or √(2/128). He initialisation uses std = √(2/n_in) for ReLU layers.</span>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- SCENARIO-BASED QUESTION -->
+<!-- ============================================================ -->
+<section id="scenario-section" data-progress-section>
+    <h2>Scenario-Based Question</h2>
+
+    <div class="quiz-container">
+
+        <div class="quiz-question" data-question="scenario1">
+            <p><strong>Scenario:</strong> You're building a neural network to classify images into 10 types of clothing (t-shirt, trouser, pullover, dress, coat, sandal, shirt, sneaker, bag, ankle boot). You design the network as follows:</p>
+            <ul>
+                <li>Input: 784 features (28×28 pixels)</li>
+                <li>Hidden layer 1: 256 neurons, sigmoid activation</li>
+                <li>Hidden layer 2: 128 neurons, sigmoid activation</li>
+                <li>Output layer: 10 neurons, sigmoid activation</li>
+                <li>Loss: Mean Squared Error (MSE)</li>
+                <li>No dropout, no batch norm, no weight decay</li>
+            </ul>
+            <p><strong>Identify ALL problems with this design and explain how to fix each one.</strong></p>
+            <div class="quiz-options">
+                <label><input type="radio" name="q-scenario1" value="a"> The only problem is using sigmoid in the output layer — change it to softmax.</label>
+                <label><input type="radio" name="q-scenario1" value="b"> There are multiple problems: (1) Sigmoid in hidden layers causes vanishing gradients — use ReLU. (2) Sigmoid output for 10-class mutually exclusive task — use softmax. (3) MSE loss for classification — use CCE. (4) No regularisation — add dropout, batch norm, early stopping.</label>
+                <label><input type="radio" name="q-scenario1" value="c"> The network architecture is fine; you just need more training epochs.</label>
+                <label><input type="radio" name="q-scenario1" value="d"> The problem is that 256 neurons is too many — reduce to 32.</label>
+            </div>
+            <div class="quiz-feedback" data-correct="b">
+                <p><strong>Correct!</strong> This design has four major issues: (1) Sigmoid in hidden layers → vanishing gradients for this depth. Fix: use ReLU. (2) Sigmoid output for 10-class mutually exclusive task → outputs don't sum to 1, not a valid probability distribution. Fix: use softmax. (3) MSE loss for classification → inappropriate; gradients are less informative for classification. Fix: use CCE. (4) No regularisation → high risk of overfitting. Fix: add dropout, batch norm, early stopping, and L2 weight decay.</p>
+                <p><strong>Incorrect.</strong> The correct answer is B. There are multiple fundamental problems: sigmoid hidden layers (vanishing gradients), sigmoid output (should be softmax for multi-class), MSE loss (should be CCE for classification), and no regularisation (high overfitting risk).</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+</main>
+
+<script src="script.js"></script>
+
+<script>
+// Flashcard functionality
+document.querySelectorAll('.flashcard').forEach(card => {
+    card.addEventListener('click', function() {
+        this.classList.toggle('flipped');
+    });
+});
+
+// Quiz functionality
+document.querySelectorAll('.quiz-question').forEach(question => {
+    const options = question.querySelectorAll('input[type="radio"]');
+    const feedback = question.querySelector('.quiz-feedback');
+    const correctAnswer = feedback.dataset.correct;
+
+    options.forEach(option => {
+        option.addEventListener('change', function() {
+            const allFeedbacks = question.querySelectorAll('.quiz-feedback p');
+            allFeedbacks.forEach(f => f.style.display = 'none');
+
+            if (this.value === correctAnswer) {
+                feedback.querySelector('p:first-child').style.display = 'block';
+                feedback.querySelector('p:last-child').style.display = 'none';
+                feedback.style.display = 'block';
+                feedback.style.borderColor = '#27ae60';
+                feedback.style.backgroundColor = '#d4edda';
+            } else {
+                feedback.querySelector('p:first-child').style.display = 'none';
+                feedback.querySelector('p:last-child').style.display = 'block';
+                feedback.style.display = 'block';
+                feedback.style.borderColor = '#e74c3c';
+                feedback.style.backgroundColor = '#f8d7da';
+            }
+        });
+    });
+});
+
+// Fill in the blank functionality
+document.querySelectorAll('.fill-blank-input').forEach(input => {
+    input.addEventListener('blur', function() {
+        const correctAnswer = this.dataset.answer.toLowerCase().trim();
+        const userAnswer = this.value.toLowerCase().trim();
+        const feedback = this.parentElement.querySelector('.fill-blank-feedback');
+
+        if (userAnswer === correctAnswer) {
+            feedback.querySelector('.correct-text').style.display = 'inline';
+            feedback.querySelector('.incorrect-text').style.display = 'none';
+            this.style.borderColor = '#27ae60';
+        } else {
+            feedback.querySelector('.correct-text').style.display = 'none';
+            feedback.querySelector('.incorrect-text').style.display = 'inline';
+            this.style.borderColor = '#e74c3c';
+        }
+        feedback.style.display = 'block';
+    });
+});
+
+// Progress tracking
+function updateProgress() {
+    const sections = document.querySelectorAll('[data-progress-section]');
+    const total = sections.length;
+    let completed = 0;
+
+    sections.forEach(section => {
+        const rect = section.getBoundingClientRect();
+        if (rect.top < window.innerHeight * 0.5) {
+            completed++;
+        }
+    });
+
+    const percent = Math.round((completed / total) * 100);
+    document.getElementById('progress-fill').style.width = percent + '%';
+    document.getElementById('progress-percent').textContent = percent + '%';
+}
+
+window.addEventListener('scroll', updateProgress);
+window.addEventListener('load', updateProgress);
+</script>
+
+</body>
+</html>

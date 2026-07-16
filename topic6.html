@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 6: Generative Models, Bayesian Reasoning &amp; Integrative Model Selection</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════ TOP NAV ═══════════════════════════ -->
+<nav class="top-nav">
+  <a href="index.html" class="nav-home">Lecture Notes</a>
+  <span class="nav-separator">|</span>
+  <span class="nav-current">Topic 6 – Generative Models, Bayesian Reasoning &amp; Integrative Model Selection</span>
+  <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span class="icon">&#9728;</span> Toggle Theme</button>
+</nav>
+
+<!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2>Topic 6</h2>
+    <p class="sidebar-subtitle">Generative Models &amp; Bayesian Reasoning</p>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+    <span class="progress-text" id="progress-text">0% complete</span>
+  </div>
+
+  <nav class="section-nav" id="section-nav">
+    <ul>
+      <li><a href="#generative-vs-discriminative">Generative vs Discriminative</a></li>
+      <li><a href="#conditional-probability">Conditional Probability</a></li>
+      <li><a href="#bayes-theorem">Bayes' Theorem</a></li>
+      <li><a href="#naive-bayes-assumptions">Naive Bayes Assumptions</a></li>
+      <li><a href="#naive-bayes-spam">Naive Bayes: Spam Classification</a></li>
+      <li><a href="#naive-bayes-advantages">NB Advantages &amp; Limitations</a></li>
+      <li><a href="#prior-knowledge-callbacks">Prior Knowledge Callbacks</a></li>
+      <li><a href="#common-mistakes">Common Mistakes &amp; Exam Traps</a></li>
+      <li><a href="#flashcards">Flashcards</a></li>
+      <li><a href="#quiz">Quiz</a></li>
+      <li><a href="#fill-blank">Fill-in-the-Blank</a></li>
+      <li><a href="#scenario">Scenario Question</a></li>
+      <li><a href="#recap">Final Recap</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<!-- ═══════════════════════════ MAIN CONTENT ═══════════════════════════ -->
+<main class="main-content" id="main-content">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 1: GENERATIVE VS DISCRIMINATIVE MODELS
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="generative-vs-discriminative" data-progress-section>
+  <h1>Generative vs Discriminative Models</h1>
+
+  <p>All classification models ultimately produce a decision boundary that separates classes. However, the <em>path</em> they take to arrive at that boundary is fundamentally different. Understanding this distinction is the key to knowing <strong>when to use which model</strong> and <strong>what each model is actually learning</strong>.</p>
+
+  <div class="definition-box">
+    <h4>Definition — Discriminative Model</h4>
+    <p>A <strong>discriminative model</strong> learns the <strong>conditional probability P(Y|X)</strong> — the probability of a label given the input features — or directly learns a decision boundary between classes. It does not model how the data itself is generated; it only learns to <em>discriminate</em> between classes.</p>
+  </div>
+
+  <div class="definition-box">
+    <h4>Definition — Generative Model</h4>
+    <p>A <strong>generative model</strong> learns the <strong>joint probability P(X, Y)</strong>, or equivalently learns <strong>P(X|Y)</strong> (how each class generates data) and <strong>P(Y)</strong> (how likely each class is). From these, it can compute P(Y|X) via Bayes' theorem, but it also learns the full distribution of the data itself — meaning it can <em>generate new samples</em>.</p>
+  </div>
+
+  <h3>The Core Formulas</h3>
+
+  <div class="formula">
+    <span class="label">Discriminative Approach</span>
+    Learn P(Y|X) directly
+    <br>
+    Example: Logistic Regression learns P(Y=1|X) = σ(w&#183;x + b)
+  </div>
+
+  <div class="formula">
+    <span class="label">Generative Approach</span>
+    Learn P(X|Y) and P(Y), then apply Bayes' theorem:
+    <br><br>
+    P(Y|X) = P(X|Y) &times; P(Y) / P(X)
+    <br><br>
+    Example: Naive Bayes learns P(word|spam) and P(spam), then computes P(spam|words)
+  </div>
+
+  <h3>The Customs Officer vs The Counterfeiting Expert</h3>
+
+  <div class="analogy-box">
+    <h4>Analogy — Customs Officer (Discriminative) vs Counterfeiting Expert (Generative)</h4>
+    <p>Imagine an airport trying to detect counterfeit currency.</p>
+    <ul>
+      <li><strong>The Customs Officer (Discriminative)</strong> has examined thousands of real and fake bills side by side. She has learned to spot the differences — the feel of the paper, the colour gradients, the microprint. She does not know <em>how</em> counterfeit bills are made; she only knows what distinguishes them from real ones. When a new bill arrives, she looks at its features and says "real" or "fake" based on the boundary she has learned. She is very fast and accurate at this task.</li>
+      <li><strong>The Counterfeiting Expert (Generative)</strong> has studied how <em>both</em> real and counterfeit bills are manufactured — the paper composition, ink chemistry, printing techniques, watermark processes. He has built a complete model of how real bills look <em>and</em> how counterfeit bills look. When a new bill arrives, he compares it against his understanding of both processes. But because he understands how things are made, he can also <em>create</em> realistic counterfeit bills and can explain <em>why</em> something is fake — not just that it is.</li>
+    </ul>
+    <p>The customs officer is faster to train (just show her examples). The counterfeiting expert takes longer but can generate new data, explain anomalies, and handle novel situations by reasoning about the underlying process.</p>
+  </div>
+
+  <h3>When Each Approach Wins</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Scenario</th>
+        <th>Winner</th>
+        <th>Why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Abundant training data</strong></td>
+        <td style="color: var(--accent-blue);">Discriminative</td>
+        <td>With enough data, the discriminative model can learn a precise decision boundary without needing to model the full data distribution.</td>
+      </tr>
+      <tr>
+        <td><strong>Limited training data</strong></td>
+        <td style="color: var(--accent-green);">Generative</td>
+        <td>Generative models make stronger assumptions (e.g., Naive Bayes independence), which acts as implicit regularisation. With few samples, these assumptions prevent overfitting.</td>
+      </tr>
+      <tr>
+        <td><strong>Need to generate new data</strong></td>
+        <td style="color: var(--accent-green);">Generative</td>
+        <td>Only generative models learn P(X|Y) — the distribution of features within each class. This allows sampling new instances (e.g., GMMs for data augmentation, HMMs for speech synthesis).</td>
+      </tr>
+      <tr>
+        <td><strong>Outlier / anomaly detection</strong></td>
+        <td style="color: var(--accent-green);">Generative</td>
+        <td>Because generative models learn the full data distribution, a new point with very low P(X) under the model is likely an outlier. Discriminative models cannot assess whether an input is "unusual" — they only classify it.</td>
+      </tr>
+      <tr>
+        <td><strong>Interpretability of class-conditional features</strong></td>
+        <td style="color: var(--accent-green);">Generative</td>
+        <td>Generative models explicitly model P(word|spam), so you can inspect which words are most indicative of each class. Discriminative models combine features into a single score without separating class-specific contributions.</td>
+      </tr>
+      <tr>
+        <td><strong>Maximum predictive accuracy</strong></td>
+        <td style="color: var(--accent-blue);">Discriminative</td>
+        <td>When data is plentiful, discriminative models typically achieve higher accuracy because they focus all their capacity on the decision boundary rather than wasting effort modelling parts of the distribution irrelevant to classification.</td>
+      </tr>
+      <tr>
+        <td><strong>Training speed</strong></td>
+        <td style="color: var(--accent-blue);">Discriminative</td>
+        <td>Discriminative models (e.g., Logistic Regression) often have closed-form or gradient-based solutions. Generative models may require EM algorithms (GMMs) or complex inference (HMMs).</td>
+      </tr>
+      <tr>
+        <td><strong>Missing features / semi-supervised learning</strong></td>
+        <td style="color: var(--accent-green);">Generative</td>
+        <td>Generative models naturally handle missing data by marginalising over unobserved features. Semi-supervised learning is natural because unlabelled data can improve the model of P(X|Y).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Examples of Each</h3>
+
+  <div class="flex-row">
+    <div class="flex-1">
+      <h4 style="color: var(--accent-blue);">Discriminative Models</h4>
+      <ul>
+        <li><strong>Logistic Regression</strong> — learns P(Y|X) via sigmoid</li>
+        <li><strong>Support Vector Machines</strong> — learns the maximum-margin boundary</li>
+        <li><strong>Random Forests</strong> — learns a voting ensemble of decision boundaries</li>
+        <li><strong>Neural Networks</strong> — learn complex non-linear decision boundaries</li>
+        <li><strong>K-Nearest Neighbours</strong> — decides based on local neighbourhood</li>
+      </ul>
+    </div>
+    <div class="flex-1">
+      <h4 style="color: var(--accent-green);">Generative Models</h4>
+      <ul>
+        <li><strong>Naive Bayes</strong> — assumes conditional independence of features</li>
+        <li><strong>Gaussian Mixture Models (GMM)</strong> — models data as a mixture of Gaussians</li>
+        <li><strong>Hidden Markov Models (HMM)</strong> — models sequential data with hidden states</li>
+        <li><strong>Linear Discriminant Analysis (LDA)</strong> — assumes Gaussian class-conditional distributions</li>
+        <li><strong>Bernoulli Naive Bayes</strong> — for binary feature data (e.g., word presence/absence)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <h4>Common Exam Trap — "Generative models are always worse"</h4>
+    <p>A common misconception is that discriminative models are universally superior. While they often win on accuracy with large datasets, generative models excel when data is limited, when you need to generate samples, when you need anomaly detection, or when you need interpretable class-conditional probabilities. The right choice depends on the task and data availability.</p>
+  </div>
+
+  <div class="formula">
+    <span class="label">Decision Boundary Comparison</span>
+    Discriminative: Learns the line/boundary directly (P(Y|X))
+    <br>
+    Generative: Learns each class's shape, then computes the boundary from their overlap (P(X|Y) &times; P(Y))
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>Discriminative models learn <strong>how to tell classes apart</strong> (P(Y|X)); generative models learn <strong>how each class looks</strong> (P(X|Y)) and derive the boundary from there. Discriminative wins on accuracy with large data; generative wins on data efficiency, interpretability, generation, and anomaly detection.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 2: CONDITIONAL PROBABILITY
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="conditional-probability" data-progress-section>
+  <h2>Conditional Probability</h2>
+
+  <p>Conditional probability is the foundation of Bayesian reasoning. It answers the question: <strong>"Given that I already know something, how does that change what I believe about something else?"</strong></p>
+
+  <div class="definition-box">
+    <h4>Definition — Conditional Probability</h4>
+    <p>The <strong>conditional probability</strong> of event A given that event B has occurred is:</p>
+    <p style="font-family: var(--font-mono); font-size: 1.1rem; color: var(--accent-cyan); margin-top: 12px;">P(A|B) = P(A &#8745; B) / P(B)</p>
+    <p style="margin-top: 8px;">where P(B) &gt; 0. This represents the probability of A <em>within the reduced sample space</em> defined by B.</p>
+  </div>
+
+  <div class="formula">
+    <span class="label">Conditional Probability Formula</span>
+    P(A|B) = P(A &#8745; B) / P(B)
+    <br><br>
+    Intuition: "How likely is A, among all outcomes where B has occurred?"
+    <br>
+    B narrows the sample space; we recompute probabilities within that narrower space.
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy — Scaling Down the World</h4>
+    <p>Imagine you are in a room with 100 people. You are told that 40 are engineers and 60 are not. Of the 40 engineers, 30 play chess. The unconditional probability of playing chess is 60/100 = 0.60 (if 60 people total play chess). But <em>given</em> someone is an engineer, the probability of playing chess is 30/40 = 0.75. Knowing they are an engineer <em>changed</em> your estimate — that is conditional probability at work. The "universe" shrank from 100 people to 40 engineers, and the chess players within that smaller universe are more concentrated.</p>
+  </div>
+
+  <h3>Worked Example — Candy/Soda Survey</h3>
+
+  <div class="worked-example">
+    <span class="example-title">Worked Example — Survey of 100 Students: Candy and Soda Preferences</span>
+
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">Setup: Survey Data</span>
+      <div class="step-content">
+        100 students surveyed about candy and soda preferences:<br><br>
+        <table>
+          <thead><tr><th></th><th>Like Coke</th><th>Like Pepsi</th><th>Total</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Like chocolate</strong></td><td>30</td><td>10</td><td>40</td></tr>
+            <tr><td><strong>Like gummies</strong></td><td>15</td><td>25</td><td>40</td></tr>
+            <tr><td><strong>Like neither candy</strong></td><td>10</td><td>10</td><td>20</td></tr>
+            <tr><td><strong>Total</strong></td><td>55</td><td>45</td><td>100</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">2</span>
+      <span class="step-title">Unconditional Probability</span>
+      <div class="step-content">
+        P(Like chocolate) = 40/100 = 0.40<br>
+        P(Like Coke) = 55/100 = 0.55<br><br>
+        These are calculated over the full sample of 100 students.
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">3</span>
+      <span class="step-title">Conditional: P(Like Coke | Like chocolate)</span>
+      <div class="step-content">
+        Given that a student likes chocolate, they are one of the 40 chocolate lovers.<br>
+        Of those 40, 30 also like Coke.<br><br>
+        P(Coke | chocolate) = P(Coke &#8745; chocolate) / P(chocolate)<br>
+        = (30/100) / (40/100)<br>
+        = 30/40<br>
+        = <strong>0.75</strong><br><br>
+        Compare: P(Coke) = 0.55. Knowing the student likes chocolate raised the probability from 0.55 to 0.75.
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">4</span>
+      <span class="step-title">Conditional: P(chocolate | Coke)</span>
+      <div class="step-content">
+        Given that a student likes Coke, they are one of the 55 Coke drinkers.<br>
+        Of those 55, 30 also like chocolate.<br><br>
+        P(chocolate | Coke) = P(chocolate &#8745; Coke) / P(Coke)<br>
+        = (30/100) / (55/100)<br>
+        = 30/55<br>
+        = <strong>0.545</strong><br><br>
+        Notice: P(Coke | chocolate) = 0.75 but P(chocolate | Coke) = 0.545. These are <strong>NOT the same!</strong>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">5</span>
+      <span class="step-title">Key Insight: Conditional Probability Is Not Symmetric</span>
+      <div class="step-content">
+        P(A|B) &#8800; P(B|A) in general.<br>
+        P(Coke | chocolate) = 0.75 &nbsp;&#8800;&nbsp; P(chocolate | Coke) = 0.545<br><br>
+        This asymmetry is the root cause of the most common Bayes' theorem mistake on exams.
+      </div>
+    </div>
+  </div>
+
+  <h3>More Examples</h3>
+
+  <div class="worked-example">
+    <span class="example-title">Worked Example — Weather and Traffic</span>
+
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">Setup</span>
+      <div class="step-content">
+        Out of 200 days:<br>
+        - 60 days were rainy<br>
+        - Of those 60 rainy days, 45 had heavy traffic<br>
+        - Of the 140 non-rainy days, 28 had heavy traffic
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">2</span>
+      <span class="step-title">P(Heavy Traffic | Rain)</span>
+      <div class="step-content">
+        = P(Heavy Traffic &#8745; Rain) / P(Rain)<br>
+        = (45/200) / (60/200)<br>
+        = 45/60<br>
+        = <strong>0.75</strong> — 75% chance of traffic when it rains
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">3</span>
+      <span class="step-title">P(Heavy Traffic | No Rain)</span>
+      <div class="step-content">
+        = P(Heavy Traffic &#8745; No Rain) / P(No Rain)<br>
+        = (28/200) / (140/200)<br>
+        = 28/140<br>
+        = <strong>0.20</strong> — only 20% chance of traffic without rain
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">4</span>
+      <span class="step-title">Interpretation</span>
+      <div class="step-content">
+        Knowing it is rainy raises the traffic probability from 28% (unconditional) to 75%.<br>
+        Unconditional: P(Heavy Traffic) = (45+28)/200 = 73/200 = 0.365<br><br>
+        This demonstrates how conditioning on new information (rain) dramatically shifts our belief (traffic probability).
+      </div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <h4>Common Mistake — Assuming P(A|B) = P(B|A)</h4>
+    <p>This is the single most common probability error. "The probability of being wet given that it is raining" is NOT the same as "the probability of rain given that you are wet." You can be wet from a sprinkler, a spilled drink, or swimming. Always pay attention to <strong>which event is the condition</strong> (the one after the "|").</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>Conditional probability recomputes probabilities within a <strong>narrowed sample space</strong>. P(A|B) restricts attention to outcomes where B occurred, then re-weights A within that subset. P(A|B) &#8800; P(B|A) in general — confusing these is the most common exam error.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 3: BAYES' THEOREM
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="bayes-theorem" data-progress-section>
+  <h2>Bayes' Theorem</h2>
+
+  <p>Bayes' theorem is the mathematical bridge that converts one conditional probability into its reverse. If you know P(B|A) but want P(A|B), Bayes' theorem gives you the exact formula. It is the engine behind all generative classifiers.</p>
+
+  <div class="formula">
+    <span class="label">Bayes' Theorem</span>
+    P(A|B) = P(B|A) &times; P(A) / P(B)
+    <br><br>
+    Equivalently:
+    <br>
+    P(A|B) = P(B|A) &times; P(A) / [P(B|A) &times; P(A) + P(B|&#172;A) &times; P(&#172;A)]
+  </div>
+
+  <h3>The Four Components</h3>
+
+  <div class="definition-box">
+    <h4>Definition — Prior, Likelihood, Evidence, Posterior</h4>
+    <table style="margin-top: 10px;">
+      <thead><tr><th>Component</th><th>Symbol</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><strong>Prior</strong></td>
+          <td style="font-family: var(--font-mono);">P(A)</td>
+          <td>What you believed about A <em>before</em> seeing any evidence. Your initial estimate.</td>
+        </tr>
+        <tr>
+          <td><strong>Likelihood</strong></td>
+          <td style="font-family: var(--font-mono);">P(B|A)</td>
+          <td>How probable is the evidence B <em>if</em> A is true? The strength of the evidence under the hypothesis.</td>
+        </tr>
+        <tr>
+          <td><strong>Evidence</strong></td>
+          <td style="font-family: var(--font-mono);">P(B)</td>
+          <td>The overall probability of observing the evidence B, regardless of A. Acts as a normalising constant.</td>
+        </tr>
+        <tr>
+          <td><strong>Posterior</strong></td>
+          <td style="font-family: var(--font-mono);">P(A|B)</td>
+          <td>Your updated belief about A <em>after</em> observing evidence B. This is what Bayes' theorem computes.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="formula">
+    <span class="label">Bayes' Theorem with Named Components</span>
+    Posterior = (Likelihood &times; Prior) / Evidence
+    <br><br>
+    P(A|B) = [P(B|A) &times; P(A)] / P(B)
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy — Updating a Weather Forecast</h4>
+    <p>You wake up and the morning forecast says 30% chance of rain (that is your <strong>prior</strong>). You look outside and see dark clouds. Dark clouds have an 80% chance of appearing on rainy days (the <strong>likelihood</strong> of this evidence given rain). But dark clouds also appear on 10% of dry days. Bayes' theorem combines these to update your belief: the dark clouds have pushed the rain probability from 30% up to about 77% (the <strong>posterior</strong>). You used the evidence to revise your prior belief.</p>
+  </div>
+
+  <h3>The Disease Test Example — Why P(Disease|Positive) &#8800; P(Positive|Disease)</h3>
+
+  <div class="worked-example">
+    <span class="example-title">Worked Example — Disease Testing (Step-by-Step)</span>
+
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">Setup</span>
+      <div class="step-content">
+        A disease affects <strong>1 in 1,000</strong> people (prevalence = 0.001).<br>
+        A diagnostic test has the following properties:<br>
+        - <strong>True Positive Rate (Sensitivity):</strong> P(Positive|Disease) = 0.99 (99% accurate when disease is present)<br>
+        - <strong>True Negative Rate (Specificity):</strong> P(Negative|No Disease) = 0.99 (99% accurate when disease is absent)<br>
+        - <strong>False Positive Rate:</strong> P(Positive|No Disease) = 0.01 (1% false alarm rate)<br><br>
+        A person tests positive. What is the probability they actually have the disease?
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">2</span>
+      <span class="step-title">Identify the Components</span>
+      <div class="step-content">
+        <strong>Prior:</strong> P(Disease) = 0.001<br>
+        <strong>Likelihood:</strong> P(Positive|Disease) = 0.99<br>
+        <strong>Evidence:</strong> P(Positive) = ? (need to calculate)<br>
+        <strong>Posterior:</strong> P(Disease|Positive) = ? (what we want)
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">3</span>
+      <span class="step-title">Calculate P(Positive) — Total Probability</span>
+      <div class="step-content">
+        P(Positive) = P(Positive|Disease) &times; P(Disease) + P(Positive|No Disease) &times; P(No Disease)<br>
+        = 0.99 &times; 0.001 + 0.01 &times; 0.999<br>
+        = 0.00099 + 0.00999<br>
+        = <strong>0.01098</strong><br><br>
+        So about 1.1% of all people will test positive.
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">4</span>
+      <span class="step-title">Apply Bayes' Theorem</span>
+      <div class="step-content">
+        P(Disease|Positive) = P(Positive|Disease) &times; P(Disease) / P(Positive)<br>
+        = 0.99 &times; 0.001 / 0.01098<br>
+        = 0.00099 / 0.01098<br>
+        = <strong>0.0902 &#8776; 9%</strong>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">5</span>
+      <span class="step-title">Interpretation</span>
+      <div class="step-content">
+        Despite the test being 99% accurate, a person who tests positive only has a <strong>9% chance</strong> of actually having the disease!<br><br>
+        This is counterintuitive but correct. The reason is the <strong>base rate</strong> (prevalence). The disease is so rare (1 in 1,000) that the false positives from the 999 healthy people vastly outnumber the true positives from the 1 sick person.<br><br>
+        In a population of 10,000:<br>
+        - 10 people have the disease → ~10 test positive (true positives)<br>
+        - 9,990 people are healthy → ~100 test positive (false positives)<br>
+        - Of the ~110 who test positive, only 10 actually have the disease<br>
+        - P(Disease|Positive) = 10/110 &#8776; 9.1%
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">6</span>
+      <span class="step-title">Why P(Disease|Positive) &#8800; P(Positive|Disease)</span>
+      <div class="step-content">
+        P(Positive|Disease) = 0.99 (the test's sensitivity)<br>
+        P(Disease|Positive) = 0.09 (the patient's actual risk)<br><br>
+        These are <em>vastly</em> different! The test accuracy (0.99) tells you how well the test performs among <strong>sick people</strong>. The posterior (0.09) tells you how likely disease is among <strong>positive testers</strong>. Because the disease is rare, most positives are false alarms.
+      </div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <h4>Exam Trap — The Prosecutor's Fallacy</h4>
+    <p>Confusing P(Evidence|Innocent) with P(Innocent|Evidence) is known as the <strong>prosecutor's fallacy</strong>. "The probability of seeing this DNA match if the defendant is innocent is only 1 in 1,000,000" does NOT mean "the probability the defendant is innocent is 1 in 1,000,000." The prior probability of guilt matters enormously. Always use Bayes' theorem to get the direction of conditioning right.</p>
+  </div>
+
+  <h3>The General Pattern</h3>
+
+  <div class="worked-example">
+    <span class="example-title">Worked Example — Generic Bayes Calculation Template</span>
+
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">Step 1: Write Down What You Know</span>
+      <div class="step-content">
+        P(Hypothesis) = prior<br>
+        P(Evidence|Hypothesis) = likelihood<br>
+        P(Evidence|&#172;Hypothesis) = false alarm rate
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">2</span>
+      <span class="step-title">Step 2: Compute Total Evidence</span>
+      <div class="step-content">
+        P(Evidence) = P(E|H) &times; P(H) + P(E|&#172;H) &times; P(&#172;H)
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">3</span>
+      <span class="step-title">Step 3: Apply Bayes</span>
+      <div class="step-content">
+        P(H|E) = P(E|H) &times; P(H) / P(E)
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">4</span>
+      <span class="step-title">Step 4: Check — Does the Answer Make Sense?</span>
+      <div class="step-content">
+        The posterior should be between the prior and 1. If the evidence is strong (high likelihood), the posterior should be pushed toward 1. If the prior was very low, even strong evidence may not push the posterior very high.
+      </div>
+    </div>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>Bayes' theorem updates beliefs in the light of evidence: <strong>Posterior = (Likelihood &times; Prior) / Evidence</strong>. The base rate (prior) has a huge effect — even highly accurate tests can produce low posteriors when the condition is rare. Always compute P(B) via the total probability formula. Never confuse P(A|B) with P(B|A).</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 4: NAIVE BAYES ASSUMPTIONS
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="naive-bayes-assumptions" data-progress-section>
+  <h2>Naive Bayes Assumptions</h2>
+
+  <p>The Naive Bayes classifier is the most practical application of Bayes' theorem for classification. Its power comes from a bold simplifying assumption that makes computation tractable while retaining surprisingly good performance.</p>
+
+  <div class="definition-box">
+    <h4>Definition — Naive Bayes</h4>
+    <p>The <strong>Naive Bayes</strong> classifier applies Bayes' theorem with the assumption that all features are <strong>conditionally independent</strong> given the class label. This means the presence or absence of any particular feature is unrelated to the presence or absence of any other feature, once the class is known.</p>
+  </div>
+
+  <div class="formula">
+    <span class="label">Naive Bayes Classification Rule</span>
+    y* = argmax_y  P(Y = y) &times; &#8719; P(X_i | Y = y)
+    <br><br>
+    For each class y, compute: prior(y) &times; likelihood of each feature given y
+    <br>
+    Predict the class with the highest product.
+  </div>
+
+  <h3>The Naive Assumption — Conditional Independence</h3>
+
+  <div class="formula">
+    <span class="label">The "Naive" Independence Assumption</span>
+    P(X_1, X_2, ..., X_n | Y) = P(X_1|Y) &times; P(X_2|Y) &times; ... &times; P(X_n|Y) = &#8719; P(X_i|Y)
+    <br><br>
+    Without this assumption, we would need P(X_1, X_2, ..., X_n | Y)
+    <br>
+    which requires estimating an exponential number of joint probabilities.
+  </div>
+
+  <h3>Why "Naive" but Effective?</h3>
+
+  <p>The assumption is called "naive" because in reality, features are rarely independent. In email spam detection, the words "free" and "money" are <em>not</em> independent — they frequently co-occur. So the assumption is technically wrong. But it works remarkably well in practice for several reasons:</p>
+
+  <ul>
+    <li><strong>Classification only needs the decision boundary, not exact probabilities.</strong> Even if the independence assumption distorts the actual probability values, the <em>ranking</em> of classes may remain correct. If P(Spam|words) is overestimated from 0.85 to 0.92, it doesn't matter for classification — Spam is still predicted over Not Spam.</li>
+    <li><strong>Low variance from strong assumptions.</strong> The independence assumption constrains the model, reducing overfitting. With small datasets, this implicit regularisation often beats more complex models that can overfit.</li>
+    <li><strong>Each feature adds evidence independently.</strong> Even if features are correlated, they each contribute signal. The "double-counting" from correlation tends to amplify the signal rather than distort the ranking.</li>
+    <li><strong>Computationally simple.</strong> Instead of estimating O(K^n) joint probabilities (K values per feature, n features), we only need O(K &times; n) individual conditional probabilities. This makes Naive Bayes extremely fast to train and predict.</li>
+  </ul>
+
+  <div class="analogy-box">
+    <h4>Analogy — The Independent Witness Rule</h4>
+    <p>Imagine a judge evaluating testimony. The Naive Bayes assumption is like assuming each witness is independent. If five witnesses all say "the defendant is guilty," the judge becomes very confident — even if some witnesses talked to each other (violating independence). The conclusion might still be correct because five independent reports of guilt is strong evidence. The judge's confidence may be slightly inflated by the correlation, but the <em>ranking</em> (guilty vs innocent) rarely flips.</p>
+  </div>
+
+  <h3>Types of Naive Bayes</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Variant</th>
+        <th>Feature Type</th>
+        <th>P(X_i|Y) Model</th>
+        <th>Use Case</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Gaussian NB</strong></td>
+        <td>Continuous</td>
+        <td>Normal distribution: N(&#956;, &#963;&#178;)</td>
+        <td>Iris classification, medical measurements</td>
+      </tr>
+      <tr>
+        <td><strong>Multinomial NB</strong></td>
+        <td>Discrete counts</td>
+        <td>Multinomial distribution</td>
+        <td>Text classification (word counts)</td>
+      </tr>
+      <tr>
+        <td><strong>Bernoulli NB</strong></td>
+        <td>Binary (0/1)</td>
+        <td>Bernoulli distribution</td>
+        <td>Text classification (word presence/absence)</td>
+      </tr>
+      <tr>
+        <td><strong>Complement NB</strong></td>
+        <td>Discrete counts</td>
+        <td>Complement of class distribution</td>
+        <td>Imbalanced text classification</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>Naive Bayes assumes features are <strong>conditionally independent given the class</strong>. This is technically wrong but practically effective because: (1) classification only needs correct rankings, not exact probabilities; (2) the strong assumption reduces variance; (3) computation is dramatically simplified from exponential to linear.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 5: NAIVE BAYES - SPAM CLASSIFICATION (DETAILED)
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="naive-bayes-spam" data-progress-section>
+  <h2>Naive Bayes — Spam Classification (Detailed)</h2>
+
+  <p>We now walk through a <strong>complete, step-by-step</strong> Naive Bayes classification by hand. This is the type of calculation you must be able to reproduce on an exam.</p>
+
+  <h3>Step 1: Training Data</h3>
+
+  <div class="worked-example">
+    <span class="example-title">Training Data — 12 Messages</span>
+
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">The Dataset</span>
+      <div class="step-content">
+        <table>
+          <thead><tr><th>Message</th><th>Class</th></tr></thead>
+          <tbody>
+            <tr><td>"Meet me at the park"</td><td style="color: var(--accent-green);">Normal</td></tr>
+            <tr><td>"Dear friend, how are you"</td><td style="color: var(--accent-green);">Normal</td></tr>
+            <tr><td>"Can we reschedule the meeting"</td><td style="color: var(--accent-green);">Normal</td></tr>
+            <tr><td>"Project deadline is tomorrow"</td><td style="color: var(--accent-green);">Normal</td></tr>
+            <tr><td>"Lunch at the cafe today"</td><td style="color: var(--accent-green);">Normal</td></tr>
+            <tr><td>"Please review the document"</td><td style="color: var(--accent-green);">Normal</td></tr>
+            <tr><td>"Call me when you are free"</td><td style="color: var(--accent-green);">Normal</td></tr>
+            <tr><td>"See you at the office"</td><td style="color: var(--accent-green);">Normal</td></tr>
+            <tr><td>"Win a free iPhone now"</td><td style="color: var(--accent-red);">Spam</td></tr>
+            <tr><td>"Dear friend, you won a prize"</td><td style="color: var(--accent-red);">Spam</td></tr>
+            <tr><td>"Free money, click here now"</td><td style="color: var(--accent-red);">Spam</td></tr>
+            <tr><td>"Claim your free gift today"</td><td style="color: var(--accent-red);">Spam</td></tr>
+          </tbody>
+        </table>
+        8 Normal messages, 4 Spam messages. Total = 12.
+      </div>
+    </div>
+  </div>
+
+  <h3>Step 2: Prior Probabilities</h3>
+
+  <div class="formula">
+    <span class="label">Prior Probabilities</span>
+    p(Normal) = 8/12 = 0.667
+    <br>
+    p(Spam) = 4/12 = 0.333
+  </div>
+
+  <p>Before looking at any words, we expect a message to be Normal with probability 0.667 and Spam with probability 0.333, simply based on the class frequencies in the training data.</p>
+
+  <h3>Step 3: Word Likelihood Tables</h3>
+
+  <div class="worked-example">
+    <span class="example-title">Building the Word Frequency Tables</span>
+
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">Count Word Frequencies per Class</span>
+      <div class="step-content">
+        <strong>Normal class (8 messages):</strong><br>
+        Total words in Normal: Let us count each word occurrence:<br>
+        "Meet me at the park" = Meet, me, at, the, park (5 words)<br>
+        "Dear friend, how are you" = Dear, friend, how, are, you (5 words)<br>
+        "Can we reschedule the meeting" = Can, we, reschedule, the, meeting (5 words)<br>
+        "Project deadline is tomorrow" = Project, deadline, is, tomorrow (4 words)<br>
+        "Lunch at the cafe today" = Lunch, at, the, cafe, today (5 words)<br>
+        "Please review the document" = Please, review, the, document (4 words)<br>
+        "Call me when you are free" = Call, me, when, you, are, free (6 words)<br>
+        "See you at the office" = See, you, at, the, office (5 words)<br>
+        Total words in Normal = 39
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">2</span>
+      <span class="step-title">Count Spam Word Frequencies</span>
+      <div class="step-content">
+        <strong>Spam class (4 messages):</strong><br>
+        "Win a free iPhone now" = Win, a, free, iPhone, now (5 words)<br>
+        "Dear friend, you won a prize" = Dear, friend, you, won, a, prize (6 words)<br>
+        "Free money, click here now" = Free, money, click, here, now (5 words)<br>
+        "Claim your free gift today" = Claim, your, free, gift, today (5 words)<br>
+        Total words in Spam = 21
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">3</span>
+      <span class="step-title">Compute Likelihoods for "Dear" and "Friend"</span>
+      <div class="step-content">
+        We need p("Dear"|Normal) and p("Friend"|Normal) for the test message "Dear Friend":<br><br>
+        <strong>In Normal class:</strong><br>
+        "Dear" appears 1 time (in "Dear friend, how are you")<br>
+        "friend" appears 1 time<br><br>
+        p(Dear|Normal) = 1/39 = 0.026<br>
+        p(Friend|Normal) = 1/39 = 0.026<br><br>
+
+        <strong>In Spam class:</strong><br>
+        "Dear" appears 1 time (in "Dear friend, you won a prize")<br>
+        "friend" appears 1 time<br><br>
+        p(Dear|Spam) = 1/21 = 0.048<br>
+        p(Friend|Spam) = 1/21 = 0.048<br><br>
+
+        Note: The original problem statement uses frequency tables with slightly different numbers (0.47, 0.29, etc.) which represent relative frequencies within a smaller vocabulary. The key idea is the same: count occurrences, divide by total words in that class.
+      </div>
+    </div>
+  </div>
+
+  <h3>Step 4: Classification of "Dear Friend"</h3>
+
+  <div class="worked-example">
+    <span class="example-title">Worked Example — Classifying "Dear Friend"</span>
+
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">Compute Score for Normal</span>
+      <div class="step-content">
+        score(Normal) = p(Normal) &times; p(Dear|Normal) &times; p(Friend|Normal)<br>
+        = 0.667 &times; (1/39) &times; (1/39)<br>
+        = 0.667 &times; 0.0256 &times; 0.0256<br>
+        = 0.667 &times; 0.000655<br>
+        = <strong>0.000437</strong>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">2</span>
+      <span class="step-title">Compute Score for Spam</span>
+      <div class="step-content">
+        score(Spam) = p(Spam) &times; p(Dear|Spam) &times; p(Friend|Spam)<br>
+        = 0.333 &times; (1/21) &times; (1/21)<br>
+        = 0.333 &times; 0.0476 &times; 0.0476<br>
+        = 0.333 &times; 0.00227<br>
+        = <strong>0.000755</strong>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">3</span>
+      <span class="step-title">Normalize to Get Probabilities</span>
+      <div class="step-content">
+        Total = score(Normal) + score(Spam) = 0.000437 + 0.000755 = 0.001192<br><br>
+        P(Normal|Dear Friend) = 0.000437 / 0.001192 = <strong>0.367</strong><br>
+        P(Spam|Dear Friend) = 0.000755 / 0.001192 = <strong>0.633</strong><br><br>
+        Based on these raw likelihoods with this specific data, "Dear Friend" leans toward Spam. However, the direction of the classification depends heavily on the exact training data and vocabulary used.
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">4</span>
+      <span class="step-title">Using the Textbook Frequency Table Values</span>
+      <div class="step-content">
+        Using the frequency table values from the problem statement:<br><br>
+        p(N) = 8/12 = 0.67, p(S) = 4/12 = 0.33<br>
+        p(Dear|N) = 0.47, p(Friend|N) = 0.29<br>
+        p(Dear|S) = 0.29, p(Friend|S) = 0.14<br><br>
+
+        <strong>Normal score:</strong><br>
+        0.67 &times; 0.47 &times; 0.29 = 0.67 &times; 0.1363 = <strong>0.0913</strong><br><br>
+
+        <strong>Spam score:</strong><br>
+        0.33 &times; 0.29 &times; 0.14 = 0.33 &times; 0.0406 = <strong>0.0134</strong><br><br>
+
+        Since 0.0913 &gt; 0.0134, classify as <strong>Normal</strong>.
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">5</span>
+      <span class="step-title">Convert to Probabilities</span>
+      <div class="step-content">
+        P(Normal|Dear Friend) = 0.0913 / (0.0913 + 0.0134) = 0.0913 / 0.1047 = <strong>0.872</strong><br>
+        P(Spam|Dear Friend) = 0.0134 / (0.0913 + 0.0134) = 0.0134 / 0.1047 = <strong>0.128</strong><br><br>
+        The message "Dear Friend" is classified as <strong>Normal with 87.2% confidence</strong>.
+      </div>
+    </div>
+  </div>
+
+  <h3>Step 5: Laplace Smoothing</h3>
+
+  <div class="definition-box">
+    <h4>Definition — Laplace Smoothing (Additive Smoothing)</h4>
+    <p><strong>Laplace smoothing</strong> adds a count of &#945; (typically &#945; = 1) to every word count before computing likelihoods. This ensures that no word has a probability of exactly zero, which would kill the entire class score.</p>
+  </div>
+
+  <div class="formula">
+    <span class="label">Laplace Smoothed Likelihood</span>
+    p(word|class) = (count(word, class) + &#945;) / (total words in class + &#945; &times; V)
+    <br><br>
+    where:
+    <br>
+    count(word, class) = how many times word appears in class
+    <br>
+    &#945; = smoothing parameter (typically 1)
+    <br>
+    V = size of vocabulary (total unique words)
+  </div>
+
+  <div class="worked-example">
+    <span class="example-title">Worked Example — Why Zero Probabilities Are Fatal</span>
+
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">The Zero Probability Problem</span>
+      <div class="step-content">
+        Suppose the word "crypto" appears in the test message but was NEVER seen in any Normal training message.<br><br>
+        Without smoothing: p("crypto"|Normal) = 0/39 = 0<br><br>
+        If a test message has 5 words and even ONE word has zero probability:<br>
+        score(Normal) = 0.667 &times; ... &times; <strong>0</strong> &times; ... = <strong>0</strong><br><br>
+        The entire Normal score becomes zero, regardless of how strong the other evidence is! The single unseen word completely destroys the class. This is catastrophic.
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">2</span>
+      <span class="step-title">With Laplace Smoothing (&#945; = 1)</span>
+      <div class="step-content">
+        Vocabulary size V = 40 unique words (across all messages)<br><br>
+        p("crypto"|Normal) = (0 + 1) / (39 + 1 &times; 40) = 1/79 = <strong>0.0127</strong><br><br>
+        Instead of 0, we get a small but non-zero probability. This small value means the word provides weak evidence against Normal, but it does not destroy the entire calculation.<br><br>
+        The smoothed likelihoods for "Dear" and "Friend":<br>
+        p(Dear|Normal) = (1 + 1) / (39 + 40) = 2/79 = 0.0253<br>
+        p(Friend|Normal) = (1 + 1) / (39 + 40) = 2/79 = 0.0253<br>
+        p(Dear|Spam) = (1 + 1) / (21 + 40) = 2/61 = 0.0328<br>
+        p(Friend|Spam) = (1 + 1) / (21 + 40) = 2/61 = 0.0328
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">3</span>
+      <span class="step-title">Recalculated Classification with Smoothing</span>
+      <div class="step-content">
+        score(Normal) = 0.667 &times; 0.0253 &times; 0.0253 = 0.667 &times; 0.000640 = <strong>0.000427</strong><br>
+        score(Spam) = 0.333 &times; 0.0328 &times; 0.0328 = 0.333 &times; 0.001076 = <strong>0.000358</strong><br><br>
+        P(Normal|Dear Friend) = 0.000427 / (0.000427 + 0.000358) = 0.000427 / 0.000785 = <strong>0.544</strong><br>
+        P(Spam|Dear Friend) = 0.000358 / 0.000785 = <strong>0.456</strong><br><br>
+        With smoothing, the classification is closer (Normal 54.4% vs Spam 45.6%) — the smoothing has dampened the class separation, which is expected. The model is more conservative.
+      </div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <h4>Why Laplace Smoothing Is Essential</h4>
+    <p>Without Laplace smoothing, a <strong>single unseen word</strong> kills the entire class score, making the probability zero. This is especially dangerous because: (1) in real-world text, vocabulary is enormous and training data never covers all words; (2) a zero probability means the class becomes impossible, which is obviously wrong; (3) the effect cascades — even a well-classified message gets destroyed by one novel word. Always use &#945; = 1 as the default.</p>
+  </div>
+
+  <div class="recap-box">
+    <h4>Recap — Naive Bayes Classification Steps</h4>
+    <ul>
+      <li><strong>Step 1:</strong> Compute prior probabilities P(Y) from class frequencies</li>
+      <li><strong>Step 2:</strong> Build word likelihood tables P(X_i|Y) with Laplace smoothing</li>
+      <li><strong>Step 3:</strong> For each class, compute: score(y) = P(y) &times; &#8719; P(X_i|y)</li>
+      <li><strong>Step 4:</strong> Normalise scores to get posterior probabilities</li>
+      <li><strong>Step 5:</strong> Predict the class with the highest posterior</li>
+    </ul>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>Naive Bayes classification computes P(class|words) by multiplying the prior with each word's likelihood. Laplace smoothing (&#945; = 1) is <strong>mandatory</strong> — without it, a single unseen word produces a zero probability that destroys an entire class. The final scores are normalised to produce posterior probabilities.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 6: NAIVE BAYES ADVANTAGES & LIMITATIONS
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="naive-bayes-advantages" data-progress-section>
+  <h2>Naive Bayes — Advantages &amp; Limitations</h2>
+
+  <div class="flex-row">
+    <div class="flex-1">
+      <h4 style="color: var(--accent-green);">Advantages</h4>
+      <ul>
+        <li><strong>Simple and fast</strong> — training is O(n &times; d) where n = samples, d = features. Prediction is a single dot product of log-probabilities.</li>
+        <li><strong>Works well with small data</strong> — the strong independence assumption acts as regularisation, preventing overfitting when data is limited.</li>
+        <li><strong>Naturally handles multi-class</strong> — no need for one-vs-rest or softmax; just compute P(class|features) for each class and take the max.</li>
+        <li><strong>No iterative optimisation</strong> — parameters are estimated in a single pass (counting), no gradient descent or convergence concerns.</li>
+        <li><strong>Handles high-dimensional data</strong> — each feature is processed independently, so the curse of dimensionality has less impact than in distance-based methods.</li>
+        <li><strong>Interpretable</strong> — you can inspect the word likelihoods to understand which features drive each class.</li>
+        <li><strong>Robust to irrelevant features</strong> — irrelevant features get similar likelihoods across all classes and contribute near-zero log-difference to the decision.</li>
+      </ul>
+    </div>
+    <div class="flex-1">
+      <h4 style="color: var(--accent-red);">Limitations</h4>
+      <ul>
+        <li><strong>Independence assumption is wrong</strong> — real features are often correlated (e.g., "free" and "money" in spam). This can degrade performance when correlations are strong.</li>
+        <li><strong>Probability estimates are poorly calibrated</strong> — the independence assumption biases the probability values. They tend to be pushed toward 0 or 1, even when the true probability is moderate. Use them for classification, not for reliable probability estimates.</li>
+        <li><strong>Zero-frequency problem</strong> — without Laplace smoothing, unseen features produce zero probabilities that destroy the class entirely.</li>
+        <li><strong>Feature interaction blindness</strong> — cannot capture that "buy" + "now" together indicate spam much more than either word alone. Each feature is treated in isolation.</li>
+        <li><strong>Assumes equal feature importance</strong> — every feature contributes multiplicatively. There is no mechanism to weight important features more heavily (unlike logistic regression's learned weights).</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Log Probabilities — Preventing Numerical Underflow</h3>
+
+  <div class="formula">
+    <span class="label">Why We Use Log Probabilities</span>
+    score(y) = P(y) &times; P(X_1|y) &times; P(X_2|y) &times; ... &times; P(X_n|y)
+    <br><br>
+    When n is large, multiplying many small probabilities (e.g., 0.01^100) produces values smaller than floating-point can represent → <strong>numerical underflow</strong> (result rounds to 0.0).
+    <br><br>
+    <strong>Solution: Take the logarithm.</strong>
+    <br>
+    log score(y) = log P(y) + &#8721; log P(X_i|y)
+    <br><br>
+    Multiplication becomes addition. Small probabilities become manageable negative numbers.
+    <br>
+    The class with the highest log-score is the same class with the highest score.
+  </div>
+
+  <div class="worked-example">
+    <span class="example-title">Worked Example — Log Probability Computation</span>
+
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">Without Logs (Underflow Risk)</span>
+      <div class="step-content">
+        Suppose we have 200 words in a message, each with P(word|class) &#8776; 0.01:<br>
+        score = 0.33 &times; (0.01)^200 = 0.33 &times; 10^(-400)<br>
+        This is far below the smallest representable floating-point number (~10^(-308)). Result: <strong>0.0</strong>. Both classes underflow to 0 — classification is impossible.
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">2</span>
+      <span class="step-title">With Logs (Safe Computation)</span>
+      <div class="step-content">
+        log score = log(0.33) + 200 &times; log(0.01)<br>
+        = -1.109 + 200 &times; (-4.605)<br>
+        = -1.109 + (-921.0)<br>
+        = <strong>-922.1</strong><br><br>
+        This is a perfectly representable number. We can now compare log-scores across classes to make a classification decision.
+      </div>
+    </div>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy — Measuring Stars</h4>
+    <p>Astronomers use <strong>magnitudes</strong> (a logarithmic scale) to measure star brightness because stars vary by factors of trillions. If they used raw brightness, faint stars would be recorded as "zero" compared to bright ones. Log-probabilities in Naive Bayes serve the same purpose: they bring wildly different scales into a manageable range where comparisons are meaningful.</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>Naive Bayes is simple, fast, and surprisingly effective — especially with small data and many features. The independence assumption is technically wrong but usually acceptable for classification. Always use <strong>log probabilities</strong> in practice to prevent numerical underflow, and always apply <strong>Laplace smoothing</strong> to avoid zero probabilities.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 7: PRIOR KNOWLEDGE CALLBACKS
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="prior-knowledge-callbacks" data-progress-section>
+  <h2>Prior Knowledge Callbacks</h2>
+
+  <p>Everything we learned in previous topics applies to generative models as well. Here we connect the Bayesian/Naive Bayes framework back to the validation, bias-variance, and evaluation concepts from Topics 1–5.</p>
+
+  <h3>Cross-Validation Applies to Generative Models</h3>
+  <p>Naive Bayes and other generative models are subject to the same overfitting risks as discriminative models, and K-Fold Cross-Validation works identically:</p>
+  <ul>
+    <li>Split data into K folds</li>
+    <li>Train the Naive Bayes classifier on K-1 folds (estimating priors and likelihoods from the training fold)</li>
+    <li>Evaluate on the held-out fold</li>
+    <li>Repeat and average</li>
+  </ul>
+  <p>The only difference is that Naive Bayes parameters are estimated by <strong>counting</strong>, not gradient descent — but the CV protocol is the same.</p>
+
+  <h3>Bias-Variance for Naive Bayes</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Model</th>
+        <th>Bias</th>
+        <th>Variance</th>
+        <th>Why</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Naive Bayes</strong></td>
+        <td style="color: var(--accent-red);">HIGH</td>
+        <td style="color: var(--accent-green);">LOW</td>
+        <td>The independence assumption introduces systematic bias (it is "wrong"), but the strong assumption also means the model barely changes across different training sets (low variance). NB is a <strong>high-bias, low-variance</strong> model.</td>
+      </tr>
+      <tr>
+        <td><strong>Gaussian Mixture Model (K too large)</strong></td>
+        <td style="color: var(--accent-green);">LOW</td>
+        <td style="color: var(--accent-red);">HIGH</td>
+        <td>A GMM with too many components can fit any shape in the data, including noise. Low bias (flexible), but high variance (sensitive to which training samples define the cluster centres).</td>
+      </tr>
+      <tr>
+        <td><strong>GMM (K tuned via CV)</strong></td>
+        <td style="color: var(--accent-green);">LOW</td>
+        <td style="color: var(--accent-green);">LOW</td>
+        <td>When K is chosen via cross-validation, the GMM achieves a good bias-variance balance.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="formula">
+    <span class="label">Naive Bayes Bias-Variance Profile</span>
+    Bias: HIGH (independence assumption is wrong — systematic error)
+    <br>
+    Variance: LOW (strong assumptions mean the model barely changes across training sets)
+    <br>
+    Best regime: Small data, many features, moderate accuracy needed
+  </div>
+
+  <h3>Classification Metrics Apply at the Decision Boundary</h3>
+  <p>Once Naive Bayes produces posterior probabilities, we apply the <strong>same evaluation metrics</strong> from Topic 5:</p>
+  <ul>
+    <li><strong>Accuracy:</strong> fraction of correct predictions (P(class|features) &gt; 0.5 → predict class)</li>
+    <li><strong>Precision &amp; Recall:</strong> measure performance on the positive class</li>
+    <li><strong>F1 Score:</strong> harmonic mean of precision and recall</li>
+    <li><strong>AUC-ROC:</strong> evaluates the model across all classification thresholds</li>
+    <li><strong>Confusion Matrix:</strong> shows TP, TN, FP, FN counts</li>
+  </ul>
+  <p>These metrics measure the quality of the <em>decision boundary</em>, regardless of whether the model is generative or discriminative. A Naive Bayes classifier that outputs probabilities is evaluated exactly the same way as a Logistic Regression that outputs probabilities.</p>
+
+  <div class="warning-box">
+    <h4>Warning — GMM Log-Likelihood Is NOT Accuracy</h4>
+    <p>A Gaussian Mixture Model's log-likelihood measures how well the model fits the data's distribution — it does <strong>not</strong> measure classification accuracy. A GMM with K=100 on 50 data points can achieve extremely high log-likelihood (by overfitting) while being useless for classification. Always evaluate classification performance using classification metrics (accuracy, F1, AUC), not generative metrics (log-likelihood).</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>Naive Bayes is high-bias, low-variance — it makes wrong assumptions but is stable. CV, bias-variance analysis, and classification metrics all apply identically to generative models. GMM log-likelihood is a generative metric, not a classification metric — do not confuse them.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 8: COMMON MISTAKES & EXAM TRAPS
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="common-mistakes" data-progress-section>
+  <h2>Common Mistakes &amp; Exam Traps</h2>
+
+  <p>This section collects the most frequent errors students make on exams involving Bayesian reasoning and Naive Bayes. Every one of these has appeared on past papers.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">
+      <span>&#10007; Mistake 1: Confusing P(A|B) with P(B|A)</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="collapsible-body">
+      <p><strong>The Error:</strong> "The test is 99% accurate, so if I test positive, there is a 99% chance I have the disease."</p>
+      <p><strong>Reality:</strong> P(Positive|Disease) = 0.99 does NOT mean P(Disease|Positive) = 0.99. The base rate matters. With 1% prevalence, P(Disease|Positive) &#8776; 9%, not 99%.</p>
+      <p><strong>Fix:</strong> Always draw the table. P(A|B) means "A is the unknown, B is the known condition." Never swap them without applying Bayes' theorem.</p>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">
+      <span>&#10007; Mistake 2: Forgetting Laplace Smoothing</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="collapsible-body">
+      <p><strong>The Error:</strong> Computing p(word|class) = count / total without adding &#945; = 1, resulting in zero probabilities for unseen words.</p>
+      <p><strong>Reality:</strong> A single zero probability makes the entire class score zero. The classifier becomes incapable of considering that class, regardless of how strong the other evidence is.</p>
+      <p><strong>Fix:</strong> Always use p(word|class) = (count + 1) / (total + V) where V is the vocabulary size. This is non-negotiable.</p>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">
+      <span>&#10007; Mistake 3: Reporting Raw Probabilities Instead of Log Probabilities</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="collapsible-body">
+      <p><strong>The Error:</strong> Computing p(N) &times; p(w1|N) &times; p(w2|N) &times; ... &times; p(wn|N) using raw multiplication and reporting the result as "the probability."</p>
+      <p><strong>Reality:</strong> For messages with many words, the raw product underflows to zero in floating-point arithmetic. Both classes get the same score (0.0), making classification impossible. Furthermore, the raw product is NOT the posterior probability — it is an unnormalised score.</p>
+      <p><strong>Fix:</strong> Use log-probabilities for computation: log-score = log(prior) + &#8721; log(p(word|class)). To get the actual posterior, exponentiate and normalise: P(class) = exp(log-score_class) / &#8721; exp(log-score_k).</p>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">
+      <span>&#10007; Mistake 4: Treating GMM Log-Likelihood as Classification Accuracy</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="collapsible-body">
+      <p><strong>The Error:</strong> "My GMM achieved a log-likelihood of -150. That means it is 150% accurate."</p>
+      <p><strong>Reality:</strong> Log-likelihood is a <strong>generative</strong> metric — it measures how well the model fits the data distribution. It is always negative (log of a probability), and more negative = worse fit. A high log-likelihood means the model fits the data well, but it says nothing about classification accuracy. A GMM with K=1000 on 100 points can achieve great log-likelihood by overfitting while being terrible at classification.</p>
+      <p><strong>Fix:</strong> For classification tasks, use accuracy, F1, AUC-ROC. Use log-likelihood only for density estimation tasks or model comparison within the same model family.</p>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">
+      <span>&#10007; Mistake 5: Saying "Accuracy" for Regression Metrics</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="collapsible-body">
+      <p><strong>The Error:</strong> "My GMM achieved 85% accuracy on the regression task."</p>
+      <p><strong>Reality:</strong> "Accuracy" is a classification metric (fraction of correct class predictions). For regression, you should report RMSE, MAE, R&#178;, or MAPE. These measure the magnitude of prediction errors, not whether they fall into discrete categories.</p>
+      <p><strong>Fix:</strong> Classification → accuracy, precision, recall, F1, AUC. Regression → RMSE, MAE, R&#178;, MAPE. Never mix these up.</p>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">
+      <span>&#10007; Mistake 6: Ignoring the Prior in Bayes' Theorem</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="collapsible-body">
+      <p><strong>The Error:</strong> Computing P(A|B) &#8733; P(B|A) and ignoring P(A) entirely.</p>
+      <p><strong>Reality:</strong> P(A|B) = P(B|A) &times; P(A) / P(B). The prior P(A) has a direct multiplicative effect on the posterior. Ignoring it is equivalent to assuming P(A) = P(&#172;A) = 0.5, which is often wrong. In the disease example, ignoring the 0.001 prevalence would give a wildly inflated posterior.</p>
+      <p><strong>Fix:</strong> Always include the prior. The full formula is: Posterior &#8733; Likelihood &times; Prior. Never drop the Prior.</p>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <h4>Exam Strategy</h4>
+    <p>In any Bayesian problem, draw a table with columns: Class, Prior P(C), Likelihood P(E|C), and compute the posterior for each class. This structure forces you to include all components and avoids the most common errors. If the problem does not explicitly give you the prior, you must compute it from the class frequencies.</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>The six most common exam mistakes are: (1) confusing P(A|B) with P(B|A), (2) forgetting Laplace smoothing, (3) using raw probabilities instead of log-probabilities, (4) confusing log-likelihood with accuracy, (5) misusing classification metrics for regression, and (6) ignoring the prior. Draw a structured table to avoid all of these.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     FLASHCARDS
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="flashcards" data-progress-section>
+  <h2>Flashcards</h2>
+
+  <div class="flashcard-container">
+
+    <div class="flashcard-controls">
+      <button class="btn btn-sm btn-secondary flash-prev">&#9664; Prev</button>
+      <button class="btn btn-sm btn-primary flash-next">Next &#9654;</button>
+      <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
+      <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
+      <span class="flashcard-counter"></span>
+    </div>
+
+    <!-- Card 1 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is a <strong>Generative Model</strong>?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>A model that learns the <strong>joint distribution P(X, Y)</strong> or equivalently the class-conditional distribution P(X|Y) and the prior P(Y). It can derive P(Y|X) via Bayes' theorem and can also <strong>generate new data samples</strong>. Examples: Naive Bayes, GMM, HMM.</p>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is a <strong>Discriminative Model</strong>?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>A model that learns the <strong>conditional distribution P(Y|X)</strong> directly, or learns a decision boundary between classes. It does not model how the data is generated. Examples: Logistic Regression, SVM, Random Forest, Neural Networks.</p>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>State <strong>Bayes' Theorem</strong>.</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>P(A|B) = P(B|A) &times; P(A) / P(B)</strong></p>
+        <p>The posterior probability of A given B equals the likelihood of B given A, multiplied by the prior P(A), divided by the evidence P(B). It converts P(B|A) into P(A|B).</p>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is a <strong>Prior Probability</strong>?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>The <strong>initial belief about an event before observing any evidence</strong>. In Bayes' theorem, P(A) is the prior. In Naive Bayes, P(class) is the prior — typically the fraction of training samples in that class.</p>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is a <strong>Posterior Probability</strong>?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>The <strong>updated belief after observing evidence</strong>. In Bayes' theorem, P(A|B) is the posterior. In Naive Bayes, P(class|features) is the posterior — computed as (prior &times; likelihood) / evidence.</p>
+      </div>
+    </div>
+
+    <!-- Card 6 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is the <strong>Likelihood</strong> in Bayes' theorem?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>P(B|A)</strong> — the probability of observing the evidence B given that hypothesis A is true. In Naive Bayes, P(word|class) is the likelihood: how probable is this word if the message belongs to this class?</p>
+      </div>
+    </div>
+
+    <!-- Card 7 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>Define <strong>Conditional Probability</strong> and give its formula.</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>P(A|B) = P(A &#8745; B) / P(B)</strong></p>
+        <p>The probability of A occurring given that B has already occurred. It restricts the sample space to outcomes where B is true, then re-measures A within that reduced space. Note: P(A|B) &#8800; P(B|A) in general.</p>
+      </div>
+    </div>
+
+    <!-- Card 8 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is <strong>Naive Bayes</strong>?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>A classifier based on Bayes' theorem that assumes all features are <strong>conditionally independent given the class</strong>. Classification rule: y* = argmax_y P(y) &times; &#8719; P(x_i|y). Despite the "naive" assumption being wrong, it often performs well because classification only needs correct rankings, not exact probabilities.</p>
+      </div>
+    </div>
+
+    <!-- Card 9 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is <strong>Laplace Smoothing</strong> and why is it essential?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>Adds &#945; = 1 to every count before computing likelihoods: p(word|class) = (count + 1) / (total + V). It prevents <strong>zero probabilities</strong> for unseen words. Without it, a single unseen word produces p = 0, which multiplies the entire class score to zero, making the class impossible regardless of other evidence.</p>
+      </div>
+    </div>
+
+    <!-- Card 10 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>Why do we use <strong>Log-Odds</strong> / log-probabilities in Naive Bayes?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>Multiplying many small probabilities (e.g., 0.01^200) causes <strong>numerical underflow</strong> — the result rounds to zero in floating-point. Taking logarithms converts multiplication to addition: log(p1 &times; p2 &times; ...) = log(p1) + log(p2) + .... This keeps values in a representable range while preserving the ranking needed for classification.</p>
+      </div>
+    </div>
+
+    <!-- Card 11 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is the <strong>Naive Assumption</strong> in Naive Bayes?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>That all features are <strong>conditionally independent given the class label</strong>. Formally: P(X_1, X_2, ..., X_n|Y) = &#8719; P(X_i|Y). This means knowing the class makes all features independent of each other. It is called "naive" because real features are almost always correlated, but the assumption makes computation tractable and often preserves correct classification rankings.</p>
+      </div>
+    </div>
+
+    <!-- Card 12 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>State the <strong>Bayes Rule</strong> for classification.</p>
+      </div>
+      <div class="flashcard-back">
+        <p>P(Y = c | X) = P(X | Y = c) &times; P(Y = c) / P(X)</p>
+        <p>For classification, we compute this for each class c and predict the class with the highest posterior. Since P(X) is the same for all classes, we can compare unnormalised scores: score(c) = P(Y = c) &times; &#8719; P(X_i | Y = c).</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     QUIZ
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="quiz" data-progress-section>
+  <h2>Quiz</h2>
+
+  <div class="quiz-container">
+
+    <!-- Q1 -->
+    <div class="quiz-question">
+      <div class="q-num">Question 1</div>
+      <div class="q-text">A disease has a prevalence of 2% in the population. A test has 95% sensitivity (true positive rate) and 90% specificity (true negative rate). If a person tests positive, what is P(Disease|Positive)?</div>
+      <div class="quiz-option" data-correct="false">95% — the test is 95% accurate</div>
+      <div class="quiz-option" data-correct="false">90% — the specificity is 90%</div>
+      <div class="quiz-option" data-correct="true">About 16.3% — the low prevalence means most positives are false alarms</div>
+      <div class="quiz-option" data-correct="false">2% — the prevalence does not change</div>
+      <div class="quiz-feedback correct">Correct! P(D|+) = P(+|D)P(D) / P(+) = (0.95)(0.02) / [(0.95)(0.02) + (0.10)(0.98)] = 0.019 / 0.117 = 0.163. Despite a 95% accurate test, only ~16% of positive results indicate actual disease because the base rate is low.</div>
+      <div class="quiz-feedback incorrect">Incorrect. You must apply Bayes' theorem: P(D|+) = P(+|D)P(D) / [P(+|D)P(D) + P(+|&#172;D)P(&#172;D)] = (0.95)(0.02) / [(0.95)(0.02) + (0.10)(0.98)] &#8776; 16.3%. The low prevalence means most positives are false alarms.</div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-question">
+      <div class="q-num">Question 2</div>
+      <div class="q-text">Why is Laplace smoothing necessary in Naive Bayes?</div>
+      <div class="quiz-option" data-correct="false">It makes the model more accurate by adjusting the decision boundary</div>
+      <div class="quiz-option" data-correct="false">It reduces the computational complexity of the model</div>
+      <div class="quiz-option" data-correct="true">It prevents zero probabilities for unseen words, which would destroy the entire class score</div>
+      <div class="quiz-option" data-correct="false">It enforces the conditional independence assumption</div>
+      <div class="quiz-feedback correct">Correct! Without Laplace smoothing, any word not seen in the training data for a class gets p = 0. Since Naive Bayes multiplies all word likelihoods, a single zero makes the entire class score zero — making classification impossible for that class.</div>
+      <div class="quiz-feedback incorrect">Incorrect. Laplace smoothing adds &#945; = 1 to every word count so that no probability is exactly zero. A single zero probability would multiply the entire class score to zero, making that class impossible regardless of other evidence.</div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-question">
+      <div class="q-num">Question 3</div>
+      <div class="q-text">Which of the following is true about the Naive Bayes independence assumption?</div>
+      <div class="quiz-option" data-correct="false">It is always correct, which is why Naive Bayes works well</div>
+      <div class="quiz-option" data-correct="false">It makes Naive Bayes computationally impossible for large datasets</div>
+      <div class="quiz-option" data-correct="true">It is technically wrong but often sufficient for classification because it preserves the ranking of class posteriors</div>
+      <div class="quiz-option" data-correct="false">It requires that all features have the same variance</div>
+      <div class="quiz-feedback correct">Correct! The conditional independence assumption is almost always violated in practice, but Naive Bayes often classifies correctly because the distortion from correlation tends to affect all classes similarly, preserving the relative ranking of posterior probabilities.</div>
+      <div class="quiz-feedback incorrect">Incorrect. The independence assumption is almost always wrong in practice, but Naive Bayes works because: (1) classification only needs correct rankings, not exact probabilities, and (2) the assumption reduces variance, acting as implicit regularisation.</div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-question">
+      <div class="q-num">Question 4</div>
+      <div class="q-text">In Bayes' theorem, what does the "evidence" term P(B) represent?</div>
+      <div class="quiz-option" data-correct="false">The probability of the hypothesis being true</div>
+      <div class="quiz-option" data-correct="false">The probability of the evidence given the hypothesis</div>
+      <div class="quiz-option" data-correct="true">The overall probability of observing the evidence, computed via the total probability formula</div>
+      <div class="quiz-option" data-correct="false">The strength of the likelihood function</div>
+      <div class="quiz-feedback correct">Correct! P(B) = P(B|A)P(A) + P(B|&#172;A)P(&#172;A) is the total probability of observing the evidence across all possible hypotheses. It acts as a normalising constant to ensure the posterior probabilities sum to 1.</div>
+      <div class="quiz-feedback incorrect">Incorrect. P(B) is the total probability of the evidence: P(B) = P(B|A)P(A) + P(B|&#172;A)P(&#172;A). It normalises the posterior so that probabilities across all classes sum to 1.</div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-question">
+      <div class="q-num">Question 5</div>
+      <div class="q-text">Why do we use log-probabilities instead of raw probabilities in Naive Bayes?</div>
+      <div class="quiz-option" data-correct="false">Log-probabilities are more mathematically elegant</div>
+      <div class="quiz-option" data-correct="true">Multiplying many small probabilities causes numerical underflow; logs convert multiplication to addition, keeping values representable</div>
+      <div class="quiz-option" data-correct="false">Log-probabilities automatically apply Laplace smoothing</div>
+      <div class="quiz-option" data-correct="false">Raw probabilities always sum to more than 1</div>
+      <div class="quiz-feedback correct">Correct! When a message has hundreds of words, each with small probability, their product can be smaller than the smallest floating-point number (underflow to 0.0). Taking logs converts this to a sum of manageable negative numbers: log(p1 &times; p2 &times; ...) = log(p1) + log(p2) + ....</div>
+      <div class="quiz-feedback incorrect">Incorrect. The main reason is numerical underflow. For example, (0.01)^200 = 10^(-400), which underflows to 0.0 in floating-point. But log(0.01) &times; 200 = -921, which is perfectly representable.</div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="quiz-question">
+      <div class="q-num">Question 6</div>
+      <div class="q-text">A generative model is preferred over a discriminative model when:</div>
+      <div class="quiz-option" data-correct="false">You have a very large dataset and want maximum accuracy</div>
+      <div class="quiz-option" data-correct="false">You only need a decision boundary and nothing else</div>
+      <div class="quiz-option" data-correct="true">You need to generate new data samples or detect outliers</div>
+      <div class="quiz-option" data-correct="false">Training speed is the only concern</div>
+      <div class="quiz-feedback correct">Correct! Generative models learn the full data distribution P(X|Y), enabling them to generate new samples and identify outliers (points with low P(X)). Discriminative models only learn P(Y|X) and cannot assess whether an input is "unusual."</div>
+      <div class="quiz-feedback incorrect">Incorrect. Generative models are preferred when you need to generate data, detect anomalies, handle missing features, or work with small datasets. With large data and pure classification, discriminative models usually win on accuracy.</div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="quiz-question">
+      <div class="q-num">Question 7</div>
+      <div class="q-text">Naive Bayes is best described as having:</div>
+      <div class="quiz-option" data-correct="false">Low bias and low variance</div>
+      <div class="quiz-option" data-correct="true">High bias and low variance</div>
+      <div class="quiz-option" data-correct="false">Low bias and high variance</div>
+      <div class="quiz-option" data-correct="false">High bias and high variance</div>
+      <div class="quiz-feedback correct">Correct! The independence assumption is almost always wrong, creating systematic (high) bias. But the strong assumption also constrains the model, so it barely changes across different training sets (low variance). Naive Bayes is a high-bias, low-variance classifier.</div>
+      <div class="quiz-feedback incorrect">Incorrect. Naive Bayes has HIGH bias (the independence assumption is wrong, causing systematic error) and LOW variance (the strong assumption means the model barely changes across training sets). This makes it a high-bias, low-variance classifier.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     FILL-IN-THE-BLANK
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="fill-blank" data-progress-section>
+  <h2>Fill-in-the-Blank</h2>
+
+  <div class="fill-blank-container" data-answer="conditional independence" data-alt-answers="conditionally independent|independent given the class">
+    <div class="fill-blank-question">
+      <h4>1. The Naive Bayes classifier assumes that all features are <strong>______</strong> given the class label.</h4>
+      <input type="text" class="fill-blank-input" placeholder="Type the assumption...">
+      <button class="btn btn-sm btn-primary btn-check">Check</button>
+      <p class="fill-blank-feedback">Answer: <strong>conditional independence</strong> — P(X_1, X_2, ..., X_n|Y) = &#8719; P(X_i|Y). This is the "naive" assumption that simplifies computation.</p>
+    </div>
+  </div>
+
+  <div class="fill-blank-container" data-answer="Laplace" data-alt-answers="laplace|additive smoothing|alpha=1">
+    <div class="fill-blank-question">
+      <h4>2. <strong>______</strong> smoothing adds &#945; = 1 to every count before computing likelihoods, preventing zero probabilities for unseen words.</h4>
+      <input type="text" class="fill-blank-input" placeholder="Type the smoothing method...">
+      <button class="btn btn-sm btn-primary btn-check">Check</button>
+      <p class="fill-blank-feedback">Answer: <strong>Laplace</strong> smoothing (also called additive smoothing). Formula: p(word|class) = (count + 1) / (total + V).</p>
+    </div>
+  </div>
+
+  <div class="fill-blank-container" data-answer="log probabilities" data-alt-answers="log probabilities|logarithms|log-probabilities|log">
+    <div class="fill-blank-question">
+      <h4>3. In practice, Naive Bayes uses <strong>______</strong> instead of raw probabilities to prevent numerical underflow when multiplying many small values.</h4>
+      <input type="text" class="fill-blank-input" placeholder="Type the technique...">
+      <button class="btn btn-sm btn-primary btn-check">Check</button>
+      <p class="fill-blank-feedback">Answer: <strong>log probabilities</strong> — converting multiplication to addition: log(p1 &times; p2 &times; ...) = log(p1) + log(p2) + ....</p>
+    </div>
+  </div>
+
+  <div class="fill-blank-container" data-answer="generative" data-alt-answers="generative model|joint">
+    <div class="fill-blank-question">
+      <h4>4. A model that learns P(X|Y) and P(Y) — the full data distribution — is called a <strong>______</strong> model, as opposed to a discriminative model that learns P(Y|X) directly.</h4>
+      <input type="text" class="fill-blank-input" placeholder="Type the model type...">
+      <button class="btn btn-sm btn-primary btn-check">Check</button>
+      <p class="fill-blank-feedback">Answer: <strong>generative</strong> — it learns how each class generates data (P(X|Y)) and can therefore generate new samples, detect anomalies, and compute P(Y|X) via Bayes' theorem.</p>
+    </div>
+  </div>
+
+  <div class="fill-blank-container" data-answer="posterior" data-alt-answers="posterior probability|updated belief">
+    <div class="fill-blank-question">
+      <h4>5. In Bayes' theorem, P(A|B) is called the <strong>______</strong> — it represents the updated belief about A after observing evidence B.</h4>
+      <input type="text" class="fill-blank-input" placeholder="Type the term...">
+      <button class="btn btn-sm btn-primary btn-check">Check</button>
+      <p class="fill-blank-feedback">Answer: <strong>posterior</strong> (or posterior probability). Posterior = (Likelihood &times; Prior) / Evidence.</p>
+    </div>
+  </div>
+
+  <div class="fill-blank-container" data-answer="P(B|A)" data-alt-answers="pb|a|p(b given a)|likelihood">
+    <div class="fill-blank-question">
+      <h4>6. In Bayes' theorem P(A|B) = P(B|A) &times; P(A) / P(B), the term <strong>______</strong> is called the "likelihood."</h4>
+      <input type="text" class="fill-blank-input" placeholder="Type the formula term...">
+      <button class="btn btn-sm btn-primary btn-check">Check</button>
+      <p class="fill-blank-feedback">Answer: <strong>P(B|A)</strong> — the probability of observing evidence B if hypothesis A is true. In Naive Bayes, this corresponds to P(word|class).</p>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SCENARIO QUESTION
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="scenario" data-progress-section>
+  <h2>Scenario Question</h2>
+
+  <div class="scenario-box" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 24px; margin: 20px 0;">
+    <h4>Scenario: Email Spam Filter Design</h4>
+    <p>A company wants to build an email spam filter. They have a training dataset of 5,000 emails: 3,500 are legitimate (ham) and 1,500 are spam. The email body is tokenised into individual words.</p>
+    <p>The data science team is debating between two approaches:</p>
+    <ul>
+      <li><strong>Approach A:</strong> Naive Bayes with Multinomial likelihoods</li>
+      <li><strong>Approach B:</strong> Logistic Regression</li>
+    </ul>
+    <p>During development, the team encounters a test email containing the words: "Congratulations winner claim prize". The word "Congratulations" does not appear in any spam training email.</p>
+
+    <h4>Questions:</h4>
+    <ol>
+      <li>Compute the prior probabilities for ham and spam.</li>
+      <li>Without Laplace smoothing, what happens when the Naive Bayes classifier processes the word "Congratulations" for the spam class?</li>
+      <li>Apply Laplace smoothing with &#945; = 1. If the vocabulary has 10,000 unique words, what is p("Congratulations"|Spam) after smoothing?</li>
+      <li>Which approach (A or B) would you recommend if the training dataset were only 200 emails? Justify using the bias-variance framework.</li>
+      <li>Describe one scenario where Approach A is preferable to Approach B, and one scenario where B is preferable to A.</li>
+    </ol>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">
+      <span>Show Solution</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="collapsible-body">
+      <h4>1. Prior Probabilities</h4>
+      <p>P(Ham) = 3,500 / 5,000 = <strong>0.70</strong></p>
+      <p>P(Spam) = 1,500 / 5,000 = <strong>0.30</strong></p>
+
+      <h4>2. Without Laplace Smoothing</h4>
+      <p>Since "Congratulations" appears in <strong>zero</strong> spam emails: p("Congratulations"|Spam) = 0/total_spam_words = 0.</p>
+      <p>When the Naive Bayes classifier multiplies all word likelihoods for the Spam class, the product becomes: score(Spam) = 0.30 &times; ... &times; <strong>0</strong> &times; ... = <strong>0</strong>.</p>
+      <p>The Spam class score is completely destroyed. The email can NEVER be classified as spam, regardless of how strongly the other words ("winner", "claim", "prize") indicate spam. This is the catastrophic failure that Laplace smoothing prevents.</p>
+
+      <h4>3. With Laplace Smoothing</h4>
+      <p>p("Congratulations"|Spam) = (0 + 1) / (total_spam_words + 10,000)</p>
+      <p>If total spam words &#8776; 15,000: p("Congratulations"|Spam) = 1 / (15,000 + 10,000) = 1/25,000 = <strong>0.00004</strong></p>
+      <p>This is small (as expected — the word is rare in spam) but non-zero, so the Spam class remains viable. The other strong spam indicators ("winner", "prize") can still push the classification toward spam.</p>
+
+      <h4>4. Small Dataset Recommendation (200 emails)</h4>
+      <p><strong>Approach A (Naive Bayes)</strong> is better with 200 emails. Naive Bayes is high-bias, low-variance — its strong independence assumption acts as implicit regularisation, preventing overfitting on small datasets. Logistic Regression is lower-bias but higher-variance — with only 200 samples and potentially thousands of word features, it is likely to overfit. The bias-variance trade-off favours the simpler model when data is scarce.</p>
+
+      <h4>5. When Each Approach is Preferable</h4>
+      <p><strong>Approach A (Naive Bayes) is preferable when:</strong> Data is limited, real-time predictions are needed (NB is extremely fast), or you need interpretable word-level likelihoods (you can inspect which words are most indicative of spam).</p>
+      <p><strong>Approach B (Logistic Regression) is preferable when:</strong> Data is abundant (tens of thousands of emails), you need well-calibrated probabilities, you want to capture feature interactions (through feature engineering), or you need to assign different weights to different words (LR learns w_i for each word, while NB treats all words equally).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     FINAL RECAP
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="recap" data-progress-section>
+  <h2>Final Recap</h2>
+
+  <div class="recap-box">
+    <h4>Key Concepts Summary</h4>
+    <ul>
+      <li><strong>Discriminative vs Generative:</strong> Discriminative models learn P(Y|X) directly (the decision boundary). Generative models learn P(X|Y) and P(Y) (the data distribution), then derive P(Y|X) via Bayes' theorem. Discriminative wins on accuracy with large data; generative wins on data efficiency, interpretability, and generation.</li>
+      <li><strong>Conditional Probability:</strong> P(A|B) = P(A &#8745; B) / P(B) — re-computes probability within a narrowed sample space. P(A|B) &#8800; P(B|A) in general. This asymmetry is the root of many exam errors.</li>
+      <li><strong>Bayes' Theorem:</strong> P(A|B) = P(B|A) &times; P(A) / P(B). Converts the likelihood P(B|A) into the posterior P(A|B). Components: Prior P(A), Likelihood P(B|A), Evidence P(B), Posterior P(A|B). The evidence is computed via the total probability formula.</li>
+      <li><strong>Naive Bayes:</strong> Applies Bayes' theorem with the assumption that features are <strong>conditionally independent</strong> given the class. Classification rule: y* = argmax_y P(y) &times; &#8719; P(x_i|y). The independence assumption is wrong but often sufficient for correct classification.</li>
+      <li><strong>Laplace Smoothing:</strong> Adds &#945; = 1 to every count: p(word|class) = (count + 1) / (total + V). Essential to prevent zero probabilities that destroy entire class scores. Without it, any unseen word makes its class impossible.</li>
+      <li><strong>Log Probabilities:</strong> Convert multiplication to addition: log(p1 &times; p2 &times; ...) = log(p1) + log(p2) + .... Prevents numerical underflow when many small probabilities are multiplied. The class with the highest log-score is the same as the class with the highest raw score.</li>
+      <li><strong>Bias-Variance for Naive Bayes:</strong> High bias (independence assumption is wrong) but low variance (strong assumptions mean stable predictions across training sets). Best for small datasets with many features.</li>
+      <li><strong>Common Exam Traps:</strong> (1) Confusing P(A|B) with P(B|A). (2) Forgetting Laplace smoothing. (3) Using raw probabilities instead of logs. (4) Confusing log-likelihood with accuracy. (5) Using classification metrics for regression. (6) Ignoring the prior.</li>
+    </ul>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Big Picture Takeaway</h4>
+    <p>Bayesian reasoning is the mathematical framework for <strong>updating beliefs in the light of evidence</strong>. Naive Bayes is its most practical application — a classifier that is fast, simple, and surprisingly effective despite its "naive" assumption. The key formulas are: <strong>Bayes' theorem</strong> (P(A|B) = P(B|A)P(A)/P(B)), the <strong>Naive Bayes classification rule</strong> (argmax P(y) &#8719; P(x_i|y)), and <strong>Laplace smoothing</strong> (count+1)/(total+V). Whether a model is generative or discriminative, all the validation and evaluation tools from previous topics — cross-validation, bias-variance analysis, classification metrics — apply identically. The choice between approaches depends on your data size, your need for interpretability, and whether you need to generate data or just classify it.</p>
+  </div>
+</section>
+
+</main>
+<!-- ═══════════════════════════ END MAIN CONTENT ═══════════════════════════ -->
+
+<script src="script.js"></script>
+</body>
+</html>

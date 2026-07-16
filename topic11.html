@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic 11: Transfer Learning & Pre-trained Model Adaptation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Top Navigation -->
+    <nav class="top-nav">
+        <div class="nav-brand">
+            <a href="index.html">ML Course Notes</a>
+        </div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span class="icon">&#9728;</span> Toggle Theme</button>
+        </div>
+    </nav>
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+            <span class="progress-text" id="progress-text">0%</span>
+        </div>
+        <nav class="section-nav">
+            <h3>Topic 11: Transfer Learning</h3>
+            <ul>
+                <li><a href="#section-1" class="nav-link active">1. From Building to Reusing</a></li>
+                <li><a href="#section-2" class="nav-link">2. Why Transfer Works</a></li>
+                <li><a href="#section-3" class="nav-link">3. When Transfer Helps & Hurts</a></li>
+                <li><a href="#section-4" class="nav-link">4. Formal Definitions</a></li>
+                <li><a href="#section-5" class="nav-link">5. Taxonomy of Transfer Learning</a></li>
+                <li><a href="#section-6" class="nav-link">6. Two Core Strategies</a></li>
+                <li><a href="#section-7" class="nav-link">7. Mathematics of Freezing</a></li>
+                <li><a href="#section-8" class="nav-link">8. Worked Example: Parameters</a></li>
+                <li><a href="#section-9" class="nav-link">9. Pre-trained Model Zoo</a></li>
+                <li><a href="#section-10" class="nav-link">10. Adaptation Spectrum</a></li>
+                <li><a href="#section-11" class="nav-link">11. Catastrophic Forgetting</a></li>
+                <li><a href="#section-12" class="nav-link">12. Layer-wise LR Decay</a></li>
+                <li><a href="#section-13" class="nav-link">13. Warmup + Cosine LR</a></li>
+                <li><a href="#section-14" class="nav-link">14. LoRA - PEFT</a></li>
+                <li><a href="#section-15" class="nav-link">15. EWC - Elastic Weight</a></li>
+                <li><a href="#section-16" class="nav-link">16. Comparison Table</a></li>
+                <li><a href="#section-17" class="nav-link">17. Practical Decision Workflow</a></li>
+                <li><a href="#section-flashcards" class="nav-link">Flashcards</a></li>
+                <li><a href="#section-quiz" class="nav-link">Quiz</a></li>
+                <li><a href="#section-fill-blank" class="nav-link">Fill-in-the-Blank</a></li>
+                <li><a href="#section-scenario" class="nav-link">Scenario</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="topic-header">
+            <h1>Topic 11: Transfer Learning & Pre-trained Model Adaptation</h1>
+            <p class="subtitle">Why build from scratch when you can build on the shoulders of giants?</p>
+        </header>
+
+        <!-- SECTION 1: FROM BUILDING TO REUSING -->
+        <section id="section-1" class="content-section" data-progress-section>
+            <h2>1. From Building to Reusing</h2>
+            
+            <div class="analogy-box">
+                <h4>🚲 → 🏍️ Analogy: Learning to Ride</h4>
+                <p>Imagine you spent months learning to ride a bicycle. You mastered balance, steering, braking, and pedaling. Now someone hands you a motorbike. Do you need to relearn everything from scratch? <strong>No!</strong></p>
+                <p>You already know how to balance, steer, and brake. The only new skills are using the throttle and changing gears. The motorbike problem is <em>easier</em> because you transfer knowledge from cycling.</p>
+            </div>
+
+            <p>So far in this course, we've built neural networks from <strong>random initialization</strong> — every single weight started as noise, and gradient descent sculpted them into useful features. This is like teaching a child to read by starting with zero knowledge of letters, words, or grammar.</p>
+
+            <div class="warning-box">
+                <h4>⚠️ The Reality Check</h4>
+                <p>In real-world systems, two things are almost always scarce:</p>
+                <ul>
+                    <li><strong>Labelled data:</strong> Getting high-quality labels is expensive and time-consuming (medical imaging, autonomous driving, etc.)</li>
+                    <li><strong>Compute resources:</strong> Training large models from scratch costs millions of dollars and weeks of GPU time</li>
+                </ul>
+                <p>Starting from random initialization is not just inefficient — it's often <em>impractical</em>.</p>
+            </div>
+
+            <div class="definition-box">
+                <h4>Definition: Transfer Learning</h4>
+                <p>Transfer learning is the technique of <strong>reusing knowledge learned from one problem (source task)</strong> to help solve a <strong>related problem (target task)</strong> faster, with less data, or with better performance.</p>
+                <p>Instead of training every weight from scratch, we take a model that has already learned useful features and <em>adapt</em> it to our specific task.</p>
+            </div>
+
+            <p>This is exactly what transfer learning does: it takes a model that already "knows" how to see edges, textures, shapes, and objects, and asks it to apply that knowledge to your specific problem — whether that's identifying dog breeds, detecting tumors, or classifying manufacturing defects.</p>
+
+            <div class="takeaway-box">
+                <h4>💡 Key Insight</h4>
+                <p>Transfer learning changes the game from "collect millions of images and train for weeks" to "collect hundreds of images and train for hours." It's the single most important technique for making deep learning practical in resource-constrained settings.</p>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header">Why Not Always Use Transfer Learning?</button>
+                <div class="collapsible-content">
+                    <p>Transfer learning isn't always the answer. If your target task is very different from any available pre-trained model (e.g., a completely novel sensor modality), the transferred features may be useless or harmful. Also, if you have abundant labelled data and compute, training from scratch might give you full control over the architecture and avoid inheriting any biases from the source model.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: WHY TRANSFER WORKS - HIERARCHY OF FEATURES -->
+        <section id="section-2" class="content-section" data-progress-section>
+            <h2>2. Why Transfer Works — Hierarchy of Features</h2>
+            
+            <div class="analogy-box">
+                <h4>🎨 Analogy: The Artist's Toolkit</h4>
+                <p>A trained artist learns skills in layers: first how to hold a brush, then basic strokes, then color mixing, then composition, and finally style. When asked to paint a new subject (say, portraits instead of landscapes), they don't relearn how to hold a brush — they reuse low-level skills and only adapt high-level decisions.</p>
+            </div>
+
+            <p>When a deep neural network is trained on a large dataset (like ImageNet with millions of images), it doesn't just memorize the training examples. It learns a <strong>hierarchy of increasingly complex features</strong>:</p>
+
+            <div class="definition-box">
+                <h4>Feature Hierarchy in Deep Networks</h4>
+                <ul>
+                    <li><strong>Layer 1-3 (Early/Lower layers):</strong> Edges, corners, color gradients, textures — extremely generic features useful for almost any visual task</li>
+                    <li><strong>Layer 4-8 (Middle layers):</strong> Parts of objects — eyes, wheels, leaves, fabric patterns — somewhat specific but still broadly useful</li>
+                    <li><strong>Layer 9-12+ (Deep/Upper layers):</strong> Whole objects, faces, specific patterns — highly task-specific features</li>
+                </ul>
+            </div>
+
+            <div class="formula">
+                <h4>Transferability Gradient</h4>
+                <p>Transferability(T) ∝ 1 / Specificity(Layer)</p>
+                <p>Where: Lower layers → high transferability (generic features)<br>
+                Upper layers → low transferability (task-specific features)</p>
+            </div>
+
+            <p>The landmark study by <strong>Yosinski et al. (2014)</strong> at NYU systematically measured this by training a network on ImageNet, then measuring how well different layers transferred to a new task:</p>
+
+            <div class="worked-example">
+                <h4>Yosinski et al. (2014) — Key Findings</h4>
+                <p><strong>Experiment:</strong> Train a 8-layer CNN on ImageNet (1000 classes), then transfer different layers to a new 8-class task.</p>
+                <p><strong>Results:</strong></p>
+                <ul>
+                    <li>Transferring layers 1-2: Task accuracy dropped only 2-3% from fully trained — generic features transfer well</li>
+                    <li>Transferring layers 1-6: Task accuracy dropped 5-8% — still mostly useful</li>
+                    <li>Transferring layers 1-8 (entire network): Accuracy dropped 15-20% — top layers are too specific</li>
+                </ul>
+                <p><strong>Conclusion:</strong> Features evolve from general (bottom) to specific (top). Transfer works because the generic features are reusable; the specific features need to be relearned.</p>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 The Rule of Thumb</h4>
+                <p><strong>Re-use bottom layers (generic features), replace or fine-tune top layers (task-specific features).</strong> This is the foundational principle behind all transfer learning strategies we'll discuss.</p>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header">Why Do Lower Layers Learn Generic Features?</button>
+                <div class="collapsible-content">
+                    <p>This emerges naturally from the structure of data. Edges, textures, and color gradients are <em>statistically necessary</em> to represent any visual input. A network must learn to detect edges to distinguish any object, regardless of whether the task is cats vs. dogs or tumors vs. healthy tissue. Higher layers combine these building blocks into increasingly specific patterns that depend on the particular task.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: WHEN TRANSFER HELPS AND HURTS -->
+        <section id="section-3" class="content-section" data-progress-section>
+            <h2>3. When Transfer Helps and Hurts</h2>
+            
+            <div class="definition-box">
+                <h4>The Two Sides of Transfer</h4>
+                <p>Transfer learning is powerful but not magical. Its success depends on the relationship between source and target tasks. Sometimes it helps dramatically; sometimes it can actually <em>hurt</em> performance.</p>
+            </div>
+
+            <h3>When Transfer Helps</h3>
+            <p>Transfer learning provides the greatest benefit when:</p>
+            <ul>
+                <li><strong>Source and target share underlying structure:</strong> If both tasks require detecting edges, textures, or similar patterns, the transferred features are directly useful.</li>
+                <li><strong>Target data is limited:</strong> When you have few labelled examples, starting from pre-trained weights prevents overfitting.</li>
+                <li><strong>Target data is "close" to source data:</strong> Medical imaging (source: general images, target: X-rays) benefits because visual features transfer. Stock prediction (source: NLP, target: images) would not.</li>
+            </ul>
+
+            <div class="warning-box">
+                <h4>⚠️ Negative Transfer</h4>
+                <p><strong>Negative transfer</strong> occurs when borrowed features actually <em>mislead</em> the target model, resulting in worse performance than training from scratch.</p>
+                <p>This happens when:</p>
+                <ul>
+                    <li>Source and target domains are very different (e.g., transferring from natural images to spectrograms)</li>
+                    <li>The source model has learned biases that are counterproductive for the target task</li>
+                    <li>The target task requires fundamentally different feature types</li>
+                </ul>
+                <p><strong>Example:</strong> A model pre-trained on satellite imagery might learn features about atmospheric conditions and lighting that are irrelevant (or harmful) when transferred to microscopic cell classification.</p>
+            </div>
+
+            <div class="analogy-box">
+                <h4>🚗 Analogy: Driving Skills</h4>
+                <p>Driving a car transfers well to driving a truck (same road rules, similar controls). But driving a car does <em>not</em> transfer well to piloting an airplane — the environment, controls, and physics are fundamentally different. Forcing car-driving habits onto an airplane could be dangerous (negative transfer).</p>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 Key Takeaway</h4>
+                <p><strong>Always check domain similarity before choosing transfer learning.</strong> If the domains are very different, consider training from scratch or using unsupervised pre-training on your target domain instead.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 4: FORMAL DEFINITIONS -->
+        <section id="section-4" class="content-section" data-progress-section>
+            <h2>4. Formal Definitions</h2>
+            
+            <div class="definition-box">
+                <h4>Domain (D)</h4>
+                <p>A domain is defined as D = {X, P(X)} where:</p>
+                <ul>
+                    <li><strong>X:</strong> The feature space (e.g., all possible pixel values for images, or all possible word embeddings for text)</li>
+                    <li><strong>P(X):</strong> The marginal distribution over features (e.g., how often certain colors, textures, or objects appear)</li>
+                </ul>
+            </div>
+
+            <div class="definition-box">
+                <h4>Task (T)</h4>
+                <p>A task is defined as T = {Y, f(·)} where:</p>
+                <ul>
+                    <li><strong>Y:</strong> The label space (e.g., {cat, dog, bird} for classification, or all real numbers for regression)</li>
+                    <li><strong>f(·):</strong> The predictive function (the true mapping from inputs to labels that we're trying to learn)</li>
+                </ul>
+            </div>
+
+            <div class="formula">
+                <h4>Transfer Learning Problem</h4>
+                <p>Given: Source domain Dₛ = {Xₛ, Pₛ(Xₛ)} and source task Tₛ = {Yₛ, fₛ(·)}<br>
+                Target domain Dₜ = {Xₜ, Pₜ(Xₜ)} and target task Tₜ = {Yₜ, fₜ(·)}</p>
+                <p>Goal: Learn the target conditional distribution P(Yₜ|Xₜ) using knowledge from (Dₛ, Tₛ)</p>
+                <p>Where: Dₛ ≠ Dₜ and/or Tₛ ≠ Tₜ</p>
+            </div>
+
+            <h3>What May Differ Between Source and Target</h3>
+            
+            <div class="worked-example">
+                <h4>Types of Differences</h4>
+                <table>
+                    <tr>
+                        <th>Component</th>
+                        <th>Can Differ?</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td>Feature spaces (X)</td>
+                        <td>✅ Yes</td>
+                        <td>Text vs. images vs. audio</td>
+                    </tr>
+                    <tr>
+                        <td>Distributions P(X)</td>
+                        <td>✅ Yes</td>
+                        <td>Daytime photos vs. nighttime photos</td>
+                    </tr>
+                    <tr>
+                        <td>Label spaces (Y)</td>
+                        <td>✅ Yes</td>
+                        <td>Binary vs. multi-class classification</td>
+                    </tr>
+                    <tr>
+                        <td>Predictive function f(·)</td>
+                        <td>✅ Yes</td>
+                        <td>Object detection vs. image classification</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 Key Insight</h4>
+                <p>Transfer learning is most powerful (and most common) when the feature space X is the same but the distributions P(X) differ (domain adaptation) or the tasks T differ (task adaptation). The more components that differ, the harder transfer becomes.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 5: TAXONOMY OF TRANSFER LEARNING -->
+        <section id="section-5" class="content-section" data-progress-section>
+            <h2>5. Taxonomy of Transfer Learning</h2>
+            
+            <p>Transfer learning methods can be classified based on how the source and target domains and tasks relate:</p>
+
+            <div class="worked-example">
+                <h4>Three Main Categories</h4>
+                <table>
+                    <tr>
+                        <th>Type</th>
+                        <th>Domains</th>
+                        <th>Tasks</th>
+                        <th>Target Labels</th>
+                        <th>Example</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Inductive TL</strong></td>
+                        <td>Same or different</td>
+                        <td>Different</td>
+                        <td>Available</td>
+                        <td>ImageNet → Medical imaging classification</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Transductive TL</strong></td>
+                        <td>Different</td>
+                        <td>Same</td>
+                        <td>NOT available</td>
+                        <td>Adapting sentiment model from English to French (unlabelled French data)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Unsupervised TL</strong></td>
+                        <td>Different</td>
+                        <td>Different</td>
+                        <td>NOT available</td>
+                        <td>Using ImageNet features to improve clustering on medical images</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="analogy-box">
+                <h4>📚 Analogy: University Transfer</h4>
+                <ul>
+                    <li><strong>Inductive:</strong> A biology major switches to chemistry. Different subject (task), but some knowledge carries over (same university system = same domain). They have textbooks (target labels) to guide them.</li>
+                    <li><strong>Transductive:</strong> A student moves from a US university to a UK university, same subject (task), but different educational system (domain). They don't have lecture notes yet (no target labels) but can observe how classes work.</li>
+                    <li><strong>Unsupervised:</strong> A student switches both university and major, with no syllabus to guide them. They must figure out both the new system and new subject simultaneously.</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <h4>⚠️ Most Common in Practice</h4>
+                <p>The vast majority of practical transfer learning falls into the <strong>inductive</strong> category: we have a pre-trained model (source), a different task (target), and at least some labelled target data. The techniques in this topic primarily address inductive transfer learning.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 6: TWO CORE STRATEGIES -->
+        <section id="section-6" class="content-section" data-progress-section>
+            <h2>6. Two Core Strategies</h2>
+            
+            <p>There are two fundamental approaches to using pre-trained models:</p>
+
+            <div class="worked-example">
+                <h4>Strategy 1: Feature Extraction</h4>
+                <p><strong>Idea:</strong> Use the pre-trained network as a fixed feature extractor. Freeze all backbone layers and only train a new classification head.</p>
+                <p><strong>How it works:</strong></p>
+                <ol>
+                    <li>Take pre-trained model (e.g., ResNet-50 trained on ImageNet)</li>
+                    <li>Remove the final classification layer</li>
+                    <li>Pass your data through the frozen network → get feature vectors</li>
+                    <li>Train a simple linear classifier (or small MLP) on these features</li>
+                </ol>
+                <p><strong>Characteristics:</strong></p>
+                <ul>
+                    <li>Few trainable parameters → fast training, hard to overfit</li>
+                    <li>Best when target data is small (10-1000 examples)</li>
+                    <li>Best when target domain is close to source domain</li>
+                    <li>Mathematically: ∂L/∂θⱼ = 0 for all frozen layers j ∈ F</li>
+                </ul>
+            </div>
+
+            <div class="worked-example">
+                <h4>Strategy 2: Fine-Tuning</h4>
+                <p><strong>Idea:</strong> Unfreeze some or all layers of the pre-trained model and continue training with a small learning rate.</p>
+                <p><strong>How it works:</strong></p>
+                <ol>
+                    <li>Take pre-trained model</li>
+                    <li>Replace final layer with new task head</li>
+                    <li>Unfreeze selected layers</li>
+                    <li>Continue training with small learning rate (10×-100× smaller than initial training)</li>
+                </ol>
+                <p><strong>Characteristics:</strong></p>
+                <ul>
+                    <li>More parameters move → higher performance ceiling</li>
+                    <li>Higher risk of overfitting and catastrophic forgetting</li>
+                    <li>Best when target data is plentiful (>1000 examples)</li>
+                    <li>Best when target domain differs more from source</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <h4>⚠️ Why Small Learning Rate?</h4>
+                <p>The pre-trained weights are already near a good minimum. A large learning rate would push them far from this minimum, potentially destroying the learned features. Think of it as "editing a draft" vs. "writing from scratch" — you make careful, small changes, not wholesale rewrites.</p>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 Decision Rule</h4>
+                <p><strong>Feature extraction</strong> when data is limited and domains are similar. <strong>Fine-tuning</strong> when data is plentiful or domains differ. When in doubt, start with feature extraction and graduate to fine-tuning if needed.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 7: MATHEMATICS OF FREEZING & FINE-TUNING -->
+        <section id="section-7" class="content-section" data-progress-section>
+            <h2>7. Mathematics of Freezing & Fine-Tuning</h2>
+            
+            <div class="formula">
+                <h4>Fine-Tuning Objective</h4>
+                <p>θ* = arg min_θ (1/N) Σᵢ L(f_θ(xᵢ), yᵢ)</p>
+                <p>Where: θ ← θ_source (initialize from pre-trained weights)</p>
+                <p>f_θ = neural network with parameters θ</p>
+                <p>L = loss function (e.g., cross-entropy)</p>
+                <p>N = number of training examples</p>
+            </div>
+
+            <div class="formula">
+                <h4>Freezing Mathematics</h4>
+                <p>When freezing layers, we set gradients to zero for those parameters:</p>
+                <p>∂L/∂θⱼ = 0 for all j ∈ F (frozen layer indices)</p>
+                <p>This means frozen parameters never update: θⱼ remains at θⱼ_source</p>
+                <p>Only parameters NOT in F are updated via gradient descent.</p>
+            </div>
+
+            <div class="formula">
+                <h4>Discriminative Learning Rates</h4>
+                <p>Different layers receive different learning rates:</p>
+                <p>θₗ ← θₗ - ηₗ · ∂L/∂θₗ</p>
+                <p>Where: ηₗ = η · ξ^(L-l)</p>
+                <ul>
+                    <li>η = base learning rate</li>
+                    <li>ξ = decay factor (e.g., 0.9)</li>
+                    <li>L = total number of layers</li>
+                    <li>l = current layer index</li>
+                </ul>
+            </div>
+
+            <div class="worked-example">
+                <h4>Why Discriminative Learning Rates?</h4>
+                <p><strong>Intuition:</strong> Lower layers contain generic features that are already good — they need only tiny adjustments. Upper layers contain task-specific features that need more significant adaptation.</p>
+                <p><strong>Analogy:</strong> When renovating a house, you don't tear down the foundation (low layers) — you make minor adjustments. But you might completely redo the kitchen and bathrooms (high layers).</p>
+            </div>
+
+            <div class="warning-box">
+                <h4>⚠️ The Overshooting Problem</h4>
+                <p>Pre-trained weights sit near a good minimum in the loss landscape. A large learning rate takes a big step that can jump out of this minimum, destroying the learned features. This is why fine-tuning always uses learning rates 10×-100× smaller than training from scratch.</p>
+                <p>Think of it like tuning a radio that's already close to the right station — you make tiny adjustments, not big swings.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 8: WORKED EXAMPLE - COUNTING PARAMETERS -->
+        <section id="section-8" class="content-section" data-progress-section>
+            <h2>8. Worked Example — Counting Parameters</h2>
+            
+            <p>Let's see exactly how parameter-efficient feature extraction is in practice.</p>
+
+            <div class="worked-example">
+                <h4>Scenario: Image Classification with Pre-trained ResNet</h4>
+                <p><strong>Setup:</strong></p>
+                <ul>
+                    <li>Pre-trained backbone (frozen): ResNet-50 with 23,500,000 parameters</li>
+                    <li>Backbone output: 2,048-dimensional feature vector</li>
+                    <li>Target task: Classify into 5 classes</li>
+                </ul>
+
+                <h4>Step 1: New Classification Head</h4>
+                <p>The new head is a simple linear layer:</p>
+                <p>Parameters in head = (input_dim × output_dim) + bias</p>
+                <p>= (2048 × 5) + 5 = 10,240 + 5 = <strong>10,245 parameters</strong></p>
+
+                <h4>Step 2: Total Parameters</h4>
+                <p>Total = Backbone (frozen) + Head (trainable)</p>
+                <p>= 23,500,000 + 10,245 = <strong>23,510,245 parameters</strong></p>
+
+                <h4>Step 3: Trainable Fraction</h4>
+                <p>Trainable fraction = Trainable / Total</p>
+                <p>= 10,245 / 23,510,245</p>
+                <p>= <strong>0.000436 = 0.0436%</strong></p>
+
+                <h4>Step 4: What This Means</h4>
+                <p>You train just <strong>0.04%</strong> of the parameters and inherit <strong>23.5 million</strong> frozen parameters "for free." The frozen backbone has already learned to extract useful visual features from millions of images. You're just teaching the model what those features mean for your specific 5-class problem.</p>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 The Power of Feature Extraction</h4>
+                <p>With only 10,245 trainable parameters, you can achieve performance that would require training 23.5 million parameters from scratch. This is why feature extraction is so powerful for small datasets — you have very few parameters to overfit, but access to extremely rich features.</p>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header">How Does This Compare to Training from Scratch?</button>
+                <div class="collapsible-content">
+                    <p>If you trained the same 5-class problem from scratch with a randomly initialized ResNet-50:</p>
+                    <ul>
+                        <li><strong>Parameters to train:</strong> 23,510,245 (all of them)</li>
+                        <li><strong>Data needed:</strong> Typically 50,000+ images per class for good performance</li>
+                        <li><strong>Training time:</strong> Hours to days on GPU</li>
+                    </ul>
+                    <p>With feature extraction:</p>
+                    <ul>
+                        <li><strong>Parameters to train:</strong> 10,245</li>
+                        <li><strong>Data needed:</strong> As few as 50-500 images per class</li>
+                        <li><strong>Training time:</strong> Minutes on GPU</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 9: PRE-TRAINED MODEL ZOO -->
+        <section id="section-9" class="content-section" data-progress-section>
+            <h2>9. Pre-trained Model Zoo</h2>
+            
+            <p>Just as you wouldn't build a car from raw iron ore, you shouldn't build a neural network from scratch when pre-trained models exist. Here's the landscape of available models:</p>
+
+            <div class="worked-example">
+                <h4>Computer Vision Models (ImageNet Pre-trained)</h4>
+                <table>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>Top-1 Accuracy</th>
+                        <th>Key Feature</th>
+                    </tr>
+                    <tr>
+                        <td>ResNet-50</td>
+                        <td>25.6M</td>
+                        <td>76.1%</td>
+                        <td>Residual connections, widely used</td>
+                    </tr>
+                    <tr>
+                        <td>VGG-16</td>
+                        <td>138M</td>
+                        <td>71.5%</td>
+                        <td>Simple architecture, large model</td>
+                    </tr>
+                    <tr>
+                        <td>EfficientNet-B0</td>
+                        <td>5.3M</td>
+                        <td>77.1%</td>
+                        <td>Best accuracy per parameter</td>
+                    </tr>
+                    <tr>
+                        <td>ViT-Base</td>
+                        <td>86M</td>
+                        <td>81.8%</td>
+                        <td>Transformer-based, attention</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="worked-example">
+                <h4>NLP Models (Pre-trained on Billions of Words)</h4>
+                <table>
+                    <tr>
+                        <th>Model</th>
+                        <th>Parameters</th>
+                        <th>Training Data</th>
+                        <th>Key Feature</th>
+                    </tr>
+                    <tr>
+                        <td>BERT-Base</td>
+                        <td>110M</td>
+                        <td>3.3B words</td>
+                        <td>Bidirectional, great for classification</td>
+                    </tr>
+                    <tr>
+                        <td>GPT-2</td>
+                        <td>1.5B</td>
+                        <td>8M documents</td>
+                        <td>Autoregressive, great for generation</td>
+                    </tr>
+                    <tr>
+                        <td>T5-Base</td>
+                        <td>220M</td>
+                        <td>750GB text</td>
+                        <td>Text-to-text framework</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="worked-example">
+                <h4>Word Embeddings</h4>
+                <table>
+                    <tr>
+                        <th>Model</th>
+                        <th>Vocabulary</th>
+                        <th>Dimensions</th>
+                        <th>Training</th>
+                    </tr>
+                    <tr>
+                        <td>word2vec</td>
+                        <td>3M words</td>
+                        <td>300</td>
+                        <td>Skip-gram/CBOW</td>
+                    </tr>
+                    <tr>
+                        <td>GloVe</td>
+                        <td>400K words</td>
+                        <td>300</td>
+                        <td>Global co-occurrence matrix</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="analogy-box">
+                <h4>🎓 Analogy: Inheriting Education</h4>
+                <p>Using a pre-trained model is like adopting a college graduate instead of raising a child from birth. The graduate (pre-trained model) has already spent years learning foundational skills — reading, writing, critical thinking (edges, textures, grammar, semantics). You just need to train them for your specific job (your task). This is infinitely more efficient than starting from scratch.</p>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 The Mindset Shift</h4>
+                <p>Think of pre-trained models as <strong>inherited knowledge</strong>, not starting points. You're not "cheating" — you're being smart. Every expert builds on the knowledge of those who came before them. In ML, those who came before you trained on millions of examples for weeks on expensive hardware.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 10: ADAPTATION SPECTRUM -->
+        <section id="section-10" class="content-section" data-progress-section>
+            <h2>10. Adaptation Spectrum</h2>
+            
+            <div class="analogy-box">
+                <h4>📝 Analogy: The Editing Spectrum</h4>
+                <p>Consider writing a book:</p>
+                <ul>
+                    <li><strong>Training from scratch:</strong> Writing every word yourself (blank page)</li>
+                    <li><strong>Feature extraction:</strong> Using someone's outline and filling in the details</li>
+                    <li><strong>Partial fine-tuning:</strong> Taking a draft and revising key chapters</li>
+                    <li><strong>Full fine-tuning:</strong> Taking a draft and revising the entire manuscript</li>
+                    <li><strong>PEFT:</strong> Making surgical edits to just the most important paragraphs</li>
+                </ul>
+            </div>
+
+            <div class="definition-box">
+                <h4>The Four Strategies (Ordered by Weight Movement)</h4>
+                <ol>
+                    <li><strong>Feature Extraction:</strong> Freeze backbone, train only new head. Minimum weight movement. Cheapest and most robust.</li>
+                    <li><strong>Partial Fine-Tuning:</strong> Unfreeze top layers, keep bottom frozen. Moderate weight movement. Good balance of performance and stability.</li>
+                    <li><strong>Full Fine-Tuning:</strong> Unfreeze all layers with small learning rate. Maximum weight movement. Highest ceiling but highest risk.</li>
+                    <li><strong>Parameter-Efficient Fine-Tuning (PEFT):</strong> Add small trainable modules (e.g., LoRA adapters) while keeping original weights frozen. Near-full accuracy at ~1% parameter cost.</li>
+                </ol>
+            </div>
+
+            <div class="worked-example">
+                <h4>Spectrum Visualization</h4>
+                <p>Training from scratch ←————→ Full adaptation</p>
+                <p>[Blank page] → [Feature extraction] → [Partial FT] → [Full FT] → [PEFT]</p>
+                <p>Frozen weights: [0%] → [95%+] → [50-70%] → [0%] → [99%+]</p>
+                <p>Trainable params: [100%] → [5%] → [30-50%] → [100%] → [1%]</p>
+                <p>Risk of overfitting: [High] → [Low] → [Medium] → [High] → [Low]</p>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 The Golden Rule</h4>
+                <p><strong>Start simple, add complexity as needed.</strong> Begin with feature extraction. If performance is insufficient, try partial fine-tuning. Only go to full fine-tuning if you have enough data and evidence that the simpler approaches aren't enough.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 11: CATASTROPHIC FORGETTING -->
+        <section id="section-11" class="content-section" data-progress-section>
+            <h2>11. Catastrophic Forgetting</h2>
+            
+            <div class="warning-box">
+                <h4>⚠️ The Core Problem</h4>
+                <p><strong>Catastrophic forgetting</strong> occurs when a neural network "forgets" previously learned information while learning new information. During fine-tuning with a large learning rate, weights are pushed far from their pre-trained values, scrambling the general features that made the model useful in the first place.</p>
+            </div>
+
+            <div class="analogy-box">
+                <h4>🧠 Analogy: The Multilingual Brain</h4>
+                <p>Imagine a person who speaks English, French, and Spanish fluently. If they immersion themselves in Japanese without maintaining their other languages, they might lose fluency in French and Spanish. This is catastrophic forgetting — learning new information displaces old knowledge.</p>
+            </div>
+
+            <p><strong>Why does this happen?</strong> When you fine-tune with a large learning rate:</p>
+            <ol>
+                <li>Weights move far from their pre-trained positions</li>
+                <li>Generic features (edges, textures) encoded in lower layers get overwritten</li>
+                <li>The model becomes specialized for the target task but loses general capabilities</li>
+                <li>Performance on the target task may improve, but the model becomes fragile</li>
+            </ol>
+
+            <div class="worked-example">
+                <h4>Prevention Strategies</h4>
+                <ul>
+                    <li><strong>Small learning rate:</strong> Use 10×-100× smaller LR than initial training. This keeps weights near their pre-trained values.</li>
+                    <li><strong>Learning rate scheduling:</strong> Start small and decay further. Warmup then cosine decay works well.</li>
+                    <li><strong>Freeze lower layers:</strong> Don't touch the generic features in layers 1-6. Only fine-tune task-specific upper layers.</li>
+                    <li><strong>EWC (Elastic Weight Consolidation):</strong> Add a penalty that prevents important weights from moving too far from their pre-trained values.</li>
+                    <li><strong>Gradual unfreezing:</strong> Start by fine-tuning only the head, then gradually unfreeze layers from top to bottom.</li>
+                </ul>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 Key Insight</h4>
+                <p>Catastrophic forgetting is the primary enemy of fine-tuning. Every strategy we'll discuss (discriminative learning rates, warmup, EWC, PEFT) is designed to combat it. The fundamental principle: <strong>protect the general, adapt the specific.</strong></p>
+            </div>
+        </section>
+
+        <!-- SECTION 12: LAYER-WISE LR DECAY (LLRD) WORKED EXAMPLE -->
+        <section id="section-12" class="content-section" data-progress-section>
+            <h2>12. Layer-wise Learning Rate Decay (LLRD)</h2>
+            
+            <div class="formula">
+                <h4>LLRD Formula</h4>
+                <p>ηₗ = η_top · δ^(L-l)</p>
+                <p>Where:</p>
+                <ul>
+                    <li>ηₗ = learning rate for layer l</li>
+                    <li>η_top = learning rate for the top (task-specific) layer</li>
+                    <li>δ = decay factor (e.g., 0.9)</li>
+                    <li>L = total number of layers</li>
+                    <li>l = current layer index (1 = bottom, L = top)</li>
+                </ul>
+            </div>
+
+            <div class="worked-example">
+                <h4>Worked Example: 12-Layer Transformer</h4>
+                <p><strong>Given:</strong> η_top = 1×10⁻³, δ = 0.9, L = 12 layers</p>
+                
+                <h4>Layer 12 (Top — most task-specific):</h4>
+                <p>η₁₂ = 1×10⁻³ × 0.9^(12-12) = 1×10⁻³ × 0.9⁰ = 1×10⁻³ × 1.000 = <strong>1.000×10⁻³</strong></p>
+
+                <h4>Layer 11:</h4>
+                <p>η₁₁ = 1×10⁻³ × 0.9^(12-11) = 1×10⁻³ × 0.9¹ = 1×10⁻³ × 0.900 = <strong>9.000×10⁻⁴</strong></p>
+
+                <h4>Layer 6 (Middle):</h4>
+                <p>η₆ = 1×10⁻³ × 0.9^(12-6) = 1×10⁻³ × 0.9⁶ = 1×10⁻³ × 0.531 = <strong>5.314×10⁻⁴</strong></p>
+
+                <h4>Layer 1 (Bottom — most generic):</h4>
+                <p>η₁ = 1×10⁻³ × 0.9^(12-1) = 1×10⁻³ × 0.9¹¹ = 1×10⁻³ × 0.314 = <strong>3.138×10⁻⁴</strong></p>
+
+                <h4>Summary:</h4>
+                <p>Top layer moves at 1.000×10⁻³<br>
+                Bottom layer moves at 3.138×10⁻⁴<br>
+                <strong>Bottom moves at ~⅓ the rate of the top</strong></p>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 Why This Works</h4>
+                <p>Generic features (bottom layers) need only tiny adjustments — they're already good. Task-specific features (top layers) need more significant adaptation. LLRD automatically allocates more "movement budget" to layers that need it most, while protecting generic knowledge.</p>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header">Choosing the Decay Factor δ</button>
+                <div class="collapsible-content">
+                    <p>The decay factor δ controls how much lower layers are protected:</p>
+                    <ul>
+                        <li><strong>δ = 1.0:</strong> No decay — all layers get the same LR (standard fine-tuning)</li>
+                        <li><strong>δ = 0.9:</strong> Moderate decay — bottom gets ~⅓ of top's LR (common choice)</li>
+                        <li><strong>δ = 0.8:</strong> Aggressive decay — bottom gets ~⅙ of top's LR (more protection)</li>
+                        <li><strong>δ = 0.5:</strong> Very aggressive — bottom gets ~0.05% of top's LR (almost frozen)</li>
+                    </ul>
+                    <p>Most papers use δ ∈ [0.85, 0.95]. Start with 0.9 and adjust based on validation performance.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 13: WARMUP + COSINE LR WORKED EXAMPLE -->
+        <section id="section-13" class="content-section" data-progress-section>
+            <h2>13. Warmup + Cosine Learning Rate Schedule</h2>
+            
+            <p>This two-phase schedule is the most popular LR schedule for fine-tuning:</p>
+
+            <div class="formula">
+                <h4>Warmup Phase (t ≤ T_w)</h4>
+                <p>η(t) = η_max · (t / T_w)</p>
+                <p>LR increases linearly from 0 to η_max</p>
+            </div>
+
+            <div class="formula">
+                <h4>Cosine Decay Phase (t > T_w)</h4>
+                <p>η(t) = η_max · ½ · [1 + cos(π · (t - T_w) / (T - T_w))]</p>
+                <p>LR decays from η_max to 0 following a cosine curve</p>
+            </div>
+
+            <div class="worked-example">
+                <h4>Worked Example</h4>
+                <p><strong>Given:</strong> η_max = 2×10⁻⁵, T_w = 100 (warmup steps), T = 1000 (total steps)</p>
+
+                <h4>Step 1: During Warmup (t = 50)</h4>
+                <p>η(50) = 2×10⁻⁵ × (50/100) = 2×10⁻⁵ × 0.5 = <strong>1.0×10⁻⁵</strong></p>
+                <p>At step 50, we're halfway through warmup, so LR is half of maximum.</p>
+
+                <h4>Step 2: End of Warmup (t = 100)</h4>
+                <p>η(100) = 2×10⁻⁵ × (100/100) = 2×10⁻⁵ × 1.0 = <strong>2.0×10⁻⁵</strong></p>
+                <p>Warmup complete — LR has reached maximum.</p>
+
+                <h4>Step 3: Mid-Decay (t = 550)</h4>
+                <p>η(550) = 2×10⁻⁵ × ½ × [1 + cos(π × (550-100)/(1000-100))]</p>
+                <p>= 2×10⁻⁵ × ½ × [1 + cos(π × 450/900)]</p>
+                <p>= 2×10⁻⁵ × ½ × [1 + cos(π/2)]</p>
+                <p>= 2×10⁻⁵ × ½ × [1 + 0]</p>
+                <p>= 2×10⁻⁵ × 0.5 = <strong>1.0×10⁻⁵</strong></p>
+                <p>At the midpoint of decay, LR is exactly half of maximum.</p>
+
+                <h4>Step 4: End of Training (t = 1000)</h4>
+                <p>η(1000) = 2×10⁻⁵ × ½ × [1 + cos(π × (1000-100)/(1000-100))]</p>
+                <p>= 2×10⁻⁵ × ½ × [1 + cos(π)]</p>
+                <p>= 2×10⁻⁵ × ½ × [1 + (-1)]</p>
+                <p>= 2×10⁻⁵ × 0 = <strong>0</strong></p>
+                <p>LR reaches zero at the end of training.</p>
+            </div>
+
+            <div class="worked-example">
+                <h4>Schedule Visualization</h4>
+                <p>LR</p>
+                <p>2.0×10⁻⁵ ┤      ╭──────╮</p>
+                <p>         ┤     ╱        ╲</p>
+                <p>1.0×10⁻⁵ ┤    ╱          ╲</p>
+                <p>         ┤   ╱            ╲</p>
+                <p>    0    ┤──╱──────────────╲──</p>
+                <p>         └──┬──────┬──────┬──</p>
+                <p>           0     100    1000  steps</p>
+                <p>         [Warmup] [Cosine Decay]</p>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 Why Warmup?</h4>
+                <p>At the start of fine-tuning, gradients can be noisy and large (especially if the target task differs from the source). Warmup prevents the model from taking destructive steps early on. Once gradients stabilize, cosine decay provides a smooth, effective learning rate schedule.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 14: LoRA - PARAMETER-EFFICIENT FINE-TUNING -->
+        <section id="section-14" class="content-section" data-progress-section>
+            <h2>14. LoRA — Parameter-Efficient Fine-Tuning</h2>
+            
+            <div class="definition-box">
+                <h4>LoRA: Low-Rank Adaptation</h4>
+                <p>LoRA (Hu et al., 2021) is the most popular PEFT method. Instead of fine-tuning all weights, it adds small trainable matrices while keeping the original weights frozen.</p>
+            </div>
+
+            <div class="formula">
+                <h4>LoRA Decomposition</h4>
+                <p>W = W₀ + ΔW = W₀ + BA</p>
+                <p>Where:</p>
+                <ul>
+                    <li>W₀ ∈ ℝ^(d×k) = pre-trained weight matrix (FROZEN)</li>
+                    <li>B ∈ ℝ^(d×r) = low-rank matrix (TRAINABLE)</li>
+                    <li>A ∈ ℝ^(r×k) = low-rank matrix (TRAINABLE)</li>
+                    <li>r << min(d,k) = rank (e.g., 4, 8, 16)</li>
+                </ul>
+                <p><strong>Key insight:</strong> The weight update ΔW has low "intrinsic rank" — most of the important information can be captured by a small number of dimensions.</p>
+            </div>
+
+            <div class="worked-example">
+                <h4>Worked Example: BERT Attention Projection</h4>
+                <p><strong>Setup:</strong> BERT-base attention projection matrix W ∈ ℝ^(768×768)</p>
+
+                <h4>Full Fine-Tuning:</h4>
+                <p>Parameters = 768 × 768 = <strong>589,824 parameters</strong></p>
+
+                <h4>LoRA with Rank r = 8:</h4>
+                <p>B ∈ ℝ^(768×8), A ∈ ℝ^(8×768)</p>
+                <p>Parameters = (768 × 8) + (8 × 768) = 6,144 + 6,144 = <strong>12,288 parameters</strong></p>
+
+                <h4>Comparison:</h4>
+                <p>Ratio = 12,288 / 589,824 = <strong>0.0208 = 2.08%</strong></p>
+                <p><strong>LoRA uses 48× fewer parameters</strong> while achieving near-identical performance!</p>
+
+                <h4>How It Works:</h4>
+                <ol>
+                    <li>Initialize A with random Gaussian, B with zeros → ΔW = BA = 0 at start</li>
+                    <li>During training, only A and B are updated</li>
+                    <li>At inference, merge: W_new = W₀ + BA (no extra computation!)</li>
+                </ol>
+            </div>
+
+            <div class="analogy-box">
+                <h4>🔧 Analogy: Car Tuning</h4>
+                <p>Full fine-tuning is like rebuilding an entire engine. LoRA is like adding a small performance chip — you keep the original engine intact but add a tiny module that tweaks its behavior. The result is almost as good as a full rebuild, but cheaper, faster, and reversible.</p>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 Why LoRA Works</h4>
+                <p>The key insight is that weight updates during fine-tuning have low intrinsic rank. Even though W is 768×768, the actual changes needed are much simpler and can be captured by a small 768×8 × 8×768 decomposition. This is why LoRA achieves 98%+ of full fine-tuning performance with only 2% of the parameters.</p>
+            </div>
+
+            <div class="collapsible">
+                <button class="collapsible-header">How to Choose Rank r?</button>
+                <div class="collapsible-content">
+                    <ul>
+                        <li><strong>r = 1-4:</strong> Minimal parameters, good for similar source/target tasks</li>
+                        <li><strong>r = 8-16:</strong> Good balance for most tasks (common default: r=8)</li>
+                        <li><strong>r = 32-64:</strong> More capacity for dissimilar tasks, approaching full fine-tuning cost</li>
+                        <li><strong>Rule of thumb:</strong> Start with r=8, increase if validation performance plateaus</li>
+                    </ul>
+                    <p>Memory savings: LoRA typically uses 10-50× less GPU memory than full fine-tuning.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 15: EWC - ELASTIC WEIGHT CONSOLIDATION -->
+        <section id="section-15" class="content-section" data-progress-section>
+            <h2>15. EWC — Elastic Weight Consolidation</h2>
+            
+            <div class="definition-box">
+                <h4>EWC: Preventing Catastrophic Forgetting</h4>
+                <p>EWC (Kirkpatrick et al., 2017) adds a penalty term that prevents important weights from changing too much during fine-tuning. It measures each weight's importance using Fisher Information.</p>
+            </div>
+
+            <div class="formula">
+                <h4>EWC Loss Function</h4>
+                <p>L_total = L_new + (λ/2) · Σᵢ Fᵢ · (θᵢ - θ*ᵢ)²</p>
+                <p>Where:</p>
+                <ul>
+                    <li>L_new = standard loss on target task</li>
+                    <li>λ = regularization strength (hyperparameter)</li>
+                    <li>Fᵢ = Fisher Information for parameter i (importance measure)</li>
+                    <li>θᵢ = current value of parameter i</li>
+                    <li>θ*ᵢ = pre-trained (source) value of parameter i</li>
+                </ul>
+            </div>
+
+            <div class="worked-example">
+                <h4>Worked Example: Single Parameter</h4>
+                <p><strong>Given:</strong> λ = 0.4, Fᵢ = 50, θ* = 1.20 (pre-trained value), θ = 1.50 (current value)</p>
+
+                <h4>Step 1: Compute the difference</h4>
+                <p>Δθ = θ - θ* = 1.50 - 1.20 = 0.30</p>
+
+                <h4>Step 2: Square the difference</h4>
+                <p>Δθ² = 0.30² = 0.09</p>
+
+                <h4>Step 3: Multiply by Fisher Information</h4>
+                <p>Fᵢ × Δθ² = 50 × 0.09 = 4.5</p>
+
+                <h4>Step 4: Apply λ/2</h4>
+                <p>penalty = (0.4/2) × 4.5 = 0.2 × 4.5 = <strong>0.9</strong></p>
+
+                <h4>Interpretation:</h4>
+                <p>The penalty term contributes <strong>0.9</strong> to the total loss. This creates a "spring force" pulling θ back toward θ*. The strength depends on both λ (how much we care about forgetting) and Fᵢ (how important this parameter is).</p>
+            </div>
+
+            <div class="worked-example">
+                <h4>Two Cases: Important vs. Unimportant Weights</h4>
+                <table>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Fᵢ (Importance)</th>
+                        <th>Δθ</th>
+                        <th>Penalty</th>
+                        <th>Effect</th>
+                    </tr>
+                    <tr>
+                        <td>θ₁ (edge detector)</td>
+                        <td>500 (very important)</td>
+                        <td>0.30</td>
+                        <td>0.2 × 500 × 0.09 = 9.0</td>
+                        <td><strong>Strong anchor</strong> — barely moves</td>
+                    </tr>
+                    <tr>
+                        <td>θ₂ (rarely used)</td>
+                        <td>0.1 (unimportant)</td>
+                        <td>0.30</td>
+                        <td>0.2 × 0.1 × 0.09 = 0.0018</td>
+                        <td><strong>Free to adapt</strong> — moves easily</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="analogy-box">
+                <h4>⚓ Analogy: Anchor Points</h4>
+                <p>Imagine weights are boats on a lake. EWC places anchors (springs) on important boats. The anchor strength (Fᵢ) determines how tight the spring is. Important boats (edge detectors, common patterns) are tightly anchored and barely move. Unimportant boats (rarely used features) have weak anchors and can drift freely to adapt to the new task.</p>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 Key Insight</h4>
+                <p>EWC allows selective adaptation: parameters crucial for the source task stay anchored, while less important parameters are free to adapt. This is the mathematical implementation of "protect the general, adapt the specific."</p>
+            </div>
+        </section>
+
+        <!-- SECTION 16: COMPARISON TABLE -->
+        <section id="section-16" class="content-section" data-progress-section>
+            <h2>16. Comparison Table</h2>
+            
+            <div class="worked-example">
+                <h4>Strategy Comparison</h4>
+                <table>
+                    <tr>
+                        <th>Strategy</th>
+                        <th>Trainable Params</th>
+                        <th>Training Cost</th>
+                        <th>Performance Ceiling</th>
+                        <th>Overfit Risk</th>
+                        <th>Best When</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Feature Extraction</strong></td>
+                        <td>~0.04-5%</td>
+                        <td>Lowest</td>
+                        <td>Moderate</td>
+                        <td>Lowest</td>
+                        <td>Small data, similar domain</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Partial Fine-Tune</strong></td>
+                        <td>~30-70%</td>
+                        <td>Moderate</td>
+                        <td>High</td>
+                        <td>Moderate</td>
+                        <td>Medium data, somewhat different domain</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Full Fine-Tune</strong></td>
+                        <td>100%</td>
+                        <td>Highest</td>
+                        <td>Highest</td>
+                        <td>Highest</td>
+                        <td>Large data, very different domain</td>
+                    </tr>
+                    <tr>
+                        <td><strong>LoRA (PEFT)</strong></td>
+                        <td>~1-5%</td>
+                        <td>Low</td>
+                        <td>Near-full</td>
+                        <td>Low</td>
+                        <td>Most scenarios (best all-around)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>EWC</strong></td>
+                        <td>100% (with penalty)</td>
+                        <td>Moderate-High</td>
+                        <td>High</td>
+                        <td>Low-Moderate</td>
+                        <td>Sequential tasks, preventing forgetting</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="worked-example">
+                <h4>Key Metrics Comparison</h4>
+                <table>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Feature Extraction</th>
+                        <th>Fine-Tuning</th>
+                        <th>LoRA</th>
+                    </tr>
+                    <tr>
+                        <td>GPU Memory</td>
+                        <td>1×</td>
+                        <td>3-4×</td>
+                        <td>1.1-1.3×</td>
+                    </tr>
+                    <tr>
+                        <td>Training Time</td>
+                        <td>1×</td>
+                        <td>2-3×</td>
+                        <td>1.2-1.5×</td>
+                    </tr>
+                    <tr>
+                        <td>Storage per Task</td>
+                        <td>Head only (~KB)</td>
+                        <td>Full model (~GB)</td>
+                        <td>Adapter only (~MB)</td>
+                    </tr>
+                    <tr>
+                        <td>Multi-task Efficiency</td>
+                        <td>Good (shared backbone)</td>
+                        <td>Poor (separate copies)</td>
+                        <td>Excellent (swap adapters)</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 The Sweet Spot</h4>
+                <p><strong>LoRA (PEFT)</strong> offers the best trade-off for most practical applications: near-full fine-tuning accuracy at a fraction of the cost. It's the default choice in 2024+ for adapting large pre-trained models. Use full fine-tuning only when you have abundant data and compute, and feature extraction only when simplicity is paramount.</p>
+            </div>
+        </section>
+
+        <!-- SECTION 17: PRACTICAL DECISION WORKFLOW -->
+        <section id="section-17" class="content-section" data-progress-section>
+            <h2>17. Practical Decision Workflow</h2>
+            
+            <div class="worked-example">
+                <h4>Decision Flowchart</h4>
+                <pre>
+START
+  │
+  ▼
+Have pre-trained model on similar domain?
+  │
+  ├─ YES ──→ How much labelled target data?
+  │            │
+  │            ├─ < 100 examples ──→ Feature Extraction
+  │            │
+  │            ├─ 100-1000 examples ──→ LoRA (PEFT)
+  │            │
+  │            └─ > 1000 examples ──→ How different is target domain?
+  │                                    │
+  │                                    ├─ Similar ──→ Partial Fine-Tuning
+  │                                    │
+  │                                    └─ Different ──→ Full Fine-Tuning
+  │                                                      │
+  │                                                      └─ Consider EWC to prevent forgetting
+  │
+  └─ NO ──→ Train from scratch (or find better pre-trained model)
+                </pre>
+            </div>
+
+            <div class="worked-example">
+                <h4>The Golden Rule</h4>
+                <p><strong>Always benchmark against a from-scratch baseline.</strong></p>
+                <p>Even though transfer learning usually wins, you should always verify:</p>
+                <ol>
+                    <li>Train a small model from scratch on your target data</li>
+                    <li>Compare against the pre-trained model with your chosen adaptation strategy</li>
+                    <li>If the pre-trained model doesn't help, it may indicate domain mismatch or other issues</li>
+                </ol>
+            </div>
+
+            <div class="worked-example">
+                <h4>Practical Checklist</h4>
+                <ul>
+                    <li>✅ Check if a pre-trained model exists for your modality (vision, text, audio)</li>
+                    <li>✅ Assess domain similarity (how different is your data from training data?)</li>
+                    <li>✅ Count your labelled examples (this determines your strategy)</li>
+                    <li>✅ Start with the simplest approach (feature extraction)</li>
+                    <li>✅ Monitor validation loss for overfitting</li>
+                    <li>✅ Use learning rate warmup + cosine decay</li>
+                    <li>✅ Apply discriminative learning rates or LoRA if fine-tuning</li>
+                    <li>✅ Consider EWC if learning multiple tasks sequentially</li>
+                    <li>✅ Save checkpoints and compare against baselines</li>
+                </ul>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 Final Wisdom</h4>
+                <p>Transfer learning has democratized deep learning. You no longer need millions of images and weeks of GPU time to build state-of-the-art models. With a pre-trained model and a few hundred labelled examples, you can achieve remarkable performance. The key is understanding when and how to adapt — and that's what this entire topic has been about.</p>
+            </div>
+        </section>
+
+        <!-- FLASHCARDS SECTION -->
+        <section id="section-flashcards" class="content-section" data-progress-section>
+            <h2>Flashcards</h2>
+            
+            <div class="flashcard-container">
+                <div class="flashcard">
+                    <div class="flashcard-front">
+                        <h3>What is Transfer Learning?</h3>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>Reusing knowledge learned from one problem (source task) to help solve a related problem (target task) faster, with less data, or with better performance.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard">
+                    <div class="flashcard-front">
+                        <h3>What is Negative Transfer?</h3>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>When borrowed features from the source task actually mislead the target model, resulting in worse performance than training from scratch. Occurs when source and target domains are very different.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard">
+                    <div class="flashcard-front">
+                        <h3>Why do lower layers transfer better than upper layers?</h3>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>Lower layers learn generic features (edges, textures) useful for any task. Upper layers learn task-specific features (faces, objects) that may not apply to a new task. Transferability decreases from generic to specific layers.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard">
+                    <div class="flashcard-front">
+                        <h3>What is the key difference between Feature Extraction and Fine-Tuning?</h3>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>Feature extraction freezes all pre-trained layers and only trains a new head. Fine-tuning unfreezes some/all layers and continues training with a small learning rate. Feature extraction is cheaper but has lower ceiling; fine-tuning is more expensive but more flexible.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard">
+                    <div class="flashcard-front">
+                        <h3>What is LoRA and why is it parameter-efficient?</h3>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>LoRA (Low-Rank Adaptation) decomposes weight updates as BA where B∈R^(d×r) and A∈R^(r×k) with r<<min(d,k). Only A and B are trained while original weights W₀ are frozen. This captures low-rank updates with ~2% of parameters.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard">
+                    <div class="flashcard-front">
+                        <h3>What is Catastrophic Forgetting?</h3>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>When a neural network forgets previously learned information while learning new information. During fine-tuning with large LR, weights move far from pre-trained values, scrambling general features. Prevented by small LR, freezing lower layers, or EWC.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard">
+                    <div class="flashcard-front">
+                        <h3>What does EWC stand for and what does it do?</h3>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>Elastic Weight Consolidation. It adds a penalty term L_total = L_new + (λ/2)·ΣFᵢ·(θᵢ - θ*ᵢ)² that prevents important weights (measured by Fisher Information Fᵢ) from moving far from their pre-trained values, preventing catastrophic forgetting.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard">
+                    <div class="flashcard-front">
+                        <h3>What is a Domain in transfer learning?</h3>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>A domain D = {X, P(X)} consisting of a feature space X and a marginal distribution P(X) over those features. Domains differ when feature spaces or distributions differ.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard">
+                    <div class="flashcard-front">
+                        <h3>Why use discriminative learning rates in fine-tuning?</h3>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>Lower layers have generic features needing small adjustments (small LR). Upper layers have task-specific features needing larger adaptation (larger LR). ηₗ = η·ξ^(L-l) automatically allocates more movement to upper layers.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard">
+                    <div class="flashcard-front">
+                        <h3>What percentage of parameters are typically trainable in feature extraction?</h3>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>Usually 0.04-5% of total parameters. For example, with a 23.5M parameter backbone and 10K parameter head, only 0.04% are trainable. You inherit millions of frozen parameters for free.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUIZ SECTION -->
+        <section id="section-quiz" class="content-section" data-progress-section>
+            <h2>Quiz</h2>
+            
+            <div class="quiz-container">
+                <div class="quiz-question">
+                    <h3>1. In transfer learning, why do lower layers transfer better than upper layers?</h3>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q1" value="a"> A. Lower layers have more parameters</label>
+                        <label><input type="radio" name="q1" value="b"> B. Lower layers learn generic features (edges, textures) useful for any task</label>
+                        <label><input type="radio" name="q1" value="c"> C. Lower layers are trained longer</label>
+                        <label><input type="radio" name="q1" value="d"> D. Lower layers have higher learning rates</label>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-q1"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <h3>2. What is negative transfer?</h3>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q2" value="a"> A. When transfer learning is too slow</label>
+                        <label><input type="radio" name="q2" value="b"> B. When borrowed features mislead the target model, worsening performance</label>
+                        <label><input type="radio" name="q2" value="c"> C. When the source model is too large</label>
+                        <label><input type="radio" name="q2" value="d"> D. When fine-tuning uses negative learning rates</label>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-q2"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <h3>3. In LoRA, what do matrices B and A represent?</h3>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q3" value="a"> A. Two different pre-trained models</label>
+                        <label><input type="radio" name="q3" value="b"> B. Low-rank decomposition of the weight update ΔW = BA</label>
+                        <label><input type="radio" name="q3" value="c"> C. Bias terms for the network</label>
+                        <label><input type="radio" name="q3" value="d"> D. Learning rate matrices</label>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-q3"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <h3>4. What does EWC use to measure parameter importance?</h3>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q4" value="a"> A. Gradient magnitude</label>
+                        <label><input type="radio" name="q4" value="b"> B. Fisher Information</label>
+                        <label><input type="radio" name="q4" value="c"> C. Learning rate</label>
+                        <label><input type="radio" name="q4" value="d"> D. Number of epochs trained</label>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-q4"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <h3>5. Why is a small learning rate crucial for fine-tuning?</h3>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q5" value="a"> A. Small LR trains faster</label>
+                        <label><input type="radio" name="q5" value="b"> B. Pre-trained weights are near a good minimum; large LR would overshoot and destroy learned features</label>
+                        <label><input type="radio" name="q5" value="c"> C. Small LR uses less memory</label>
+                        <label><input type="radio" name="q5" value="d"> D. Small LR prevents overfitting only</label>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-q5"></div>
+                </div>
+
+                <div class="quiz-question">
+                    <h3>6. In the LLRD formula ηₗ = η_top · δ^(L-l), what happens when δ = 1.0?</h3>
+                    <div class="quiz-options">
+                        <label><input type="radio" name="q6" value="a"> A. All layers get zero learning rate</label>
+                        <label><input type="radio" name="q6" value="b"> B. All layers get the same learning rate (standard fine-tuning)</label>
+                        <label><input type="radio" name="q6" value="c"> C. Bottom layers get higher LR than top</label>
+                        <label><input type="radio" name="q6" value="d"> D. Training diverges</label>
+                    </div>
+                    <div class="quiz-feedback" id="feedback-q6"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FILL-IN-THE-BLANK SECTION -->
+        <section id="section-fill-blank" class="content-section" data-progress-section>
+            <h2>Fill-in-the-Blank</h2>
+            
+            <div class="fill-blank-container">
+                <div class="fill-blank-question">
+                    <h3>1. Transfer learning is most beneficial when ________ data is scarce and compute resources are limited.</h3>
+                    <input type="text" class="fill-blank-input" data-answer="labelled" placeholder="Type your answer...">
+                    <div class="fill-blank-feedback"></div>
+                </div>
+
+                <div class="fill-blank-question">
+                    <h3>2. In feature extraction, we freeze the backbone and only train a new ________.</h3>
+                    <input type="text" class="fill-blank-input" data-answer="head" placeholder="Type your answer...">
+                    <div class="fill-blank-feedback"></div>
+                </div>
+
+                <div class="fill-blank-question">
+                    <h3>3. LoRA decomposes weight updates as ΔW = ________, where B∈R^(d×r) and A∈R^(r×k).</h3>
+                    <input type="text" class="fill-blank-input" data-answer="BA" placeholder="Type your answer...">
+                    <div class="fill-blank-feedback"></div>
+                </div>
+
+                <div class="fill-blank-question">
+                    <h3>4. EWC prevents catastrophic forgetting by adding a penalty term based on ________ Information.</h3>
+                    <input type="text" class="fill-blank-input" data-answer="Fisher" placeholder="Type your answer...">
+                    <div class="fill-blank-feedback"></div>
+                </div>
+
+                <div class="fill-blank-question">
+                    <h3>5. The warmup phase causes the learning rate to increase ________ from 0 to η_max.</h3>
+                    <input type="text" class="fill-blank-input" data-answer="linearly" placeholder="Type your answer...">
+                    <div class="fill-blank-feedback"></div>
+                </div>
+
+                <div class="fill-blank-question">
+                    <h3>6. In LLRD, the decay factor δ determines how much ________ layers are protected from large updates.</h3>
+                    <input type="text" class="fill-blank-input" data-answer="lower" placeholder="Type your answer...">
+                    <div class="fill-blank-feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCENARIO SECTION -->
+        <section id="section-scenario" class="content-section" data-progress-section>
+            <h2>Scenario</h2>
+            
+            <div class="worked-example">
+                <h4>🏥 Scenario: Medical Image Classification</h4>
+                <p>You're a machine learning engineer at a hospital. Your task is to build a system that classifies chest X-rays into 3 categories: Normal, Pneumonia, and COVID-19.</p>
+                
+                <p><strong>Constraints:</strong></p>
+                <ul>
+                    <li>You have only <strong>500 labelled X-rays</strong> (150 Normal, 200 Pneumonia, 150 COVID-19)</li>
+                    <li>You have access to a <strong>pre-trained ResNet-50</strong> (trained on ImageNet — natural images)</li>
+                    <li>You have <strong>1 GPU</strong> with limited memory</li>
+                    <li>You need the model deployed within <strong>2 weeks</strong></li>
+                </ul>
+
+                <h4>Decision Process:</h4>
+                <ol>
+                    <li><strong>Data size check:</strong> 500 examples → very small dataset → feature extraction or LoRA</li>
+                    <li><strong>Domain similarity:</strong> ImageNet (natural images) → X-rays (medical images) → somewhat different but visual features (edges, textures) transfer well</li>
+                    <li><strong>Compute constraint:</strong> Limited GPU → prefer parameter-efficient methods</li>
+                    <li><strong>Time constraint:</strong> 2 weeks → need fast iteration</li>
+                </ol>
+
+                <h4>Recommended Strategy:</h4>
+                <p><strong>Primary: LoRA (PEFT)</strong></p>
+                <ul>
+                    <li>Use pre-trained ResNet-50 backbone</li>
+                    <li>Add LoRA adapters (rank r=8) to the last 2-3 residual blocks</li>
+                    <li>Train only LoRA parameters (~2% of total)</li>
+                    <li>Use warmup + cosine LR schedule</li>
+                    <li>Expected training time: 1-2 hours on single GPU</li>
+                </ul>
+
+                <p><strong>Backup: Feature Extraction</strong></p>
+                <ul>
+                    <li>If LoRA overfits (check validation loss), fall back to feature extraction</li>
+                    <li>Freeze entire backbone, train only classification head</li>
+                    <li>Even fewer parameters, even less overfitting risk</li>
+                </ul>
+
+                <h4>Why NOT Full Fine-Tuning?</h4>
+                <ul>
+                    <li>500 examples is too few to fine-tune 25M parameters</li>
+                    <li>High risk of overfitting and catastrophic forgetting</li>
+                    <li>Would require extensive regularization and careful LR scheduling</li>
+                </ul>
+
+                <h4>Expected Outcome:</h4>
+                <p>With LoRA on 500 examples, you can likely achieve <strong>85-92% accuracy</strong> — remarkable for such a small dataset. Without transfer learning, a model trained from scratch on 500 examples would likely achieve only <strong>50-65%</strong> accuracy (barely above random for 3 classes).</p>
+            </div>
+
+            <div class="recap-box">
+                <h4>📝 Scenario Key Takeaways</h4>
+                <ul>
+                    <li>Small dataset (< 1000 examples) → feature extraction or LoRA</li>
+                    <li>Limited compute → parameter-efficient methods</li>
+                    <li>Always have a backup strategy (feature extraction is the safety net)</li>
+                    <li>Transfer learning's value is most dramatic with small datasets</li>
+                    <li>Monitor validation loss to detect overfitting early</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- FINAL RECAP -->
+        <section id="section-recap" class="content-section" data-progress-section>
+            <h2>Topic Recap</h2>
+            
+            <div class="recap-box">
+                <h4>Key Concepts Covered</h4>
+                <ol>
+                    <li><strong>Transfer Learning:</strong> Reusing knowledge from source to target task</li>
+                    <li><strong>Feature Hierarchy:</strong> Lower layers = generic, upper layers = specific</li>
+                    <li><strong>Formal Definitions:</strong> Domain D = {X, P(X)}, Task T = {Y, f(·)}</li>
+                    <li><strong>Two Core Strategies:</strong> Feature extraction (frozen) vs. Fine-tuning (adaptive)</li>
+                    <li><strong>Catastrophic Forgetting:</strong> Major risk when fine-tuning with large LR</li>
+                    <li><strong>LLRD:</strong> Layer-wise LR decay protects lower layers</li>
+                    <li><strong>Warmup + Cosine:</strong> Standard LR schedule for fine-tuning</li>
+                    <li><strong>LoRA:</strong> PEFT via low-rank decomposition of weight updates</li>
+                    <li><strong>EWC:</strong> Elastic weight consolidation prevents forgetting via Fisher Information</li>
+                    <li><strong>Decision Workflow:</strong> Data size → domain similarity → choose strategy</li>
+                </ol>
+            </div>
+
+            <div class="takeaway-box">
+                <h4>💡 The Big Picture</h4>
+                <p>Transfer learning has made deep learning accessible to everyone. You don't need millions of data points or weeks of GPU time — a pre-trained model and a few hundred examples can achieve remarkable results. The key is understanding when and how to adapt: start simple, add complexity as needed, and always protect the general while adapting the specific.</p>
+            </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

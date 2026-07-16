@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic 3: Probabilistic Classification</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="top-nav">
+        <a href="index.html" class="nav-home">Home</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">Dark</button>
+    </nav>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+            <span class="progress-text" id="progressText">0%</span>
+        </div>
+        <nav class="section-nav">
+            <ul>
+                <li><a href="#section1">1. Why Logistic Regression</a></li>
+                <li><a href="#section2">2. The Sigmoid Function</a></li>
+                <li><a href="#section3">3. Sigmoid Derivative</a></li>
+                <li><a href="#section4">4. Odds and Logit</a></li>
+                <li><a href="#section5">5. Why Not MSE</a></li>
+                <li><a href="#section6">6. BCE Derivation</a></li>
+                <li><a href="#section7">7. BCE Intuition</a></li>
+                <li><a href="#section8">8. Gradient of BCE &amp; Update Rule</a></li>
+                <li><a href="#section9">9. Overfitting &amp; Regularisation</a></li>
+                <li><a href="#section10">10. Multi-Class Extension</a></li>
+                <li><a href="#section11">11. Common Mistakes</a></li>
+                <li><a href="#flashcards-section">Flashcards</a></li>
+                <li><a href="#quiz-section">Quizzes</a></li>
+                <li><a href="#fill-blank-section">Fill in the Blanks</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <!-- ===== SECTION 1 ===== -->
+        <section id="section1" data-progress-section>
+            <h2>1. Why Logistic Regression</h2>
+
+            <div class="analogy-box">
+                <strong>Analogy:</strong> Imagine you're a teacher grading exams on a 0–100 scale. Linear regression would happily predict a score of 142 or -37 — both meaningless as probabilities. You need a function that squashes any real number into the [0, 1] range, just like a thermostat that can only output between "fully off" and "fully on."
+                <br><br>
+                <strong>Mapping:</strong>
+                <ul>
+                    <li>Raw exam score (unbounded) → linear regression output (unbounded)</li>
+                    <li>Percentage chance of passing (bounded 0–1) → logistic regression output (bounded 0–1)</li>
+                    <li>Outlier student scoring 200 → outlier data point shifting the regression line</li>
+                </ul>
+            </div>
+
+            <h3>The Problem with Linear Regression for Classification</h3>
+            <p>Suppose we want to predict whether a patient has a disease (1) or not (0) based on a biomarker. We might try fitting a linear regression:</p>
+            <div class="formula">
+                ŷ = w₁x + b
+            </div>
+            <p>This has two fatal flaws:</p>
+
+            <div class="warning-box">
+                <strong>Flaw 1: Unbounded Output.</strong> If x = 10, w₁ = 2, b = -3, then ŷ = 17. But a probability cannot exceed 1. Similarly, ŷ can go negative — probabilities cannot be negative either. The model can produce any real number, but we need outputs strictly in [0, 1].
+            </div>
+
+            <div class="warning-box">
+                <strong>Flaw 2: Outlier Sensitivity.</strong> A single extreme data point far from the rest pulls the entire regression line toward it, changing the decision boundary. If you add one patient with biomarker = 1000, the slope flattens dramatically and previously correct classifications become wrong.
+            </div>
+
+            <h3>What We Actually Want</h3>
+            <p>We don't want a raw score — we want a <strong>probability</strong>:</p>
+            <div class="formula">
+                P(y = 1 | x) = ?
+            </div>
+            <p>This probability must satisfy:</p>
+            <ul>
+                <li>0 ≤ P(y=1|x) ≤ 1</li>
+                <li>If P(y=1|x) > 0.5, predict class 1</li>
+                <li>If P(y=1|x) < 0.5, predict class 0</li>
+                <li>If P(y=1|x) = 0.5, maximum uncertainty</li>
+            </ul>
+
+            <h3>The Decision Boundary</h3>
+            <p>The <strong>decision boundary</strong> is the threshold where the model switches its prediction. For logistic regression, this is where σ(z) = 0.5, which occurs at z = 0 (i.e., wᵀx + b = 0). This boundary is a hyperplane in the feature space.</p>
+            <div class="definition-box">
+                <strong>Definition — Decision Boundary:</strong> The set of points where the predicted probability equals 0.5 (or equivalently, where z = wᵀx + b = 0). Points on one side are classified as class 1; points on the other side as class 0.
+            </div>
+
+            <div class="recap-box">
+                <strong>Key Takeaway:</strong> Linear regression produces unbounded outputs and is sensitive to outliers. We need a model that outputs probabilities in [0, 1] and has a well-defined decision boundary. That model is logistic regression.
+            </div>
+        </section>
+
+        <!-- ===== SECTION 2 ===== -->
+        <section id="section2" data-progress-section>
+            <h2>2. The Sigmoid Function</h2>
+
+            <div class="analogy-box">
+                <strong>Analogy:</strong> Think of a water faucet. No matter how hard you turn the handle (the input z), the flow rate can never exceed the maximum capacity or go below zero. The sigmoid function is like a faucet that smoothly transitions from "fully off" (0) to "fully on" (1) as you turn the handle.
+                <br><br>
+                <strong>Mapping:</strong>
+                <ul>
+                    <li>Handle position (turn left = negative, right = positive) → linear score z</li>
+                    <li>Flow rate (0 to max) → probability σ(z) in [0, 1]</li>
+                    <li>Fully off → σ(z) ≈ 0 (class 0)</li>
+                    <li>Fully on → σ(z) ≈ 1 (class 1)</li>
+                    <li>Middle position → σ(z) = 0.5 (uncertain)</li>
+                </ul>
+            </div>
+
+            <h3>Definition</h3>
+            <div class="definition-box">
+                <strong>Definition — Sigmoid Function:</strong>
+                <div class="formula">
+                    σ(z) = 1 / (1 + e<sup>−z</sup>)
+                </div>
+                where z = wᵀx + b = w₁x₁ + w₂x₂ + ... + wₙxₙ + b
+            </div>
+
+            <h3>Properties of the Sigmoid</h3>
+            <p>The sigmoid function has several critical properties that make it ideal for classification:</p>
+            <ul>
+                <li><strong>Bounded:</strong> Output is always in (0, 1), regardless of how large or small z is</li>
+                <li><strong>S-shaped curve:</strong> Starts near 0, rises through 0.5 at z=0, and approaches 1</li>
+                <li><strong>Symmetric at origin:</strong> σ(-z) = 1 - σ(z), meaning it's symmetric about the point (0, 0.5)</li>
+                <li><strong>Smooth and differentiable:</strong> No sharp corners, gradient exists everywhere</li>
+                <li><strong>Monotonically increasing:</strong> Larger z always gives larger σ(z)</li>
+            </ul>
+
+            <h3>Key Values</h3>
+            <table>
+                <thead>
+                    <tr><th>z value</th><th>σ(z) value</th><th>Interpretation</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>z ≪ 0 (e.g., -10)</td><td>σ(z) ≈ 0.000045</td><td>Very confident: class 0</td></tr>
+                    <tr><td>z = -2</td><td>σ(z) ≈ 0.119</td><td>Likely class 0</td></tr>
+                    <tr><td>z = -1</td><td>σ(z) ≈ 0.269</td><td>Leaning class 0</td></tr>
+                    <tr><td>z = 0</td><td>σ(z) = 0.5</td><td>Maximum uncertainty</td></tr>
+                    <tr><td>z = 1</td><td>σ(z) ≈ 0.731</td><td>Leaning class 1</td></tr>
+                    <tr><td>z = 2</td><td>σ(z) ≈ 0.881</td><td>Likely class 1</td></tr>
+                    <tr><td>z ≫ 0 (e.g., 10)</td><td>σ(z) ≈ 0.99995</td><td>Very confident: class 1</td></tr>
+                </tbody>
+            </table>
+
+            <h3>Full Pipeline: From Features to Class Prediction</h3>
+            <div class="worked-example">
+                <strong>Worked Example — Email Spam Classification:</strong>
+                <p>Given features: x = [word_freq("free") = 3.2, word_freq("meeting") = 0.1, caps_ratio = 0.4]</p>
+                <p>Weights: w = [0.5, -0.3, 1.2], bias: b = -1.0</p>
+
+                <p><strong>Step 1: Compute linear score z</strong></p>
+                <div class="formula">
+                    z = wᵀx + b = (0.5)(3.2) + (-0.3)(0.1) + (1.2)(0.4) + (-1.0)<br>
+                    z = 1.6 + (-0.03) + 0.48 - 1.0 = 1.05
+                </div>
+
+                <p><strong>Step 2: Apply sigmoid</strong></p>
+                <div class="formula">
+                    σ(1.05) = 1 / (1 + e<sup>-1.05</sup>) = 1 / (1 + 0.350) = 1 / 1.350 ≈ 0.741
+                </div>
+
+                <p><strong>Step 3: Interpret probability</strong></p>
+                <p>P(spam | x) = 0.741 → Since 0.741 > 0.5, predict <strong>class 1 (spam)</strong>.</p>
+
+                <p><strong>Step 4: Decision</strong></p>
+                <p>The model is 74.1% confident this email is spam. The decision boundary is crossed when z = 0 (i.e., when wᵀx + b = 0).</p>
+            </div>
+
+            <div class="recap-box">
+                <strong>Key Takeaway:</strong> The sigmoid function σ(z) = 1/(1+e⁻ᶻ) maps any real number z to a value in (0, 1), making it a natural choice for representing probabilities. The full pipeline is: compute linear score → pass through sigmoid → interpret as probability → threshold at 0.5 for classification.
+            </div>
+        </section>
+
+        <!-- ===== SECTION 3 ===== -->
+        <section id="section3" data-progress-section>
+            <h2>3. Sigmoid Derivative</h2>
+
+            <div class="analogy-box">
+                <strong>Analogy:</strong> Imagine a car's speedometer. The derivative of position is speed. For the sigmoid, the derivative tells us how fast the output is changing at any point. At z = 0, the curve is steepest — the sigmoid is most sensitive to changes there. At the extremes (z ≈ ±10), the curve is nearly flat — the sigmoid barely responds to input changes.
+                <br><br>
+                <strong>Mapping:</strong>
+                <ul>
+                    <li>Position of car → σ(z) (sigmoid output)</li>
+                    <li>Speed of car → dσ/dz (rate of change of sigmoid)</li>
+                    <li>Steepest part of road (z=0) → maximum gradient = 0.25</li>
+                    <li>Flat highway (z≈±10) → gradient ≈ 0 (vanishing gradient problem)</li>
+                </ul>
+            </div>
+
+            <h3>The Derivative</h3>
+            <div class="definition-box">
+                <strong>Definition — Sigmoid Derivative:</strong>
+                <div class="formula">
+                    dσ/dz = σ(z) · (1 − σ(z))
+                </div>
+            </div>
+
+            <h3>Proof (Step by Step)</h3>
+            <div class="worked-example">
+                <strong>Worked Example — Deriving dσ/dz:</strong>
+                <p>Starting with σ(z) = 1 / (1 + e<sup>−z</sup>) = (1 + e<sup>−z</sup>)<sup>−1</sup></p>
+
+                <p><strong>Step 1: Apply chain rule</strong></p>
+                <div class="formula">
+                    dσ/dz = −1 · (1 + e<sup>−z</sup>)<sup>−2</sup> · (−e<sup>−z</sup>) = e<sup>−z</sup> / (1 + e<sup>−z</sup>)<sup>2</sup>
+                </div>
+
+                <p><strong>Step 2: Rewrite as product of σ(z) and (1−σ(z))</strong></p>
+                <p>Notice that e<sup>−z</sup> / (1 + e<sup>−z</sup>)<sup>2</sup> = [1 / (1 + e<sup>−z</sup>)] · [e<sup>−z</sup> / (1 + e<sup>−z</sup>)]</p>
+                <p>And e<sup>−z</sup> / (1 + e<sup>−z</sup>) = 1 − 1/(1+e<sup>−z</sup>) = 1 − σ(z)</p>
+                <div class="formula">
+                    Therefore: dσ/dz = σ(z) · (1 − σ(z))
+                </div>
+            </div>
+
+            <h3>Why This Matters</h3>
+
+            <div class="takeaway-box">
+                <strong>Why the self-referential form matters:</strong>
+                <ul>
+                    <li><strong>Computationally efficient:</strong> If you've already computed σ(z) during the forward pass, the derivative costs only one multiplication and one subtraction — no new exponentials needed.</li>
+                    <li><strong>No extra memory:</strong> You don't need to store intermediate values; σ(z) is already available.</li>
+                    <li><strong>Foundation for neural networks:</strong> This same pattern — the derivative expressed in terms of the forward pass output — generalizes to many activation functions and is the backbone of backpropagation.</li>
+                </ul>
+            </div>
+
+            <h3>Maximum Derivative Value</h3>
+            <p>The maximum value of σ(z)·(1−σ(z)) occurs at z = 0 where σ(0) = 0.5:</p>
+            <div class="formula">
+                max dσ/dz = 0.5 × (1 − 0.5) = 0.25
+            </div>
+            <p>This means the sigmoid's gradient is <strong>at most 0.25</strong>. In deep networks with many sigmoid layers, gradients shrink exponentially — the <strong>vanishing gradient problem</strong>. This is why modern neural networks prefer ReLU activation.</p>
+
+            <div class="recap-box">
+                <strong>Key Takeaway:</strong> dσ/dz = σ(z)(1−σ(z)). This elegant self-referential form means the derivative can be computed cheaply from the forward pass output. Maximum gradient is 0.25 at z=0, which causes vanishing gradients in deep networks.
+            </div>
+        </section>
+
+        <!-- ===== SECTION 4 ===== -->
+        <section id="section4" data-progress-section>
+            <h2>4. Odds and Logit</h2>
+
+            <div class="analogy-box">
+                <strong>Analogy:</strong> Suppose you're told "the chance of rain is 75%." That's a probability. But bookmakers talk differently — they say "3 to 1 odds." Odds = 3 means for every 1 time it doesn't rain, it rains 3 times. The logit function is the natural logarithm of these odds, and logistic regression models the logit as a linear function of the features.
+                <br><br>
+                <strong>Mapping:</strong>
+                <ul>
+                    <li>Probability P(rain) = 0.75 → Odds = 0.75/0.25 = 3 → Log-odds = ln(3) ≈ 1.10</li>
+                    <li>Probability P(rain) = 0.01 → Odds = 0.01/0.99 ≈ 0.0101 → Log-odds ≈ -4.60</li>
+                    <li>Linear model predicts log-odds → sigmoid converts back to probability</li>
+                </ul>
+            </div>
+
+            <h3>Odds</h3>
+            <div class="definition-box">
+                <strong>Definition — Odds:</strong>
+                <div class="formula">
+                    Odds = P(y=1|x) / (1 − P(y=1|x))
+                </div>
+                <p>Odds range from 0 to ∞. Odds = 1 means equal chance. Odds > 1 means more likely to occur. Odds < 1 means less likely.</p>
+            </div>
+
+            <h3>Logit Function</h3>
+            <div class="definition-box">
+                <strong>Definition — Logit (Log-Odds):</strong>
+                <div class="formula">
+                    logit(P) = ln(P / (1 − P)) = z = wᵀx + b
+                </div>
+                <p>The logit maps probabilities from [0, 1] to (−∞, +∞), making them suitable for linear modeling.</p>
+            </div>
+
+            <h3>Logistic Regression is Linear in Log-Odds</h3>
+            <p>This is the key insight. The model says:</p>
+            <div class="formula">
+                ln(P / (1−P)) = w₁x₁ + w₂x₂ + ... + wₙxₙ + b
+            </div>
+            <p>Each weight wᵢ has a clear interpretation:</p>
+            <ul>
+                <li>A unit increase in xᵢ changes the <strong>log-odds</strong> by wᵢ</li>
+                <li>Equivalently, a unit increase in xᵢ <strong>multiplies the odds</strong> by e<sup>wᵢ</sup></li>
+                <li>e<sup>wᵢ</sup> is called the <strong>odds ratio</strong> for feature xᵢ</li>
+            </ul>
+
+            <div class="worked-example">
+                <strong>Worked Example — Hospital Readmission:</strong>
+                <p>Model: ln(P(readmit)/(1−P(readmit))) = 0.8 × age + 0.3 × severity − 1.2</p>
+
+                <p><strong>Interpreting w₁ = 0.8 (age):</strong></p>
+                <p>A one-unit increase in age (say, 1 year) changes log-odds by 0.8.</p>
+                <div class="formula">
+                    Odds ratio = e<sup>0.8</sup> = 2.2255
+                </div>
+                <p>This means each additional year of age <strong>multiplies the odds of readmission by 2.23</strong>. In other words, a 61-year-old has 2.23× the odds of readmission compared to a 60-year-old, holding severity constant.</p>
+
+                <p><strong>Interpreting w₂ = 0.3 (severity):</strong></p>
+                <div class="formula">
+                    Odds ratio = e<sup>0.3</sup> = 1.3499
+                </div>
+                <p>Each one-unit increase in severity score multiplies readmission odds by 1.35 (a 35% increase).</p>
+
+                <p><strong>Interpreting b = −1.2 (bias):</strong></p>
+                <p>At the baseline (age=0, severity=0):</p>
+                <div class="formula">
+                    P(readmit) = σ(−1.2) = 1/(1+e<sup>1.2</sup>) = 1/(1+3.32) ≈ 0.231
+                </div>
+                <p>A hypothetical patient with age=0 and severity=0 has a 23.1% baseline readmission probability.</p>
+
+                <p><strong>Concrete prediction for age=50, severity=3:</strong></p>
+                <div class="formula">
+                    z = 0.8(50) + 0.3(3) − 1.2 = 40 + 0.9 − 1.2 = 39.7<br>
+                    P = σ(39.7) ≈ 1.0 (virtually certain readmission)
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <strong>Common Mistake:</strong> Odds ratios are multiplicative, not additive. An odds ratio of 2.23 does NOT mean the probability increases by 123%. It means the ratio P/(1−P) is multiplied by 2.23. The actual probability change depends on the baseline.
+            </div>
+
+            <div class="recap-box">
+                <strong>Key Takeaway:</strong> Logistic regression models log-odds as a linear function. Each weight wᵢ tells you how the log-odds change per unit increase in xᵢ. The odds ratio e<sup>wᵢ</sup> gives the multiplicative effect on the odds. This interpretation makes logistic regression highly valuable in fields like medicine and social science.
+            </div>
+        </section>
+
+        <!-- ===== SECTION 5 ===== -->
+        <section id="section5" data-progress-section>
+            <h2>5. Why Not MSE for Classification?</h2>
+
+            <div class="analogy-box">
+                <strong>Analogy:</strong> Imagine trying to find the lowest point in a valley. If the valley has only one bottom (convex), you'll always reach it by walking downhill. But if the valley has multiple pits (non-convex), you might walk into a shallow pit and think you've reached the bottom — when the true bottom is elsewhere. Using MSE with sigmoid creates a landscape full of these deceptive pits.
+                <br><br>
+                <strong>Mapping:</strong>
+                <ul>
+                    <li>Valley landscape → loss surface as function of weights</li>
+                    <li>One bottom (convex) → BCE loss surface</li>
+                    <li>Multiple pits (non-convex) → MSE + sigmoid loss surface</li>
+                    <li>Walking downhill → gradient descent</li>
+                    <li>Getting stuck in a shallow pit → local minimum</li>
+                </ul>
+            </div>
+
+            <h3>MSE with Sigmoid: The Problem</h3>
+            <p>If we define the loss as MSE:</p>
+            <div class="formula">
+                L_MSE = (1/N) Σ (y − σ(wᵀx + b))²
+            </div>
+            <p>The combination of the squared error with the sigmoid produces a <strong>non-convex loss surface</strong>. This means:</p>
+            <ul>
+                <li>The loss surface has multiple local minima</li>
+                <li>Gradient descent can get stuck in a suboptimal local minimum</li>
+                <li>Small changes in initial weights can lead to very different final models</li>
+                <li>No guarantee of finding the globally best solution</li>
+            </ul>
+
+            <div class="warning-box">
+                <strong>Visual intuition:</strong> Plot the MSE loss as a function of z for a single sample with y=1. You'll see the curve has two "bumps" — one near z=−5 and another near z=+5 — with a plateau in between. Gradient descent starting from z=0 might descend into the wrong bump or get stuck on the plateau.
+            </div>
+
+            <h3>BCE: The Solution</h3>
+            <div class="takeaway-box">
+                <strong>Why Binary Cross-Entropy is convex:</strong>
+                <ul>
+                    <li>BCE loss: L = −[y·log(σ(z)) + (1−y)·log(1−σ(z))]</li>
+                    <li>This loss is <strong>convex</strong> with respect to z (and thus with respect to w and b)</li>
+                    <li>A convex function has exactly <strong>one global minimum</strong> and no local minima</li>
+                    <li>Gradient descent is <strong>guaranteed</strong> to converge to the global minimum (with appropriate learning rate)</li>
+                </ul>
+            </div>
+
+            <div class="worked-example">
+                <strong>Worked Example — Comparing Loss Surfaces:</strong>
+                <p>For a single sample with y=1, compare MSE and BCE at different predicted probabilities:</p>
+                <table>
+                    <thead>
+                        <tr><th>Predicted σ(z)</th><th>MSE Loss = (1−ŷ)²</th><th>BCE Loss = −log(ŷ)</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0.1</td><td>0.81</td><td>2.303</td></tr>
+                        <tr><td>0.3</td><td>0.49</td><td>1.204</td></tr>
+                        <tr><td>0.5</td><td>0.25</td><td>0.693</td></tr>
+                        <tr><td>0.7</td><td>0.09</td><td>0.357</td></tr>
+                        <tr><td>0.9</td><td>0.01</td><td>0.105</td></tr>
+                        <tr><td>0.99</td><td>0.0001</td><td>0.010</td></tr>
+                    </tbody>
+                </table>
+                <p>BCE penalizes confident wrong predictions much more aggressively. When ŷ=0.1 for a positive sample, BCE=2.30 but MSE=0.81. This strong penalty drives the model to correct confident mistakes quickly.</p>
+            </div>
+
+            <div class="recap-box">
+                <strong>Key Takeaway:</strong> MSE + sigmoid creates a non-convex loss surface with local minima, making gradient descent unreliable. BCE loss is convex, guaranteeing a single global minimum. This is why we use BCE (not MSE) for binary classification.
+            </div>
+        </section>
+
+        <!-- ===== SECTION 6 ===== -->
+        <section id="section6" data-progress-section>
+            <h2>6. Binary Cross-Entropy (BCE) Derivation</h2>
+
+            <div class="analogy-box">
+                <strong>Analogy — Maximum Likelihood Estimation:</strong> Imagine you're a detective. You see footprints (data) and want to find the most likely culprit (model parameters). MLE asks: "Which parameter values make the observed data most probable?" You examine every suspect and pick the one whose shoe size, walking pattern, etc. best explain the footprints you found.
+                <br><br>
+                <strong>Mapping:</strong>
+                <ul>
+                    <li>Footprints → observed data (x, y)</li>
+                    <li>Suspect characteristics → model parameters (w, b)</li>
+                    <li>"How likely are these footprints given this suspect?" → likelihood function L(w, b | data)</li>
+                    <li>"Most likely suspect" → argmax L(w, b | data) → MLE estimate</li>
+                    <li>Converting product of probabilities to sum via log → log-likelihood</li>
+                </ul>
+            </div>
+
+            <h3>Step 0: Maximum Likelihood Estimation (MLE) Intuition</h3>
+            <p>We want to find w and b that maximize the probability of observing our training data. For each data point (xᵢ, yᵢ), the model's predicted probability is:</p>
+            <div class="formula">
+                P(y = yᵢ | xᵢ) = ŷᵢ<sup>yᵢ</sup> · (1 − ŷᵢ)<sup>(1−yᵢ)</sup>
+            </div>
+            <p>where ŷᵢ = σ(wᵀxᵢ + b).</p>
+            <p>Why this formula? Because:</p>
+            <ul>
+                <li>If yᵢ = 1: P = ŷᵢ¹ · (1−ŷᵢ)⁰ = ŷᵢ ✓</li>
+                <li>If yᵢ = 0: P = ŷᵢ⁰ · (1−ŷᵢ)¹ = 1−ŷᵢ ✓</li>
+            </ul>
+
+            <h3>Step 1: The Log Trick (Product → Sum)</h3>
+            <p>The likelihood over all N independent samples is the product:</p>
+            <div class="formula">
+                L(w, b) = ∏ᵢ ŷᵢ<sup>yᵢ</sup> · (1 − ŷᵢ)<sup>(1−yᵢ)</sup>
+            </div>
+            <p>Taking the log converts the product to a sum (easier to compute, same maximum):</p>
+            <div class="formula">
+                log L(w, b) = Σᵢ [yᵢ · log(ŷᵢ) + (1 − yᵢ) · log(1 − ŷᵢ)]
+            </div>
+
+            <div class="warning-box">
+                <strong>Why the log trick works:</strong> log is a monotonically increasing function, so the value of w, b that maximizes log L is the same as the one that maximizes L. But log L is a sum instead of a product — much easier to differentiate and less prone to numerical underflow (products of many small numbers become zero in floating-point arithmetic).
+            </div>
+
+            <h3>Step 2: Negate (Maximize → Minimize)</h3>
+            <p>Standard optimization algorithms (gradient descent) <strong>minimize</strong> a loss function. So we negate the log-likelihood to convert from maximization to minimization:</p>
+            <div class="formula">
+                L(w, b) = −Σᵢ [yᵢ · log(ŷᵢ) + (1 − yᵢ) · log(1 − ŷᵢ)]
+            </div>
+
+            <h3>Step 3: Average Over N Samples</h3>
+            <p>We divide by N to get the <strong>mean</strong> loss, making it independent of dataset size:</p>
+            <div class="formula">
+                L_BCE = −(1/N) Σᵢ₌₁ᴺ [yᵢ · log(ŷᵢ) + (1 − yᵢ) · log(1 − ŷᵢ)]
+            </div>
+
+            <div class="definition-box">
+                <strong>Definition — Binary Cross-Entropy Loss:</strong>
+                <div class="formula">
+                    L_BCE = −(1/N) Σᵢ₌₁ᴺ [yᵢ · log(ŷᵢ) + (1 − yᵢ) · log(1 − ŷᵢ)]
+                </div>
+                <p>where ŷᵢ = σ(wᵀxᵢ + b) is the predicted probability, yᵢ ∈ {0, 1} is the true label, and N is the number of samples.</p>
+            </div>
+
+            <div class="worked-example">
+                <strong>Worked Example — Computing BCE for 3 Samples:</strong>
+                <p>True labels: y = [1, 0, 1]</p>
+                <p>Predicted probabilities: ŷ = [0.9, 0.2, 0.7]</p>
+
+                <p><strong>Sample 1 (y=1, ŷ=0.9):</strong></p>
+                <div class="formula">
+                    L₁ = −[1·log(0.9) + 0·log(0.1)] = −log(0.9) = −(−0.105) = 0.105
+                </div>
+
+                <p><strong>Sample 2 (y=0, ŷ=0.2):</strong></p>
+                <div class="formula">
+                    L₂ = −[0·log(0.2) + 1·log(0.8)] = −log(0.8) = −(−0.223) = 0.223
+                </div>
+
+                <p><strong>Sample 3 (y=1, ŷ=0.7):</strong></p>
+                <div class="formula">
+                    L₃ = −[1·log(0.7) + 0·log(0.3)] = −log(0.7) = −(−0.357) = 0.357
+                </div>
+
+                <p><strong>Final BCE Loss:</strong></p>
+                <div class="formula">
+                    L_BCE = (0.105 + 0.223 + 0.357) / 3 = 0.685 / 3 ≈ 0.228
+                </div>
+            </div>
+
+            <div class="recap-box">
+                <strong>Key Takeaway:</strong> BCE is derived from Maximum Likelihood Estimation. The steps are: (1) write the likelihood as a product, (2) take the log to convert product to sum, (3) negate to convert maximization to minimization, (4) average over samples. Final form: L = −(1/N)Σ[y·log(ŷ) + (1−y)·log(1−ŷ)].
+            </div>
+        </section>
+
+        <!-- ===== SECTION 7 ===== -->
+        <section id="section7" data-progress-section>
+            <h2>7. BCE Intuition</h2>
+
+            <div class="analogy-box">
+                <strong>Analogy:</strong> Think of BCE as a strict teacher grading true/false exams. If a student answers "True" and is correct with 99% confidence, they get almost no penalty (loss ≈ 0.01). But if they answer "True" with only 10% confidence — they barely committed to their answer — the penalty is enormous (loss ≈ 2.30). The teacher penalizes not just wrong answers, but <strong>lack of confidence</strong> in correct answers.
+                <br><br>
+                <strong>Mapping:</strong>
+                <ul>
+                    <li>Student answers True confidently (ŷ=0.99, y=1) → low loss (0.01) → teacher is pleased</li>
+                    <li>Student answers True hesitantly (ŷ=0.51, y=1) → moderate loss (0.67) → teacher wants more commitment</li>
+                    <li>Student answers True but is wrong (ŷ=0.90, y=0) → high loss (2.30) → teacher is harsh</li>
+                    <li>Student is very wrong and very confident → penalty approaches infinity</li>
+                </ul>
+            </div>
+
+            <h3>Case 1: True Label y = 1</h3>
+            <p>When the true label is 1, the BCE loss simplifies to:</p>
+            <div class="formula">
+                L = −log(ŷ)
+            </div>
+            <table>
+                <thead>
+                    <tr><th>Predicted ŷ</th><th>Loss −log(ŷ)</th><th>Behavior</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>0.99</td><td>0.010</td><td>Correct and confident → minimal penalty</td></tr>
+                    <tr><td>0.90</td><td>0.105</td><td>Correct and fairly confident → small penalty</td></tr>
+                    <tr><td>0.50</td><td>0.693</td><td>Uncertain → moderate penalty</td></tr>
+                    <tr><td>0.10</td><td>2.303</td><td>Wrong direction → large penalty</td></tr>
+                    <tr><td>0.01</td><td>4.605</td><td>Very wrong → very large penalty</td></tr>
+                    <tr><td>0.001</td><td>6.908</td><td>Extremely wrong → enormous penalty</td></tr>
+                </tbody>
+            </table>
+            <p>As ŷ → 0 (confidently predicting class 0 when true label is 1), loss → ∞. The model is severely punished for being confidently wrong.</p>
+
+            <h3>Case 2: True Label y = 0</h3>
+            <p>When the true label is 0, the BCE loss simplifies to:</p>
+            <div class="formula">
+                L = −log(1 − ŷ)
+            </div>
+            <table>
+                <thead>
+                    <tr><th>Predicted ŷ</th><th>1−ŷ</th><th>Loss −log(1−ŷ)</th><th>Behavior</th></tr>
+                </thead>
+                <tbody>
+                    <tr><td>0.01</td><td>0.99</td><td>0.010</td><td>Correct and confident → minimal penalty</td></tr>
+                    <tr><td>0.10</td><td>0.90</td><td>0.105</td><td>Correct and fairly confident → small penalty</td></tr>
+                    <tr><td>0.50</td><td>0.50</td><td>0.693</td><td>Uncertain → moderate penalty</td></tr>
+                    <tr><td>0.90</td><td>0.10</td><td>2.303</td><td>Wrong direction → large penalty</td></tr>
+                    <tr><td>0.99</td><td>0.01</td><td>4.605</td><td>Very wrong → very large penalty</td></tr>
+                    <tr><td>0.999</td><td>0.001</td><td>6.908</td><td>Extremely wrong → enormous penalty</td></tr>
+                </tbody>
+            </table>
+
+            <div class="takeaway-box">
+                <strong>Confidence-Penalizing Property:</strong> BCE acts as a <strong>confidence penalty</strong>. It doesn't just care about being right or wrong — it cares about <strong>how sure</strong> the model is. Being wrong with high confidence is the worst case. This pushes the model to not only be correct, but to be well-calibrated in its confidence.
+            </div>
+
+            <div class="worked-example">
+                <strong>Worked Example — Two Models Compared:</strong>
+                <p>True label: y = 1</p>
+                <p>Model A predicts: ŷ = 0.6 (correct but uncertain)</p>
+                <p>Model B predicts: ŷ = 0.95 (correct and confident)</p>
+                <div class="formula">
+                    L_A = −log(0.6) = 0.511<br>
+                    L_B = −log(0.95) = 0.051
+                </div>
+                <p>Model B is preferred: both are correct, but B is 10× more confident. BCE rewards this confidence.</p>
+                <p>Now consider:</p>
+                <p>Model C predicts: ŷ = 0.4 (incorrect, predicts class 0)</p>
+                <p>Model D predicts: ŷ = 0.01 (very incorrect, very confident class 0)</p>
+                <div class="formula">
+                    L_C = −log(0.4) = 0.916<br>
+                    L_D = −log(0.01) = 4.605
+                </div>
+                <p>Both are wrong, but D is punished 5× more because it was confidently wrong. This is exactly what we want — the model should learn to avoid confident mistakes.</p>
+            </div>
+
+            <div class="recap-box">
+                <strong>Key Takeaway:</strong> BCE is a confidence-penalizing loss. For y=1, loss = −log(ŷ) penalizes low predicted probabilities. For y=0, loss = −log(1−ŷ) penalizes high predicted probabilities. The penalty approaches infinity for confidently wrong predictions, driving the model to be both correct and well-calibrated.
+            </div>
+        </section>
+
+        <!-- ===== SECTION 8 ===== -->
+        <section id="section8" data-progress-section>
+            <h2>8. Gradient of BCE &amp; Update Rule</h2>
+
+            <div class="analogy-box">
+                <strong>Analogy:</strong> You're hiking downhill blindfolded, and the slope of the terrain tells you which direction to step. The gradient of the BCE loss tells you exactly how much each weight contributed to the error and in which direction to adjust it. The learning rate α is your step size — too large and you overshoot; too small and it takes forever.
+                <br><br>
+                <strong>Mapping:</strong>
+                <ul>
+                    <li>Position on mountain → current weight values (w, b)</li>
+                    <li>Altitude → loss value L_BCE</li>
+                    <li>Slope in each direction → partial derivatives ∂L/∂wᵢ, ∂L/∂b</li>
+                    <li>Step size → learning rate α</li>
+                    <li>Walking downhill → gradient descent (moving opposite to gradient)</li>
+                </ul>
+            </div>
+
+            <h3>The Gradient</h3>
+            <p>The key result (which you can derive using the chain rule) is beautifully simple:</p>
+            <div class="definition-box">
+                <strong>Definition — BCE Gradients:</strong>
+                <div class="formula">
+                    ∂L/∂w = (1/N) Xᵀ(ŷ − y)
+                </div>
+                <div class="formula">
+                    ∂L/∂b = (1/N) Σᵢ (ŷᵢ − yᵢ) = mean(ŷ − y)
+                </div>
+                <p>where ŷ is the vector of predictions and y is the vector of true labels.</p>
+            </div>
+
+            <div class="takeaway-box">
+                <strong>Elegant result:</strong> The gradient of BCE with respect to the weights is simply the <strong>prediction error (ŷ − y)</strong> scaled by the input features. This is the same form as the gradient for linear regression with MSE — a deep mathematical coincidence that makes implementation clean.
+            </div>
+
+            <h3>Update Rule</h3>
+            <div class="formula">
+                w ← w − α · (1/N) Xᵀ(ŷ − y)<br>
+                b ← b − α · mean(ŷ − y)
+            </div>
+            <p>For a single sample, the per-sample update is:</p>
+            <div class="formula">
+                wᵢ ← wᵢ − α · (ŷ − y) · xᵢ<br>
+                b ← b − α · (ŷ − y)
+            </div>
+
+            <h3>Hand-Traced Numerical Example</h3>
+            <div class="worked-example">
+                <strong>Worked Example — Single Gradient Step:</strong>
+                <p><strong>Given:</strong></p>
+                <ul>
+                    <li>Input: x = [2.0, 1.5]</li>
+                    <li>True label: y = 1</li>
+                    <li>Initial weights: w = [0.0, 0.0]</li>
+                    <li>Initial bias: b = 0.0</li>
+                    <li>Learning rate: α = 0.1</li>
+                </ul>
+
+                <p><strong>Step 1: Compute z = wᵀx + b</strong></p>
+                <div class="formula">
+                    z = (0.0)(2.0) + (0.0)(1.5) + 0.0 = 0.0
+                </div>
+
+                <p><strong>Step 2: Compute ŷ = σ(z)</strong></p>
+                <div class="formula">
+                    ŷ = σ(0.0) = 1/(1 + e⁰) = 1/(1+1) = 0.5
+                </div>
+
+                <p><strong>Step 3: Compute error = ŷ − y</strong></p>
+                <div class="formula">
+                    error = 0.5 − 1.0 = −0.5
+                </div>
+
+                <p><strong>Step 4: Compute gradients</strong></p>
+                <div class="formula">
+                    ∂L/∂w₁ = error · x₁ = (−0.5)(2.0) = −1.0<br>
+                    ∂L/∂w₂ = error · x₂ = (−0.5)(1.5) = −0.75<br>
+                    ∂L/∂b = error = −0.5
+                </div>
+
+                <p><strong>Step 5: Update weights</strong></p>
+                <div class="formula">
+                    w₁ ← 0.0 − (0.1)(−1.0) = 0.0 + 0.1 = 0.1<br>
+                    w₂ ← 0.0 − (0.1)(−0.75) = 0.0 + 0.075 = 0.075<br>
+                    b ← 0.0 − (0.1)(−0.5) = 0.0 + 0.05 = 0.05
+                </div>
+
+                <p><strong>Step 6: Verify — compute new prediction</strong></p>
+                <div class="formula">
+                    z_new = (0.1)(2.0) + (0.075)(1.5) + 0.05 = 0.2 + 0.1125 + 0.05 = 0.3625<br>
+                    ŷ_new = σ(0.3625) = 1/(1 + e<sup>−0.3625</sup>) = 1/(1 + 0.696) ≈ 0.5895
+                </div>
+
+                <p><strong>Check:</strong> The prediction moved from 0.5 → 0.5895, getting closer to the true label y=1. ✓</p>
+            </div>
+
+            <div class="worked-example">
+                <strong>Worked Example — Second Gradient Step:</strong>
+                <p>Continuing from above with new w = [0.1, 0.075], b = 0.05:</p>
+
+                <p><strong>Step 1: z = (0.1)(2.0) + (0.075)(1.5) + 0.05 = 0.3625</strong></p>
+                <p><strong>Step 2: ŷ = σ(0.3625) ≈ 0.5895</strong></p>
+                <p><strong>Step 3: error = 0.5895 − 1.0 = −0.4105</strong></p>
+                <div class="formula">
+                    w₁ ← 0.1 − (0.1)(−0.4105)(2.0) = 0.1 + 0.0821 = 0.1821<br>
+                    w₂ ← 0.075 − (0.1)(−0.4105)(1.5) = 0.075 + 0.0616 = 0.1366<br>
+                    b ← 0.05 − (0.1)(−0.4105) = 0.05 + 0.0411 = 0.0911
+                </div>
+                <p><strong>New prediction:</strong> z = (0.1821)(2.0) + (0.1366)(1.5) + 0.0911 = 0.3642 + 0.2049 + 0.0911 = 0.6602</p>
+                <div class="formula">
+                    ŷ = σ(0.6602) ≈ 0.6592
+                </div>
+                <p>Prediction improved from 0.5895 → 0.6592, continuing toward y=1. ✓</p>
+                <p>After many more steps, ŷ will approach 1.0.</p>
+            </div>
+
+            <div class="recap-box">
+                <strong>Key Takeaway:</strong> The BCE gradient simplifies to (prediction error) × (input features). The update rule w ← w − α·(ŷ−y)·x is intuitive: if we underpredicted (ŷ−y < 0), increase weights on active features. The hand-traced example showed how each step pushes the prediction closer to the true label.
+            </div>
+        </section>
+
+        <!-- ===== SECTION 9 ===== -->
+        <section id="section9" data-progress-section>
+            <h2>9. Overfitting &amp; Regularisation</h2>
+
+            <div class="analogy-box">
+                <strong>Analogy:</strong> Imagine a student memorizing every answer to practice exams (overfitting) versus understanding the underlying concepts (generalization). Regularisation is like a teacher saying "simplify your approach — don't overthink it." L2 regularisation says "keep all your notes short" (shrinks everything), while L1 says "cut out unnecessary notes entirely" (feature selection).
+                <br><br>
+                <strong>Mapping:</strong>
+                <ul>
+                    <li>Memorizing practice exams → overfitting to training data</li>
+                    <li>Performing well on new exams → generalization to test data</li>
+                    <li>Teacher saying "simplify" → regularisation penalty</li>
+                    <li>L2: "Keep all notes short" → shrink all weights toward 0</li>
+                    <li>L1: "Delete unnecessary notes" → force some weights to exactly 0</li>
+                    <li>C = 1/λ → how strict the teacher is (low C = strict, high C = lenient)</li>
+                </ul>
+            </div>
+
+            <h3>Overfitting in Logistic Regression</h3>
+            <div class="definition-box">
+                <strong>Definition — Overfitting:</strong> When a model learns the training data too well, including noise and outliers, resulting in high training accuracy but poor test accuracy. In logistic regression, this manifests as very large weight values that create an overly complex decision boundary.
+            </div>
+
+            <h3>L2 Regularisation (Ridge)</h3>
+            <p>L2 adds a penalty proportional to the <strong>sum of squared weights</strong>:</p>
+            <div class="formula">
+                L_regularised = L_BCE + λ · ||w||² = L_BCE + λ · Σᵢ wᵢ²
+            </div>
+            <ul>
+                <li>λ (lambda) controls the strength of regularisation</li>
+                <li>Large λ → stronger penalty → weights shrink toward 0</li>
+                <li>λ = 0 → no regularisation → original BCE</li>
+                <li>L2 shrinks all weights but <strong>rarely makes them exactly 0</strong></li>
+                <li>Encourages weights to be small and evenly distributed</li>
+            </ul>
+
+            <h3>L1 Regularisation (Lasso)</h3>
+            <p>L1 adds a penalty proportional to the <strong>sum of absolute weights</strong>:</p>
+            <div class="formula">
+                L_regularised = L_BCE + λ · ||w||₁ = L_BCE + λ · Σᵢ |wᵢ|
+            </div>
+            <ul>
+                <li>L1 pushes many weights to <strong>exactly 0</strong></li>
+                <li>This performs <strong>automatic feature selection</strong></li>
+                <li>Result: a sparse model that uses only the most important features</li>
+                <li>Especially useful when you have many features but suspect only a few matter</li>
+            </ul>
+
+            <div class="warning-box">
+                <strong>Key Difference — L1 vs L2:</strong>
+                <ul>
+                    <li>L2 (Ridge): All weights get smaller, but none become exactly 0. Good when all features are somewhat useful.</li>
+                    <li>L1 (Lasso): Some weights become exactly 0. Good for feature selection when many features are irrelevant.</li>
+                    <li>Elastic Net combines both: L = L_BCE + λ₁||w||₁ + λ₂||w||²</li>
+                </ul>
+            </div>
+
+            <h3>The C Parameter in scikit-learn</h3>
+            <div class="definition-box">
+                <strong>Definition — C Parameter:</strong>
+                <div class="formula">
+                    C = 1/λ
+                </div>
+                <ul>
+                    <li><strong>Small C</strong> (e.g., 0.001): Strong regularisation → simple model → may underfit</li>
+                    <li><strong>Large C</strong> (e.g., 1000): Weak regularisation → complex model → may overfit</li>
+                    <li><strong>C = 1</strong>: Default, moderate regularisation</li>
+                </ul>
+            </div>
+
+            <div class="worked-example">
+                <strong>Worked Example — Regularisation Effect:</strong>
+                <p>Suppose L_BCE = 0.35 and current weights are w = [3.0, −2.5, 0.8, −0.1] with λ = 0.1</p>
+                <p><strong>L2 penalty:</strong></p>
+                <div class="formula">
+                    λ||w||² = 0.1 × (3.0² + (−2.5)² + 0.8² + (−0.1)²)<br>
+                    = 0.1 × (9.0 + 6.25 + 0.64 + 0.01) = 0.1 × 15.9 = 1.59
+                </div>
+                <p>Total L2 loss = 0.35 + 1.59 = 1.94</p>
+                <p>The large weights (3.0 and −2.5) contribute the most to the penalty. Gradient descent will shrink them preferentially.</p>
+
+                <p><strong>L1 penalty:</strong></p>
+                <div class="formula">
+                    λ||w||₁ = 0.1 × (|3.0| + |−2.5| + |0.8| + |−0.1|)<br>
+                    = 0.1 × (3.0 + 2.5 + 0.8 + 0.1) = 0.1 × 6.4 = 0.64
+                </div>
+                <p>Total L1 loss = 0.35 + 0.64 = 0.99</p>
+                <p>L1 pushes the small weight (−0.1) toward exactly 0, effectively removing that feature.</p>
+            </div>
+
+            <div class="recap-box">
+                <strong>Key Takeaway:</strong> Overfitting occurs when the model is too complex. L2 regularisation shrinks all weights; L1 regularisation can force weights to exactly 0 (feature selection). The C parameter controls regularisation strength: C = 1/λ, where small C means strong regularisation and large C means weak regularisation.
+            </div>
+        </section>
+
+        <!-- ===== SECTION 10 ===== -->
+        <section id="section10" data-progress-section>
+            <h2>10. Multi-Class Extension</h2>
+
+            <div class="analogy-box">
+                <strong>Analogy:</strong> Binary classification is like choosing between two restaurants (Chinese or Italian). Multi-class is like choosing among five. Two strategies: (1) Run a series of head-to-head votes (One-vs-Rest) — "Is it Chinese vs. not-Chinese?", "Is it Italian vs. not-Italian?", etc. (2) Have all five restaurants simultaneously present their case and pick the strongest (Softmax).
+                <br><br>
+                <strong>Mapping:</strong>
+                <ul>
+                    <li>Head-to-head vote → One-vs-Rest (OvR) with K binary classifiers</li>
+                    <li>Simultaneous presentation → Softmax function</li>
+                    <li>Each restaurant's "strength" → e<sup>zₖ</sup> for class k</li>
+                    <li>"Pick the strongest" → argmax of softmax output</li>
+                </ul>
+            </div>
+
+            <h3>One-vs-Rest (OvR) Strategy</h3>
+            <div class="definition-box">
+                <strong>Definition — One-vs-Rest (OvR):</strong> For K classes, train K separate binary classifiers. Classifier k treats class k as "positive" and all other classes as "negative." At prediction time, the class with the highest predicted probability wins.
+            </div>
+            <ul>
+                <li>For K classes, you need K classifiers</li>
+                <li>Each classifier outputs P(y=k | x)</li>
+                <li>Prediction: argmax_k P(y=k | x)</li>
+                <li>Simple to implement — just use standard binary logistic regression K times</li>
+            </ul>
+
+            <div class="worked-example">
+                <strong>Worked Example — OvR for Fruit Classification (3 classes):</strong>
+                <p>Classes: Apple (0), Banana (1), Orange (2)</p>
+                <p>Train 3 binary classifiers:</p>
+                <ul>
+                    <li>Classifier 1: Apple vs. {Banana, Orange} → P(y=0|x) = 0.7</li>
+                    <li>Classifier 2: Banana vs. {Apple, Orange} → P(y=1|x) = 0.2</li>
+                    <li>Classifier 3: Orange vs. {Apple, Orange} → P(y=2|x) = 0.5</li>
+                </ul>
+                <p>Prediction: argmax(0.7, 0.2, 0.5) = 0 → <strong>Apple</strong></p>
+            </div>
+
+            <h3>Softmax Function</h3>
+            <div class="definition-box">
+                <strong>Definition — Softmax Function:</strong>
+                <div class="formula">
+                    P(y = k | x) = e<sup>zₖ</sup> / Σⱼ e<sup>zⱼ</sup>
+                </div>
+                <p>where zₖ = wₖᵀx + bₖ is the raw score for class k, and the sum is over all K classes.</p>
+            </div>
+
+            <h3>Properties of Softmax</h3>
+            <ul>
+                <li><strong>Output sums to 1:</strong> Σₖ P(y=k|x) = 1 (valid probability distribution)</li>
+                <li><strong>All outputs positive:</strong> e<sup>zₖ</sup> > 0 for all k</li>
+                <li><strong>Argmax preserved:</strong> The class with the highest zₖ gets the highest probability</li>
+                <li><strong>Temperature parameter:</strong> Softmax(z/T) — T→0 makes it hard argmax, T→∞ makes it uniform</li>
+            </ul>
+
+            <div class="worked-example">
+                <strong>Worked Example — Softmax Calculation (3 classes):</strong>
+                <p>Raw scores: z = [2.0, 1.0, 0.5]</p>
+                <p><strong>Step 1: Compute exponentials</strong></p>
+                <div class="formula">
+                    e<sup>2.0</sup> = 7.389<br>
+                    e<sup>1.0</sup> = 2.718<br>
+                    e<sup>0.5</sup> = 1.649
+                </div>
+                <p><strong>Step 2: Compute sum</strong></p>
+                <div class="formula">
+                    Σ = 7.389 + 2.718 + 1.649 = 11.756
+                </div>
+                <p><strong>Step 3: Divide each by sum</strong></p>
+                <div class="formula">
+                    P(y=0|x) = 7.389 / 11.756 = 0.629<br>
+                    P(y=1|x) = 2.718 / 11.756 = 0.231<br>
+                    P(y=2|x) = 1.649 / 11.756 = 0.140
+                </div>
+                <p><strong>Check:</strong> 0.629 + 0.231 + 0.140 = 1.000 ✓</p>
+                <p>Prediction: class 0 with 62.9% confidence.</p>
+            </div>
+
+            <div class="takeaway-box">
+                <strong>When K=2, Softmax = Sigmoid:</strong> For binary classification with two classes, softmax simplifies to sigmoid. If z₁ = z and z₂ = 0 (as the reference), then P(y=1|x) = e<sup>z</sup>/(e<sup>z</sup>+1) = 1/(1+e<sup>−z</sup>) = σ(z). This is why logistic regression is a special case of softmax regression.
+            </div>
+
+            <h3>Multi-Label vs Multi-Class</h3>
+            <div class="warning-box">
+                <strong>Common Confusion:</strong>
+                <ul>
+                    <li><strong>Multi-class:</strong> Each sample belongs to exactly ONE of K classes. Use softmax (outputs sum to 1).</li>
+                    <li><strong>Multi-label:</strong> Each sample can belong to MULTIPLE classes simultaneously. Use independent sigmoids for each class (outputs don't sum to 1).</li>
+                    <li>Example: Photo tagging (a photo can have "dog", "outdoor", AND "sunny") → multi-label → independent sigmoids.</li>
+                    <li>Example: Handwritten digit recognition (each image is exactly one digit) → multi-class → softmax.</li>
+                </ul>
+            </div>
+
+            <div class="recap-box">
+                <strong>Key Takeaway:</strong> For multi-class problems, use One-vs-Rest (K binary classifiers) or Softmax (K scores normalized to probabilities). Softmax ensures outputs sum to 1 and preserves the argmax. When K=2, softmax reduces to sigmoid. For multi-label problems, use independent sigmoids instead of softmax.
+            </div>
+        </section>
+
+        <!-- ===== SECTION 11 ===== -->
+        <section id="section11" data-progress-section>
+            <h2>11. Common Mistakes</h2>
+
+            <h3>Mistake 1: Confusing P(A|B) with P(B|A)</h3>
+            <div class="warning-box">
+                <strong>The Confusion:</strong>
+                <div class="formula">
+                    P(disease | positive test) ≠ P(positive test | disease)
+                </div>
+                <p>P(positive test | disease) = sensitivity = 0.95 (95% of diseased test positive)</p>
+                <p>P(disease | positive test) = precision = ??? (depends on disease prevalence!)</p>
+            </div>
+
+            <div class="worked-example">
+                <strong>Worked Example — The Fallacy:</strong>
+                <p>A disease affects 1 in 1000 people. A test has 95% sensitivity and 95% specificity.</p>
+                <p>Out of 100,000 people:</p>
+                <ul>
+                    <li>100 have the disease → 95 test positive (true positives)</li>
+                    <li>99,900 don't have the disease → 99,900 × 0.05 = 4,995 test positive (false positives)</li>
+                </ul>
+                <div class="formula">
+                    P(disease | positive test) = 95 / (95 + 4995) = 95 / 5090 ≈ 1.87%
+                </div>
+                <p>Despite the test seeming great (95% accuracy), a positive result only means 1.87% chance of disease! This is Bayes' theorem in action.</p>
+            </div>
+
+            <h3>Mistake 2: Not Applying Feature Scaling</h3>
+            <div class="warning-box">
+                <strong>The Problem:</strong> Logistic regression uses gradient descent, which is sensitive to feature scales. If one feature ranges [0, 1000] and another [0, 1], the gradient will be dominated by the larger feature, causing:
+                <ul>
+                    <li>Extremely slow convergence</li>
+                    <li>Overshooting in the large-scale dimension</li>
+                    <li>Weights that don't reflect true importance</li>
+                </ul>
+                <strong>Solution:</strong> Always standardise features (z-score: (x − μ)/σ) or normalise (min-max scaling) before training logistic regression.
+            </div>
+
+            <h3>Mistake 3: Using Sigmoid for Multi-Label</h3>
+            <div class="warning-box">
+                <strong>The Problem:</strong> Using softmax (outputs sum to 1) for multi-label classification forces the model to choose — if it increases P(class A), it must decrease P(class B), even if both should be true.
+                <p><strong>Solution:</strong> For multi-label tasks, use independent sigmoids for each class. Each class gets its own output neuron with σ, and the threshold (e.g., 0.5) is applied independently to each.</p>
+            </div>
+
+            <h3>Mistake 4: Ignoring Class Imbalance</h3>
+            <div class="warning-box">
+                <strong>The Problem:</strong> If 99% of emails are not spam, a model that always predicts "not spam" achieves 99% accuracy but is useless.
+                <p><strong>Solutions:</strong></p>
+                <ul>
+                    <li>Use class weights (penalize errors on minority class more heavily)</li>
+                    <li>Resample: oversample minority, undersample majority</li>
+                    <li>Use appropriate metrics: F1-score, AUC-ROC, not accuracy</li>
+                </ul>
+            </div>
+
+            <h3>Mistake 5: Interpreting Coefficients as Probabilities</h3>
+            <div class="warning-box">
+                <strong>The Problem:</strong> A weight w₁ = 0.8 does NOT mean the probability increases by 80%. It means the <strong>log-odds</strong> increase by 0.8, or equivalently, the <strong>odds</strong> are multiplied by e<sup>0.8</sup> = 2.23. The actual probability change depends on the current probability.
+            </div>
+
+            <div class="recap-box">
+                <strong>Key Takeaway:</strong> Common mistakes include confusing conditional probabilities, skipping feature scaling, using the wrong activation for multi-label, ignoring class imbalance, and misinterpreting coefficients. Always check: Is this P(A|B) or P(B|A)? Are features scaled? Am I using sigmoid or softmax correctly?
+            </div>
+        </section>
+
+        <!-- ===== FLASHCARDS ===== -->
+        <section id="flashcards-section" data-progress-section>
+            <h2>Flashcards</h2>
+            <p>Click a card to flip it. Use the navigation buttons to move between cards.</p>
+
+            <div class="flashcard-container" id="flashcardContainer">
+                <div class="flashcard" data-card="0">
+                    <div class="flashcard-front">
+                        <h3>Logistic Regression</h3>
+                        <p>What is it?</p>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>A <strong>probabilistic</strong> classification model that predicts P(y=1|x) by passing a linear score through the sigmoid function. Despite its name, it is a classification (not regression) algorithm. It models the log-odds as a linear function of the features.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard" data-card="1">
+                    <div class="flashcard-front">
+                        <h3>Sigmoid Function</h3>
+                        <p>What is σ(z) and its key property?</p>
+                    </div>
+                    <div class="flashcard-back">
+                        <div class="formula">σ(z) = 1 / (1 + e<sup>−z</sup>)</div>
+                        <p>Maps any real number z ∈ (−∞, +∞) to a value in (0, 1). S-shaped, symmetric about (0, 0.5), with maximum gradient of 0.25 at z=0. Used to convert linear scores into probabilities.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard" data-card="2">
+                    <div class="flashcard-front">
+                        <h3>Decision Boundary</h3>
+                        <p>What is it and where does it occur?</p>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>The <strong>hyperplane</strong> where the model switches its prediction. For logistic regression, it occurs where σ(z) = 0.5, i.e., where z = wᵀx + b = 0. Points on one side → class 1; points on the other → class 0. For 2D features, this is a line.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard" data-card="3">
+                    <div class="flashcard-front">
+                        <h3>Odds</h3>
+                        <p>What are odds and how do they relate to probability?</p>
+                    </div>
+                    <div class="flashcard-back">
+                        <div class="formula">Odds = P / (1 − P)</div>
+                        <p>Odds range from 0 to ∞. Odds = 1 means P = 0.5. Odds = 3 means 3:1 (75% probability). Odds < 1 means the event is unlikely. Odds are multiplicative: an odds ratio of 2.23 means the odds double and then some.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard" data-card="4">
+                    <div class="flashcard-front">
+                        <h3>Logit</h3>
+                        <p>What is the logit function?</p>
+                    </div>
+                    <div class="flashcard-back">
+                        <div class="formula">logit(P) = ln(P / (1 − P))</div>
+                        <p>The inverse of the sigmoid. Maps probabilities in (0, 1) to log-odds in (−∞, +∞). Logistic regression is <strong>linear in log-odds</strong>: logit(P) = wᵀx + b.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard" data-card="5">
+                    <div class="flashcard-front">
+                        <h3>Binary Cross-Entropy (BCE)</h3>
+                        <p>What is the BCE loss formula?</p>
+                    </div>
+                    <div class="flashcard-back">
+                        <div class="formula">L_BCE = −(1/N) Σ [y·log(ŷ) + (1−y)·log(1−ŷ)]</div>
+                        <p>Derived from Maximum Likelihood Estimation. Convex loss function with a single global minimum. Penalizes confident wrong predictions heavily (loss → ∞ as ŷ → 0 for y=1).</p>
+                    </div>
+                </div>
+
+                <div class="flashcard" data-card="6">
+                    <div class="flashcard-front">
+                        <h3>Maximum Likelihood Estimation (MLE)</h3>
+                        <p>What is the core idea?</p>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>Find the parameter values (w, b) that <strong>maximize the probability</strong> of the observed training data. MLE for logistic regression leads to BCE loss. Key steps: write likelihood as product → take log (product→sum) → negate (max→min).</p>
+                    </div>
+                </div>
+
+                <div class="flashcard" data-card="7">
+                    <div class="flashcard-front">
+                        <h3>L1 Regularisation (Lasso)</h3>
+                        <p>What does it do differently from L2?</p>
+                    </div>
+                    <div class="flashcard-back">
+                        <div class="formula">L = L_BCE + λ·Σ|wᵢ|</div>
+                        <p>Pushes weights to <strong>exactly 0</strong>, performing automatic <strong>feature selection</strong>. Creates sparse models. Useful when many features are irrelevant. The L1 penalty is not differentiable at 0, but subgradient methods handle this.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard" data-card="8">
+                    <div class="flashcard-front">
+                        <h3>L2 Regularisation (Ridge)</h3>
+                        <p>How does it prevent overfitting?</p>
+                    </div>
+                    <div class="flashcard-back">
+                        <div class="formula">L = L_BCE + λ·Σwᵢ²</div>
+                        <p>Penalizes large weights by adding the sum of squared weights. Shrinks all weights toward 0 but rarely makes them exactly 0. Encourages <strong>small, distributed weights</strong> rather than reliance on a few large weights.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard" data-card="9">
+                    <div class="flashcard-front">
+                        <h3>Softmax Function</h3>
+                        <p>What does it do for multi-class?</p>
+                    </div>
+                    <div class="flashcard-back">
+                        <div class="formula">P(y=k|x) = e<sup>zₖ</sup> / Σⱼ e<sup>zⱼ</sup></div>
+                        <p>Converts K raw scores into a valid probability distribution (all positive, sum to 1). Preserves the argmax. When K=2, softmax reduces to sigmoid: σ(z) = e<sup>z</sup>/(e<sup>z</sup>+1).</p>
+                    </div>
+                </div>
+
+                <div class="flashcard" data-card="10">
+                    <div class="flashcard-front">
+                        <h3>Cross-Entropy</h3>
+                        <p>What does it measure?</p>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>Cross-entropy measures the <strong>divergence between two probability distributions</strong>: the true distribution (y) and the predicted distribution (ŷ). Lower cross-entropy means better predictions. BCE is the binary case. For multi-class, use categorical cross-entropy.</p>
+                    </div>
+                </div>
+
+                <div class="flashcard" data-card="11">
+                    <div class="flashcard-front">
+                        <h3>Convex Loss</h3>
+                        <p>Why is it important for optimisation?</p>
+                    </div>
+                    <div class="flashcard-back">
+                        <p>A convex function has exactly <strong>one global minimum</strong> and no local minima. Gradient descent is <strong>guaranteed</strong> to converge to the global minimum (with appropriate learning rate). BCE loss is convex in w, while MSE + sigmoid is non-convex (local minima trap gradient descent).</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flashcard-nav">
+                <button id="prevCard" class="collapsible">← Previous</button>
+                <span id="cardCounter">Card 1 of 12</span>
+                <button id="nextCard" class="collapsible">Next →</button>
+            </div>
+        </section>
+
+        <!-- ===== QUIZ SECTION ===== -->
+        <section id="quiz-section" data-progress-section>
+            <h2>Quiz Questions</h2>
+            <p>Test your understanding. Select an answer and click "Check Answer" for feedback.</p>
+
+            <div class="quiz-container" id="quizContainer">
+                <!-- Quiz 1 -->
+                <div class="quiz-question" data-question="1">
+                    <h3>Question 1</h3>
+                    <p>What is the range of the sigmoid function σ(z)?</p>
+                    <label><input type="radio" name="q1" value="a"> (−∞, +∞)</label><br>
+                    <label><input type="radio" name="q1" value="b"> [0, 1]</label><br>
+                    <label><input type="radio" name="q1" value="c"> (0, 1)</label><br>
+                    <label><input type="radio" name="q1" value="d"> [−1, 1]</label><br>
+                    <button class="check-answer" data-correct="c" data-explanation="The sigmoid function maps any real number to the open interval (0, 1). It never actually reaches exactly 0 or exactly 1 — it only approaches them asymptotically. This is important because log(0) is undefined, and we need strict positivity for the BCE loss.">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Quiz 2 -->
+                <div class="quiz-question" data-question="2">
+                    <h3>Question 2</h3>
+                    <p>If the odds of an event are 4:1 (odds = 4), what is the probability?</p>
+                    <label><input type="radio" name="q2" value="a"> 0.25</label><br>
+                    <label><input type="radio" name="q2" value="b"> 0.40</label><br>
+                    <label><input type="radio" name="q2" value="c"> 0.80</label><br>
+                    <label><input type="radio" name="q2" value="d"> 0.75</label><br>
+                    <button class="check-answer" data-correct="c" data-explanation="Odds = P/(1−P) → 4 = P/(1−P) → 4(1−P) = P → 4−4P = P → 4 = 5P → P = 4/5 = 0.80. So odds of 4:1 means 80% probability.">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Quiz 3 -->
+                <div class="quiz-question" data-question="3">
+                    <h3>Question 3</h3>
+                    <p>What is the maximum value of the sigmoid derivative dσ/dz = σ(z)(1−σ(z))?</p>
+                    <label><input type="radio" name="q3" value="a"> 1.0</label><br>
+                    <label><input type="radio" name="q3" value="b"> 0.5</label><br>
+                    <label><input type="radio" name="q3" value="c"> 0.25</label><br>
+                    <label><input type="radio" name="q3" value="d"> 0.1</label><br>
+                    <button class="check-answer" data-correct="c" data-explanation="The maximum of σ(1−σ) occurs when σ = 0.5 (at z=0). The maximum value is 0.5 × (1−0.5) = 0.25. This is why deep networks with sigmoid activations suffer from vanishing gradients — the gradient is at most 0.25 and shrinks with each layer.">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Quiz 4 -->
+                <div class="quiz-question" data-question="4">
+                    <h3>Question 4</h3>
+                    <p>Why is Binary Cross-Entropy preferred over MSE for classification?</p>
+                    <label><input type="radio" name="q4" value="a"> BCE is simpler to compute</label><br>
+                    <label><input type="radio" name="q4" value="b"> BCE is convex while MSE + sigmoid is non-convex</label><br>
+                    <label><input type="radio" name="q4" value="c"> BCE always gives higher accuracy</label><br>
+                    <label><input type="radio" name="q4" value="d"> MSE cannot handle binary labels</label><br>
+                    <button class="check-answer" data-correct="b" data-explanation="BCE loss is convex with respect to the weights, meaning it has a single global minimum. MSE combined with the sigmoid function produces a non-convex loss surface with local minima, where gradient descent can get stuck. Both can technically be computed and handle binary labels, but convexity guarantees convergence to the optimal solution.">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Quiz 5 -->
+                <div class="quiz-question" data-question="5">
+                    <h3>Question 5</h3>
+                    <p>In scikit-learn, what does setting C=0.01 (very small C) do?</p>
+                    <label><input type="radio" name="q5" value="a"> Increases model complexity</label><br>
+                    <label><input type="radio" name="q5" value="b"> Reduces regularization strength</label><br>
+                    <label><input type="radio" name="q5" value="c"> Increases regularization strength (stronger shrinkage)</label><br>
+                    <label><input type="radio" name="q5" value="d"> Disables regularization entirely</label><br>
+                    <button class="check-answer" data-correct="c" data-explanation="Since C = 1/λ, a small C means a large λ, which means stronger regularization. C=0.01 applies very aggressive weight shrinkage, leading to a simpler model that may underfit. C=1000 (large C) means weak regularization, which may overfit.">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Quiz 6 -->
+                <div class="quiz-question" data-question="6">
+                    <h3>Question 6</h3>
+                    <p>For a multi-label classification problem (e.g., tagging a photo with multiple labels), which approach should you use?</p>
+                    <label><input type="radio" name="q6" value="a"> Softmax with argmax</label><br>
+                    <label><input type="radio" name="q6" value="b"> One-vs-Rest with softmax</label><br>
+                    <label><input type="radio" name="q6" value="c"> Independent sigmoid for each class</label><br>
+                    <label><input type="radio" name="q6" value="d"> A single sigmoid with threshold 0.5</label><br>
+                    <button class="check-answer" data-correct="c" data-explanation="Multi-label means each sample can belong to multiple classes simultaneously. Softmax forces outputs to sum to 1, which would prevent multiple classes from being selected. Instead, use independent sigmoids for each class, each outputting a probability independently, with its own threshold.">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Quiz 7 -->
+                <div class="quiz-question" data-question="7">
+                    <h3>Question 7</h3>
+                    <p>If a logistic regression model has weight w₁ = 1.0 for feature "hours_exercised", what does e<sup>1.0</sup> represent?</p>
+                    <label><input type="radio" name="q7" value="a"> The probability of the positive class</label><br>
+                    <label><input type="radio" name="q7" value="b"> The odds ratio: each additional hour multiplies odds by e<sup>1.0</sup> ≈ 2.72</label><br>
+                    <label><input type="radio" name="q7" value="c"> The change in probability per unit increase</label><br>
+                    <label><input type="radio" name="q7" value="d"> The log-odds when hours_exercised = 1</label><br>
+                    <button class="check-answer" data-correct="b" data-explanation="In logistic regression, e<sup>wᵢ</sup> is the odds ratio for feature xᵢ. It means each one-unit increase in xᵢ multiplies the odds of the positive class by e<sup>wᵢ</sup>. So e<sup>1.0</sup> ≈ 2.718 means each additional hour of exercise multiplies the odds by ~2.72.">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Quiz 8 -->
+                <div class="quiz-question" data-question="8">
+                    <h3>Question 8</h3>
+                    <p>What happens to BCE loss when the model predicts ŷ = 0.01 for a sample where y = 1?</p>
+                    <label><input type="radio" name="q8" value="a"> Loss is small (≈ 0.01)</label><br>
+                    <label><input type="radio" name="q8" value="b"> Loss is moderate (≈ 0.69)</label><br>
+                    <label><input type="radio" name="q8" value="c"> Loss is very large (≈ 4.61)</label><br>
+                    <label><input type="radio" name="q8" value="d"> Loss is undefined</label><br>
+                    <button class="check-answer" data-correct="c" data-explanation="For y=1, BCE loss = −log(ŷ) = −log(0.01) = −(−4.605) = 4.605. The model is confidently wrong (predicted 1% chance of class 1 when it's actually class 1), so the penalty is very large. This strong penalty drives the model to correct confident mistakes.">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Quiz 9 -->
+                <div class="quiz-question" data-question="9">
+                    <h3>Question 9</h3>
+                    <p>When does softmax reduce to sigmoid?</p>
+                    <label><input type="radio" name="q9" value="a"> When there are 3 classes</label><br>
+                    <label><input type="radio" name="q9" value="b"> When all class scores are equal</label><br>
+                    <label><input type="radio" name="q9" value="c"> When K = 2 (binary classification)</label><br>
+                    <label><input type="radio" name="q9" value="d"> When learning rate is very small</label><br>
+                    <button class="check-answer" data-correct="c" data-explanation="For K=2 classes with scores z₁ and z₂, softmax gives P(y=1) = e<sup>z₁</sup>/(e<sup>z₁</sup>+e<sup>z₂</sup>). Setting z₂ = 0 as reference: P(y=1) = e<sup>z₁</sup>/(e<sup>z₁</sup>+1) = 1/(1+e<sup>−z₁</sup>) = σ(z₁). This is why logistic regression is a special case of softmax regression.">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+
+                <!-- Quiz 10 -->
+                <div class="quiz-question" data-question="10">
+                    <h3>Question 10</h3>
+                    <p>A doctor says "the test has 95% sensitivity" — what does this mean in probability notation?</p>
+                    <label><input type="radio" name="q10" value="a"> P(disease | positive test) = 0.95</label><br>
+                    <label><input type="radio" name="q10" value="b"> P(positive test | disease) = 0.95</label><br>
+                    <label><input type="radio" name="q10" value="c"> P(disease) = 0.95</label><br>
+                    <label><input type="radio" name="q10" value="d"> P(negative test | no disease) = 0.95</label><br>
+                    <button class="check-answer" data-correct="b" data-explanation="Sensitivity (also called recall or true positive rate) = P(positive test | disease) = 0.95. It means 95% of people who actually have the disease test positive. This is NOT the same as P(disease | positive test), which depends on disease prevalence (base rate). Confusing these is the classic base rate fallacy.">Check Answer</button>
+                    <div class="quiz-feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== FILL IN THE BLANKS ===== -->
+        <section id="fill-blank-section" data-progress-section>
+            <h2>Fill in the Blanks</h2>
+            <p>Complete the sentences by typing the missing terms. Click "Check" to verify.</p>
+
+            <div class="fill-blank-container" id="fillBlankContainer">
+                <!-- Fill-in 1 -->
+                <div class="fill-blank-question" data-blank="1">
+                    <p>The sigmoid function is defined as σ(z) = 1 / (1 + e<sup>___</sup>).</p>
+                    <input type="text" class="fill-blank-input" data-answer="-z" placeholder="Type your answer">
+                    <button class="check-fill-blank">Check</button>
+                    <div class="fill-blank-feedback"></div>
+                </div>
+
+                <!-- Fill-in 2 -->
+                <div class="fill-blank-question" data-blank="2">
+                    <p>The derivative of the sigmoid function is dσ/dz = σ(z) · (1 − ___).</p>
+                    <input type="text" class="fill-blank-input" data-answer="σ(z)" placeholder="Type your answer">
+                    <button class="check-fill-blank">Check</button>
+                    <div class="fill-blank-feedback"></div>
+                </div>
+
+                <!-- Fill-in 3 -->
+                <div class="fill-blank-question" data-blank="3">
+                    <p>The odds of an event are defined as P / (1 − ___).</p>
+                    <input type="text" class="fill-blank-input" data-answer="P" placeholder="Type your answer">
+                    <button class="check-fill-blank">Check</button>
+                    <div class="fill-blank-feedback"></div>
+                </div>
+
+                <!-- Fill-in 4 -->
+                <div class="fill-blank-question" data-blank="4">
+                    <p>L1 regularisation is also known as ___ regularisation.</p>
+                    <input type="text" class="fill-blank-input" data-answer="lasso" placeholder="Type your answer">
+                    <button class="check-fill-blank">Check</button>
+                    <div class="fill-blank-feedback"></div>
+                </div>
+
+                <!-- Fill-in 5 -->
+                <div class="fill-blank-question" data-blank="5">
+                    <p>The binary cross-entropy loss is derived from Maximum ___ Estimation.</p>
+                    <input type="text" class="fill-blank-input" data-answer="likelihood" placeholder="Type your answer">
+                    <button class="check-fill-blank">Check</button>
+                    <div class="fill-blank-feedback"></div>
+                </div>
+
+                <!-- Fill-in 6 -->
+                <div class="fill-blank-question" data-blank="6">
+                    <p>In scikit-learn, the parameter C is related to the regularisation strength by C = 1/___.</p>
+                    <input type="text" class="fill-blank-input" data-answer="λ" placeholder="Type your answer">
+                    <button class="check-fill-blank">Check</button>
+                    <div class="fill-blank-feedback"></div>
+                </div>
+
+                <!-- Fill-in 7 -->
+                <div class="fill-blank-question" data-blank="7">
+                    <p>The maximum value of the sigmoid derivative σ(z)(1−σ(z)) is ___.</p>
+                    <input type="text" class="fill-blank-input" data-answer="0.25" placeholder="Type your answer">
+                    <button class="check-fill-blank">Check</button>
+                    <div class="fill-blank-feedback"></div>
+                </div>
+
+                <!-- Fill-in 8 -->
+                <div class="fill-blank-question" data-blank="8">
+                    <p>The softmax function outputs a probability distribution where all outputs are positive and they sum to ___.</p>
+                    <input type="text" class="fill-blank-input" data-answer="1" placeholder="Type your answer">
+                    <button class="check-fill-blank">Check</button>
+                    <div class="fill-blank-feedback"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ===== SCENARIO QUESTION ===== -->
+        <section id="scenario-section" data-progress-section>
+            <h2>Scenario Question</h2>
+            <div class="quiz-container">
+                <div class="quiz-question" data-question="scenario">
+                    <h3>Scenario: Hospital Readmission Prediction</h3>
+                    <p>A hospital wants to predict whether a patient will be readmitted within 30 days. They train a logistic regression model with three features:</p>
+                    <ul>
+                        <li>x₁ = age (years)</li>
+                        <li>x₂ = number of previous admissions</li>
+                        <li>x₃ = length of stay (days)</li>
+                    </ul>
+                    <p>The trained model gives:</p>
+                    <div class="formula">
+                        z = 0.05 × age + 0.8 × previous_admissions − 0.03 × stay − 2.5
+                    </div>
+                    <p><strong>Patient A:</strong> age=65, previous_admissions=3, stay=5 days</p>
+                    <p><strong>Patient B:</strong> age=45, previous_admissions=0, stay=2 days</p>
+                    <p><strong>Patient C:</strong> age=70, previous_admissions=5, stay=10 days</p>
+
+                    <p><strong>Task:</strong> For each patient, compute z, then σ(z), then classify (threshold = 0.5). Then interpret the weight for "previous admissions" as an odds ratio. Finally, identify which patient is at highest risk and explain why in terms of the model.</p>
+
+                    <details>
+                        <summary>Click for full solution</summary>
+                        <div class="worked-example">
+                            <p><strong>Patient A:</strong> z = 0.05(65) + 0.8(3) − 0.03(5) − 2.5 = 3.25 + 2.4 − 0.15 − 2.5 = 3.0</p>
+                            <div class="formula">
+                                σ(3.0) = 1/(1+e<sup>−3.0</sup>) = 1/(1+0.0498) = 1/1.0498 ≈ 0.953
+                            </div>
+                            <p>P(readmit) = 95.3% → <strong>Class 1 (will be readmitted)</strong></p>
+
+                            <p><strong>Patient B:</strong> z = 0.05(45) + 0.8(0) − 0.03(2) − 2.5 = 2.25 + 0 − 0.06 − 2.5 = −0.31</p>
+                            <div class="formula">
+                                σ(−0.31) = 1/(1+e<sup>0.31</sup>) = 1/(1+1.363) = 1/2.363 ≈ 0.423
+                            </div>
+                            <p>P(readmit) = 42.3% → <strong>Class 0 (will not be readmitted)</strong></p>
+
+                            <p><strong>Patient C:</strong> z = 0.05(70) + 0.8(5) − 0.03(10) − 2.5 = 3.5 + 4.0 − 0.3 − 2.5 = 4.7</p>
+                            <div class="formula">
+                                σ(4.7) = 1/(1+e<sup>−4.7</sup>) = 1/(1+0.0091) = 1/1.0091 ≈ 0.991
+                            </div>
+                            <p>P(readmit) = 99.1% → <strong>Class 1 (will be readmitted)</strong></p>
+
+                            <p><strong>Odds Ratio for previous admissions:</strong></p>
+                            <div class="formula">
+                                e<sup>0.8</sup> = 2.2255
+                            </div>
+                            <p>Each additional previous admission <strong>multiplies the odds of readmission by 2.23</strong>. This is the strongest predictor in the model.</p>
+
+                            <p><strong>Highest risk:</strong> Patient C (99.1%) because they have the most previous admissions (5 × 0.8 = 4.0 contribution to z), which dominates all other features. The model heavily penalizes repeat admissions, consistent with the medical intuition that frequent admissions signal chronic conditions.</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        themeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-theme');
+            themeToggle.textContent = body.classList.contains('dark-theme') ? 'Light' : 'Dark';
+        });
+
+        // Progress Bar
+        const sections = document.querySelectorAll('[data-progress-section]');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+
+        function updateProgress() {
+            let scrolled = 0;
+            const total = sections.length;
+            sections.forEach(function(section) {
+                const rect = section.getBoundingClientRect();
+                if (rect.top < window.innerHeight * 0.5) {
+                    scrolled++;
+                }
+            });
+            const pct = Math.round((scrolled / total) * 100);
+            progressBar.style.width = pct + '%';
+            progressText.textContent = pct + '%';
+        }
+
+        window.addEventListener('scroll', updateProgress);
+        updateProgress();
+
+        // Flashcards
+        var cards = document.querySelectorAll('.flashcard');
+        var currentCard = 0;
+        var cardCounter = document.getElementById('cardCounter');
+
+        function showCard(index) {
+            cards.forEach(function(c, i) {
+                c.style.display = i === index ? 'block' : 'none';
+                c.classList.remove('flipped');
+            });
+            cardCounter.textContent = 'Card ' + (index + 1) + ' of ' + cards.length;
+        }
+
+        cards.forEach(function(card) {
+            card.addEventListener('click', function() {
+                card.classList.toggle('flipped');
+            });
+        });
+
+        document.getElementById('prevCard').addEventListener('click', function() {
+            currentCard = (currentCard - 1 + cards.length) % cards.length;
+            showCard(currentCard);
+        });
+
+        document.getElementById('nextCard').addEventListener('click', function() {
+            currentCard = (currentCard + 1) % cards.length;
+            showCard(currentCard);
+        });
+
+        showCard(0);
+
+        // Quiz Answers
+        document.querySelectorAll('.check-answer').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var question = btn.closest('.quiz-question');
+                var selected = question.querySelector('input[type="radio"]:checked');
+                var feedback = question.querySelector('.quiz-feedback');
+                var correct = btn.getAttribute('data-correct');
+                var explanation = btn.getAttribute('data-explanation');
+
+                if (!selected) {
+                    feedback.textContent = 'Please select an answer.';
+                    feedback.className = 'quiz-feedback incorrect';
+                    return;
+                }
+
+                if (selected.value === correct) {
+                    feedback.textContent = 'Correct! ' + explanation;
+                    feedback.className = 'quiz-feedback correct';
+                } else {
+                    feedback.textContent = 'Incorrect. ' + explanation;
+                    feedback.className = 'quiz-feedback incorrect';
+                }
+            });
+        });
+
+        // Fill in the Blanks
+        document.querySelectorAll('.check-fill-blank').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var container = btn.closest('.fill-blank-question');
+                var input = container.querySelector('.fill-blank-input');
+                var feedback = container.querySelector('.fill-blank-feedback');
+                var answer = input.getAttribute('data-answer').toLowerCase().trim();
+                var userAnswer = input.value.toLowerCase().trim();
+
+                if (userAnswer === answer) {
+                    feedback.textContent = 'Correct!';
+                    feedback.className = 'fill-blank-feedback correct';
+                } else {
+                    feedback.textContent = 'Incorrect. The answer is: ' + input.getAttribute('data-answer');
+                    feedback.className = 'fill-blank-feedback incorrect';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

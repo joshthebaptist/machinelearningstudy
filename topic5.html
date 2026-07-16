@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 5: Model Validation &amp; Generalisation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════ TOP NAV ═══════════════════════════ -->
+<nav class="top-nav">
+  <a href="index.html" class="nav-home">Lecture Notes</a>
+  <span class="nav-separator">|</span>
+  <span class="nav-current">Topic 5 – Model Validation &amp; Generalisation</span>
+  <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span class="icon">&#9728;</span> Toggle Theme</button>
+</nav>
+
+<!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2>Topic 5</h2>
+    <p class="sidebar-subtitle">Model Validation &amp; Generalisation</p>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+    <span class="progress-text" id="progress-text">0% complete</span>
+  </div>
+
+  <nav class="section-nav" id="section-nav">
+    <ul>
+      <li><a href="#generalisation-problem">The Generalisation Problem</a></li>
+      <li><a href="#three-way-split">The Three-Way Split</a></li>
+      <li><a href="#bias-variance">Bias-Variance Trade-Off</a></li>
+      <li><a href="#k-fold-cv">K-Fold Cross-Validation</a></li>
+      <li><a href="#cv-strategies">CV Strategies Table</a></li>
+      <li><a href="#hyperparameter-optimisation">Hyperparameter Optimisation</a></li>
+      <li><a href="#erm-reanchor">ERM Re-Anchor</a></li>
+      <li><a href="#regularisation">Regularisation</a></li>
+      <li><a href="#preventing-overfitting">Preventing Overfitting</a></li>
+      <li><a href="#feature-engineering">Feature Engineering</a></li>
+      <li><a href="#common-misconceptions">Common Misconceptions</a></li>
+      <li><a href="#flashcards">Flashcards</a></li>
+      <li><a href="#quiz">Quiz</a></li>
+      <li><a href="#fill-blank">Fill-in-the-Blank</a></li>
+      <li><a href="#scenario">Scenario Question</a></li>
+      <li><a href="#recap">Final Recap</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<!-- ═══════════════════════════ MAIN CONTENT ═══════════════════════════ -->
+<main class="main-content" id="main-content">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 1: THE GENERALISATION PROBLEM
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="generalisation-problem" data-progress-section>
+  <h1>The Generalisation Problem</h1>
+
+  <p>The entire purpose of machine learning is not to memorise the data we already have, but to make accurate predictions on data we have <strong>never seen before</strong>. This gap between "doing well on training data" and "doing well in the real world" is the central challenge of model validation.</p>
+
+  <div class="definition-box">
+    <h4>Definition — Generalisation</h4>
+    <p><strong>Generalisation</strong> is a model's ability to perform well on unseen data drawn from the same underlying distribution as the training data. A model that generalises has learned the <em>true signal</em> rather than the noise.</p>
+  </div>
+
+  <h3>Good Model vs Overfit Model</h3>
+  <p>Consider a student preparing for an exam. One student studies past papers and understands the underlying concepts — when new questions appear on the exam, they can reason through them. Another student memorises the exact answers to past papers word-for-word — when the exam rephrases the questions, they freeze. The first student has generalised; the second has overfit.</p>
+
+  <div class="flex-row">
+    <div class="flex-1">
+      <h4 style="color: var(--accent-green);">&#10003; Good Model</h4>
+      <ul>
+        <li>Learns the <strong>true signal</strong> (the pattern underlying the data)</li>
+        <li>Training error is low but not zero</li>
+        <li>Test error is <strong>approximately equal</strong> to training error</li>
+        <li>Performs well on unseen, real-world data</li>
+        <li>Has <strong>appropriately matched complexity</strong> to the data</li>
+      </ul>
+    </div>
+    <div class="flex-1">
+      <h4 style="color: var(--accent-red);">&#10007; Overfit Model</h4>
+      <ul>
+        <li>Memorises <strong>noise and idiosyncrasies</strong> of the training set</li>
+        <li>Training error tends toward <strong>zero</strong></li>
+        <li>Test error is <strong>very high</strong> (diverges)</li>
+        <li>Fails catastrophically on new examples</li>
+        <li>Has <strong>excessive complexity</strong> relative to data availability</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy — The GPS Navigator</h4>
+    <p>Imagine training a GPS system. A <strong>good model</strong> learns the general rules of navigation: major roads connect cities, highways have exits, rivers require bridges. An <strong>overfit model</strong> memorises every single turn you made during training — it knows you turned left at the coffee shop on Main Street, but when it encounters a road it hasn't seen, it has no idea where to go. The overfit GPS is brilliant on routes it has memorised and useless everywhere else.</p>
+  </div>
+
+  <h3>Why Validation Reveals the Gap Before Deployment</h3>
+  <p>If you only measure training performance, every model looks fantastic — even a model that has simply memorised the data. Validation provides an <strong>unbiased estimate</strong> of how the model will perform in production by evaluating it on data it has never trained on.</p>
+
+  <div class="warning-box">
+    <h4>Common Mistake — Reporting Training Accuracy</h4>
+    <p>Students often train a model, compute accuracy on the training set, and report it as the model's performance. This is meaningless — a decision tree with unlimited depth achieves 100% training accuracy every time. Always evaluate on held-out data.</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>A model is only as good as its performance on data it has never seen. Validation is the mechanism that tells us whether we have learned the signal or merely memorised the noise — <em>before</em> we deploy and face real consequences.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 2: THE THREE-WAY SPLIT
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="three-way-split" data-progress-section>
+  <h2>The Three-Way Split</h2>
+
+  <p>To properly estimate generalisation, we split our data into <strong>three distinct sets</strong>. Each serves a specific, non-interchangeable purpose.</p>
+
+  <div class="definition-box">
+    <h4>Definition — Train / Validation / Test Split</h4>
+    <p>The <strong>training set</strong> is used to fit model parameters. The <strong>validation set</strong> is used for model selection and hyperparameter tuning. The <strong>test set</strong> is reserved for the final, unbiased evaluation of the chosen model's generalisation performance.</p>
+  </div>
+
+  <h3>Roles of Each Set</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Set</th>
+        <th>Purpose</th>
+        <th>Rule</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Training Set</strong> (~60-70%)</td>
+        <td>Fit the model's internal parameters (weights, coefficients, split points)</td>
+        <td>Used during <code>.fit()</code></td>
+      </tr>
+      <tr>
+        <td><strong>Validation Set</strong> (~15-20%)</td>
+        <td>Select the best model, tune hyperparameters, compare algorithms</td>
+        <td>Used during model selection — NOT for training</td>
+      </tr>
+      <tr>
+        <td><strong>Test Set</strong> (~15-20%)</td>
+        <td>Final, unbiased estimate of generalisation performance</td>
+        <td><strong>NEVER</strong> touched until the very end</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <h4>Critical Rule — The Test Set Is Sacred</h4>
+    <p>The test set must <strong>never</strong> be used for any decision — not for hyperparameter tuning, not for feature selection, not for early stopping. If you peek at test performance and then adjust your model, the test estimate becomes <strong>optimistically biased</strong>. It is no longer an honest measure of generalisation. Think of it as a sealed envelope you only open on presentation day.</p>
+  </div>
+
+  <h3>Why Not Just Train/Test?</h3>
+  <p>If we only split into train and test, we would have to use the test set for hyperparameter tuning. This means the test set has <strong>influenced our model choice</strong>, so the test performance is no longer an unbiased estimate of real-world performance. The validation set acts as a "practice exam" — you can study from it and improve — while the test set is the actual exam.</p>
+
+  <div class="analogy-box">
+    <h4>Analogy — Dress Rehearsal</h4>
+    <p>A theatre company has three stages of preparation: <strong>rehearsals</strong> (training set — learning lines and choreography), <strong>dress rehearsal</strong> (validation set — full run-through with costumes and lights, where feedback is gathered and adjustments made), and <strong>opening night</strong> (test set — the final performance where the audience sees the result and no changes are possible).</p>
+  </div>
+
+  <h3>K-Fold CV Replaces Fixed Validation with Limited Data</h3>
+  <p>When data is scarce, setting aside 20% for validation wastes precious training examples. <strong>K-Fold Cross-Validation</strong> solves this by rotating which portion serves as validation, so every sample gets a chance to be both training and validation data. We explore this in depth in Section 4.</p>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>The three-way split separates the roles of data: training for learning, validation for selecting, and testing for final honest evaluation. Violating these boundaries — especially using the test set for decisions — produces unreliable performance estimates.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 3: BIAS-VARIANCE TRADE-OFF (FORMAL)
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="bias-variance" data-progress-section>
+  <h2>The Bias-Variance Trade-Off</h2>
+
+  <p>Every model's expected test error can be decomposed into three fundamental components. Understanding this decomposition is essential for diagnosing whether a model underfits, overfits, or is well-calibrated.</p>
+
+  <div class="formula">
+    <span class="label">Decomposition of Expected Test Error</span>
+    E[Error] = Bias² + Variance + Irreducible Noise (σ²)
+  </div>
+
+  <h3>Breaking Down Each Component</h3>
+
+  <div class="definition-box">
+    <h4>Bias (Systematic Error)</h4>
+    <p><strong>Bias</strong> is the error introduced by approximating a complex real-world relationship with a simplified model. High bias means the model makes strong assumptions that prevent it from capturing the true pattern. It consistently misses the target — like an archer whose bow is sighted incorrectly: every arrow lands in the same wrong spot, but tightly clustered.</p>
+  </div>
+
+  <div class="definition-box">
+    <h4>Variance (Sensitivity to Data)</h4>
+    <p><strong>Variance</strong> is the error introduced by the model's sensitivity to fluctuations in the training data. High variance means the model learns different patterns depending on which specific training samples it sees. Like an archer with an unsteady hand: the arrows scatter widely around the target, sometimes hitting the bullseye by luck, sometimes missing badly.</p>
+  </div>
+
+  <div class="definition-box">
+    <h4>Irreducible Noise (σ²)</h4>
+    <p><strong>Irreducible noise</strong> is the inherent randomness in the data that no model can eliminate — measurement error, missing variables, stochastic processes. Even a perfect model with infinite data would still have this error. It sets the theoretical floor for model performance.</p>
+  </div>
+
+  <div class="formula">
+    <span class="label">Full Expansion — Squared Error Decomposition</span>
+    E[(y − f̂(x))²] = [Bias(f̂(x))]² + Var(f̂(x)) + σ²
+    <br><br>
+    where:
+    <br>
+    Bias(f̂(x)) = E[f̂(x)] − f(x)     (average prediction minus true value)
+    <br>
+    Var(f̂(x)) = E[(f̂(x) − E[f̂(x)])²]   (variance of predictions across training sets)
+  </div>
+
+  <h3>The Three Regions</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Region</th>
+        <th>Bias</th>
+        <th>Variance</th>
+        <th>Behaviour</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Underfitting</strong></td>
+        <td style="color: var(--accent-red);">HIGH</td>
+        <td style="color: var(--accent-green);">Low</td>
+        <td>Model is too simple. Cannot capture the underlying pattern. Both training and test error are high.</td>
+      </tr>
+      <tr>
+        <td><strong>Sweet Spot</strong></td>
+        <td style="color: var(--accent-green);">Low</td>
+        <td style="color: var(--accent-green);">Low</td>
+        <td>Model complexity matches the data. Bias² + Variance is minimised. Best generalisation.</td>
+      </tr>
+      <tr>
+        <td><strong>Overfitting</strong></td>
+        <td style="color: var(--accent-green);">Low</td>
+        <td style="color: var(--accent-red);">HIGH</td>
+        <td>Model is too complex. Fits training noise. Training error near zero, test error explodes.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="analogy-box">
+    <h4>Analogy — Throwing Darts at a Board</h4>
+    <p>Imagine you are throwing darts at a bullseye, and you throw many rounds, each time with a slightly different dartboard (representing different training sets):</p>
+    <ul>
+      <li><strong>High Bias, Low Variance (Underfitting):</strong> All your darts land tightly clustered together, but they are centred in the top-left corner — far from the bullseye. You are consistently wrong, but consistently wrong in the same way. A model that always predicts the mean of the training data has this property.</li>
+      <li><strong>Low Bias, High Variance (Overfitting):</strong> Your darts are scattered all over the board. Some land near the bullseye, some in the corners. The average position is roughly the centre, but each individual throw is unreliable. A high-degree polynomial that fits every training point perfectly has this property.</li>
+      <li><strong>Low Bias, Low Variance (Sweet Spot):</strong> Your darts cluster tightly around the bullseye. Each throw lands close to the centre, and over many throws they stay there. This is the goal — a model that consistently predicts close to the true value.</li>
+    </ul>
+  </div>
+
+  <h3>Visualising the Trade-Off</h3>
+  <p>As model complexity increases from left to right:</p>
+  <ul>
+    <li><strong>Bias² decreases monotonically</strong> — more complex models fit the training data better</li>
+    <li><strong>Variance increases monotonically</strong> — more complex models are more sensitive to which training samples they see</li>
+    <li><strong>Total Error follows a U-shape</strong> — it initially decreases (bias drops faster than variance rises), reaches a minimum, then increases (variance dominates)</li>
+    <li>The optimal model sits at the <strong>bottom of the U</strong></li>
+  </ul>
+
+  <div class="recap-box">
+    <h4>Recap — Bias-Variance Trade-Off</h4>
+    <ul>
+      <li>Expected Test Error = Bias² + Variance + Noise</li>
+      <li>Increasing model complexity reduces bias but increases variance</li>
+      <li>The goal is to find the complexity level where total error is minimised</li>
+      <li>Underfitting: too simple → high bias → poor on both train and test</li>
+      <li>Overfitting: too complex → high variance → great on train, terrible on test</li>
+      <li>Validation (and CV) helps us find the sweet spot without touching the test set</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 4: K-FOLD CROSS-VALIDATION
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="k-fold-cv" data-progress-section>
+  <h2>K-Fold Cross-Validation</h2>
+
+  <p>When data is limited, holding out a fixed validation set wastes valuable training examples. K-Fold Cross-Validation (CV) solves this by <strong>rotating</strong> which portion of data serves as validation, ensuring every sample is used for both training and evaluation.</p>
+
+  <h3>Step-by-Step Derivation</h3>
+
+  <div class="worked-example">
+    <span class="example-title">Worked Example — K-Fold CV Algorithm</span>
+
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">Partition</span>
+      <div class="step-content">
+        Randomly shuffle the dataset and divide it into K equal (or nearly equal) folds.<br>
+        Example: K = 5 folds, N = 1000 samples → each fold has 200 samples.
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">2</span>
+      <span class="step-title">Iterate</span>
+      <div class="step-content">
+        For i = 1 to K:<br>
+        &nbsp;&nbsp;• Hold out fold i as the <strong>validation set</strong><br>
+        &nbsp;&nbsp;• Train the model on the remaining K − 1 folds (the training set)<br>
+        &nbsp;&nbsp;• Evaluate the trained model on fold i, recording the score
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">3</span>
+      <span class="step-title">Average</span>
+      <div class="step-content">
+        CV Score = (1/K) × Σ Score_i<br>
+        Standard Deviation = sqrt((1/K) × Σ (Score_i − CV Score)²)<br>
+        The mean gives the performance estimate; the std dev gives the variability.
+      </div>
+    </div>
+  </div>
+
+  <h3>Worked Example — 3-Fold CV for House Price Prediction</h3>
+
+  <div class="worked-example">
+    <span class="example-title">Worked Example — 3-Fold CV with 9 Samples</span>
+
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">Setup</span>
+      <div class="step-content">
+        We have 9 house samples. We want to predict price using a regression model.<br>
+        Evaluation metric: RMSE (Root Mean Squared Error) in thousands of dollars.
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">2</span>
+      <span class="step-title">Partition into 3 Folds</span>
+      <div class="step-content">
+        Fold 1: Samples {1, 2, 3}<br>
+        Fold 2: Samples {4, 5, 6}<br>
+        Fold 3: Samples {7, 8, 9}
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">3</span>
+      <span class="step-title">Run 3 Training Rounds</span>
+      <div class="step-content">
+        Round 1: Train on {4,5,6,7,8,9}, evaluate on {1,2,3} → RMSE₁ = 12.4k<br>
+        Round 2: Train on {1,2,3,7,8,9}, evaluate on {4,5,6} → RMSE₂ = 14.1k<br>
+        Round 3: Train on {1,2,3,4,5,6}, evaluate on {7,8,9} → RMSE₃ = 11.8k
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">4</span>
+      <span class="step-title">Compute CV Score</span>
+      <div class="step-content">
+        CV Score = (12.4 + 14.1 + 11.8) / 3 = 38.3 / 3 = <strong>12.77k</strong><br>
+        <br>
+        Variance = [(12.4 − 12.77)² + (14.1 − 12.77)² + (11.8 − 12.77)²] / 3<br>
+        &nbsp;&nbsp;= [0.1369 + 1.7689 + 0.9409] / 3<br>
+        &nbsp;&nbsp;= 2.8467 / 3<br>
+        &nbsp;&nbsp;= 0.9489<br>
+        <br>
+        Std Dev = √0.9489 = <strong>0.96k</strong><br>
+        <br>
+        Final: <strong>12.77k ± 0.96k</strong>
+      </div>
+    </div>
+
+    <div class="step">
+      <span class="step-num">5</span>
+      <span class="step-title">Interpretation</span>
+      <div class="step-content">
+        We expect our model to make predictions with an average RMSE of approximately $12,770 ± $960. The relatively small standard deviation suggests the model's performance is stable across different data partitions.
+      </div>
+    </div>
+  </div>
+
+  <h3>Why K-Fold CV is Better Than a Single Split</h3>
+  <ul>
+    <li><strong>Every sample is used for both training and validation</strong> — no data is wasted</li>
+    <li><strong>The performance estimate is more reliable</strong> — it is averaged over K different train/test combinations</li>
+    <li><strong>The variance of the estimate tells us how stable the model is</strong> — high variance across folds signals that performance is data-dependent</li>
+    <li><strong>Reduces the luck factor</strong> — a single validation split might be unusually easy or hard by chance</li>
+  </ul>
+
+  <h3>Choosing K</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>K Value</th>
+        <th>When to Use</th>
+        <th>Trade-Off</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>K = 5</strong></td>
+        <td>Standard choice for most datasets</td>
+        <td>Good balance of bias and computational cost</td>
+      </tr>
+      <tr>
+        <td><strong>K = 10</strong></td>
+        <td>Larger datasets, or when more reliable estimates needed</td>
+        <td>Lower bias but 2× computational cost vs K=5</td>
+      </tr>
+      <tr>
+        <td><strong>K = N (LOO)</strong></td>
+        <td>Very small datasets (N &lt; 50)</td>
+        <td>Lowest bias, but highest computational cost and highest variance</td>
+      </tr>
+      <tr>
+        <td><strong>K = 3</strong></td>
+        <td>Very large datasets where speed matters</td>
+        <td>Higher bias, but fast</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <h4>Warning — Leave-One-Out (LOO) CV</h4>
+    <p>LOO is computationally expensive (N model fits) and has <strong>high variance</strong> because each training set differs by only one sample. The K training sets overlap heavily, making the estimates highly correlated. Use LOO only when data is extremely scarce and you need every possible training sample.</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>K-Fold CV is the gold standard for estimating model performance with limited data. Choose K = 5 or K = 10 as default; use LOO for tiny datasets. Always report both the mean and the standard deviation across folds.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 5: CV STRATEGIES TABLE
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="cv-strategies" data-progress-section>
+  <h2>CV Strategies — When to Use What</h2>
+
+  <p>Different data distributions and problem types require different cross-validation strategies. Using the wrong strategy can lead to <strong>data leakage</strong> or <strong>unreliable estimates</strong>.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Strategy</th>
+        <th>How It Works</th>
+        <th>When to Use</th>
+        <th>Pros</th>
+        <th>Cons</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Standard K-Fold</strong></td>
+        <td>Randomly split data into K folds; rotate validation fold</td>
+        <td>General-purpose regression and classification with IID data</td>
+        <td>Simple, reliable, widely understood</td>
+        <td>Not suitable for time series or grouped data</td>
+      </tr>
+      <tr>
+        <td><strong>Stratified K-Fold</strong></td>
+        <td>Each fold preserves the class distribution of the full dataset</td>
+        <td>Classification with imbalanced classes</td>
+        <td>Ensures every fold represents all classes proportionally</td>
+        <td>Slightly more complex to implement; not for regression</td>
+      </tr>
+      <tr>
+        <td><strong>Leave-One-Out (LOO)</strong></td>
+        <td>K = N; each sample is its own fold</td>
+        <td>Very small datasets (N &lt; 50)</td>
+        <td>Maximum training data per fold; no randomness in splits</td>
+        <td>N model fits; high variance; computationally expensive</td>
+      </tr>
+      <tr>
+        <td><strong>Time-Series Split</strong></td>
+        <td>Training set always precedes validation set in time order</td>
+        <td>Sequential/temporal data (stocks, weather, logs)</td>
+        <td>Respects temporal ordering; no future data leakage</td>
+        <td>Later folds have much more training data; earlier folds may be too small</td>
+      </tr>
+      <tr>
+        <td><strong>Group K-Fold</strong></td>
+        <td>All samples from the same group stay in the same fold</td>
+        <td>Data with groups (patients, users, geographic regions)</td>
+        <td>Prevents leakage between related samples</td>
+        <td>Fewer effective training samples; more variance in estimates</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="analogy-box">
+    <h4>Analogy — Exam Proctoring Strategies</h4>
+    <ul>
+      <li><strong>Standard K-Fold</strong> is like randomly assigning students to study groups — anyone can be with anyone.</li>
+      <li><strong>Stratified K-Fold</strong> ensures each study group has a proportional mix of strong, average, and weak students — nobody gets a group of only top performers.</li>
+      <li><strong>Time-Series Split</strong> means you can only study with people from the past semester — you never use information from the future to prepare.</li>
+      <li><strong>Group K-Fold</strong> keeps siblings in the same study group — because if one sibling shares their notes, the other knows the content too.</li>
+    </ul>
+  </div>
+
+  <div class="warning-box">
+    <h4>Data Leakage — The Silent Killer</h4>
+    <p><strong>Data leakage</strong> occurs when information from outside the training set leaks into the model. Using standard K-Fold on time-series data is the classic mistake — a model trained on days 1–50 validated on day 60 might have features computed from day 55, which is <em>before</em> the validation date but <em>after</em> the training cutoff. Always use <strong>Time-Series Split</strong> for temporal data.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 6: HYPERPARAMETER OPTIMISATION
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="hyperparameter-optimisation" data-progress-section>
+  <h2>Hyperparameter Optimisation</h2>
+
+  <h3>Parameters vs Hyperparameters</h3>
+
+  <div class="definition-box">
+    <h4>Definition — Parameters vs Hyperparameters</h4>
+    <p><strong>Parameters</strong> are learned from data during training (e.g., weights in a neural network, coefficients in linear regression, split thresholds in a decision tree). <strong>Hyperparameters</strong> are set <em>before</em> training and control the learning process (e.g., learning rate, regularisation strength λ, max depth of a tree, K in K-Nearest Neighbours).</p>
+  </div>
+
+  <div class="formula">
+    <span class="label">The Hyperparameter Search Problem</span>
+    θ* = argmin_θ CV_Score(θ)
+    <br><br>
+    where θ = set of hyperparameters, CV_Score(θ) = K-Fold CV score for configuration θ
+  </div>
+
+  <h3>Search Strategies</h3>
+
+  <h4>1. Grid Search (Exhaustive Search)</h4>
+  <div class="worked-example">
+    <span class="example-title">How Grid Search Works</span>
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">Define the Search Space</span>
+      <div class="step-content">
+        learning_rate ∈ {0.001, 0.01, 0.1, 1.0}<br>
+        max_depth ∈ {3, 5, 7, 10}<br>
+        n_estimators ∈ {100, 200, 500}
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">2</span>
+      <span class="step-title">Enumerate All Combinations</span>
+      <div class="step-content">
+        Total combinations = 4 × 4 × 3 = <strong>48 configurations</strong><br>
+        With 5-Fold CV: 48 × 5 = <strong>240 model fits</strong>
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">3</span>
+      <span class="step-title">Select the Best</span>
+      <div class="step-content">
+        Choose the θ with the lowest mean CV score.
+      </div>
+    </div>
+  </div>
+
+  <p><strong>Pros:</strong> Guarantees finding the best combination within the grid. Simple to implement.</p>
+  <p><strong>Cons:</strong> Computational cost grows <strong>exponentially</strong> with the number of hyperparameters (curse of dimensionality). Wastes time evaluating unimportant parameter combinations.</p>
+
+  <h4>2. Random Search</h4>
+  <p>Instead of exhaustively searching every combination, Random Search samples a fixed number of random configurations from the search space.</p>
+
+  <div class="worked-example">
+    <span class="example-title">How Random Search Works</span>
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">Define Distributions</span>
+      <div class="step-content">
+        learning_rate ~ LogUniform(0.0001, 1.0)<br>
+        max_depth ~ UniformInt(2, 20)<br>
+        n_estimators ~ UniformInt(50, 1000)
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">2</span>
+      <span class="step-title">Sample N Configurations</span>
+      <div class="step-content">
+        With n_iter=60: 60 random configurations × 5-fold CV = 300 model fits<br>
+        But we explore a much wider range of values than Grid Search
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">3</span>
+      <span class="step-title">Select the Best</span>
+      <div class="step-content">
+        Same as Grid Search — pick the configuration with lowest CV score.
+      </div>
+    </div>
+  </div>
+
+  <p><strong>Pros:</strong> Faster than Grid Search; explores more of the search space; works well when some hyperparameters matter more than others.</p>
+  <p><strong>Cons:</strong> No guarantee of finding the absolute best; may miss narrow optima. Still requires specifying the number of iterations.</p>
+
+  <h4>3. Bayesian Optimisation</h4>
+  <p>Bayesian Optimisation builds a <strong>probabilistic model</strong> of the objective function (CV score as a function of hyperparameters) and uses it to decide which configuration to try next. It balances exploration (trying uncertain regions) and exploitation (refining promising regions).</p>
+
+  <div class="analogy-box">
+    <h4>Analogy — Finding the Best Restaurant</h4>
+    <ul>
+      <li><strong>Grid Search</strong> is visiting every restaurant in the city in a systematic order. Exhaustive but takes forever.</li>
+      <li><strong>Random Search</strong> is picking restaurants at random from the phone book. Faster, covers more ground, but no memory of past meals.</li>
+      <li><strong>Bayesian Search</strong> is visiting restaurants, remembering which ones were good, and deliberately trying new places in the neighbourhoods that seem promising while occasionally exploring unfamiliar areas.</li>
+    </ul>
+  </div>
+
+  <p><strong>Pros:</strong> More efficient — finds good configurations with fewer evaluations; adapts based on past results.</p>
+  <p><strong>Cons:</strong> More complex to implement; parallelisation is harder since each new evaluation depends on previous results.</p>
+
+  <h3>Nested Cross-Validation</h3>
+
+  <div class="definition-box">
+    <h4>Definition — Nested CV</h4>
+    <p><strong>Nested CV</strong> uses an outer loop for unbiased performance estimation and an inner loop for hyperparameter selection. The outer loop estimates generalisation; the inner loop tunes hyperparameters within each outer fold.</p>
+  </div>
+
+  <div class="worked-example">
+    <span class="example-title">Worked Example — Nested CV Structure</span>
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">Outer Loop (5-Fold)</span>
+      <div class="step-content">
+        Split data into 5 outer folds. For each outer fold i:<br>
+        &nbsp;&nbsp;• Outer train = 4 folds, Outer test = 1 fold (hold out)
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">2</span>
+      <span class="step-title">Inner Loop (3-Fold)</span>
+      <div class="step-content">
+        On the outer train set, run 3-Fold CV to find the best hyperparameters.<br>
+        This is where hyperparameter tuning happens.
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">3</span>
+      <span class="step-title">Evaluate</span>
+      <div class="step-content">
+        Retrain with the best hyperparameters on the full outer train set.<br>
+        Evaluate on the outer test fold → record score.
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">4</span>
+      <span class="step-title">Final Score</span>
+      <div class="step-content">
+        Average the 5 outer fold scores → unbiased estimate of generalisation.
+      </div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <h4>Common Mistake — Confusing Inner and Outer CV Scores</h4>
+    <p>The inner CV score tells you which hyperparameters work best <em>on the training data</em>. The outer CV score tells you how the model with those hyperparameters generalises to <em>unseen data</em>. <strong>Never report the inner CV score as your model's performance</strong> — it is optimistically biased because the hyperparameters were chosen to minimise it. Always report the outer CV score.</p>
+  </div>
+
+  <div class="formula">
+    <span class="label">Nested CV — Total Model Fits</span>
+    Total Fits = Outer_K × Inner_K × n_configs<br>
+    Example: Outer=5, Inner=3, 50 configs = 5 × 3 × 50 = 750 fits
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>Hyperparameter tuning is itself a form of learning — it must be contained within the cross-validation pipeline to avoid overfitting. Nested CV separates the "tuning" loop from the "evaluation" loop, giving you an honest performance estimate. Use Random Search as default; switch to Bayesian for expensive evaluations.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 7: ERM RE-ANCHOR
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="erm-reanchor" data-progress-section>
+  <h2>ERM Re-Anchor</h2>
+
+  <p>We revisit the Empirical Risk Minimisation (ERM) framework from Topic 1 and show how each of its fundamental problems connects to the validation and generalisation tools we have just learned.</p>
+
+  <div class="definition-box">
+    <h4>Definition — Empirical Risk Minimisation (ERM)</h4>
+    <p>ERM is the principle of choosing the hypothesis h ∈ H that minimises the average loss over the <em>training</em> data:<br><br>
+    h* = argmin<sub>h ∈ H</sub> (1/n) Σᵢ L(h(xᵢ), yᵢ)<br><br>
+    The empirical risk R̂(h) approximates the true risk R(h) = E[L(h(x), y)].</p>
+  </div>
+
+  <h3>Three Problems of ERM and Their Solutions</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Problem</th>
+        <th>Description</th>
+        <th>Solution</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Problem 1: ERM overfits</strong></td>
+        <td>Minimising empirical risk alone leads to memorisation — the model achieves zero training error but fails to generalise. More complex models always fit training data better, so ERM without constraint always prefers the most complex hypothesis.</td>
+        <td><strong>K-Fold Cross-Validation</strong> — provides an unbiased estimate of true risk, allowing us to select the model that generalises rather than the one that memorises.</td>
+      </tr>
+      <tr>
+        <td><strong>Problem 2: Unknown true risk minimiser</strong></td>
+        <td>Even if we know the best hypothesis exists, we cannot access the true data distribution to find it. We only have finite samples, which may not represent the full distribution.</td>
+        <td><strong>Regularisation</strong> — constrains the hypothesis space, reducing the gap between empirical and true risk by limiting model complexity (e.g., L1, L2 penalties).</td>
+      </tr>
+      <tr>
+        <td><strong>Problem 3: Which hypothesis class?</strong></td>
+        <td>ERM takes the hypothesis class H as given. But how do we choose H? A linear model, a decision tree, and a neural network have very different H.</td>
+        <td><strong>Hyperparameter Optimisation</strong> — systematically searches over different hypothesis classes (via their hyperparameters) using CV to find the best one.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="formula">
+    <span class="label">The ERM Framework with Solutions</span>
+    True Risk:  R(h) = E[L(h(x), y)]                ← Unknown, cannot compute
+    <br>
+    Empirical Risk:  R̂(h) = (1/n) Σ L(h(xᵢ), yᵢ)    ← What ERM minimises
+    <br>
+    Regularised Risk:  R̂(h) + λΩ(h)                   ← Constrains complexity
+    <br>
+    CV Estimate:  (1/K) Σ Score_k                      ← Unbiased estimate of R(h)
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy — Studying for an Unknown Exam</h4>
+    <p>You are preparing for an exam but you don't know the exact questions (true risk is unknown). You have a set of past papers (training data). <strong>ERM</strong> says: find the study strategy that scores highest on these past papers. But this might mean memorising exact answers. <strong>Cross-validation</strong> is like having a friend hold back some past papers for a mock exam — it tests whether your strategy actually works. <strong>Regularisation</strong> is like forcing yourself to understand concepts rather than memorise — it constrains your approach to be simpler and more robust. <strong>Hyperparameter optimisation</strong> is choosing between studying techniques (flashcards vs practice problems vs summary notes).</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>The ERM framework is the theoretical foundation; CV, regularisation, and hyperparameter optimisation are the practical tools that address its three fundamental weaknesses. Together, they form the complete toolkit for building models that generalise.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 8: REGULARISATION
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="regularisation" data-progress-section>
+  <h2>Regularisation</h2>
+
+  <p>Regularisation adds a <strong>penalty for model complexity</strong> to the loss function, discouraging the model from fitting noise. It is the mathematical embodiment of Occam's Razor: among models with similar performance, prefer the simpler one.</p>
+
+  <div class="formula">
+    <span class="label">Regularised Loss Function</span>
+    L_regularised = L_original + λ × Ω(w)
+    <br><br>
+    where:
+    <br>
+    L_original = original loss (e.g., MSE, cross-entropy)
+    <br>
+    λ (lambda) = regularisation strength (hyperparameter)
+    <br>
+    Ω(w) = penalty on the model parameters
+  </div>
+
+  <h3>L2 Regularisation (Ridge)</h3>
+
+  <div class="definition-box">
+    <h4>Definition — L2 / Ridge Regularisation</h4>
+    <p><strong>L2 Regularisation</strong> adds the sum of squared weights to the loss function. It shrinks all weights toward zero but rarely makes them exactly zero. This prevents any single feature from dominating the prediction.</p>
+  </div>
+
+  <div class="formula">
+    <span class="label">L2 (Ridge) Loss</span>
+    L_Ridge = L_original + λ × Σᵢ wᵢ²
+    <div class="formula-note">λ > 0: penalises large weights. λ = 0: no regularisation. λ → ∞: all weights → 0.</div>
+  </div>
+
+  <div class="worked-example">
+    <span class="example-title">Worked Example — L2 Regularisation Effect</span>
+    <div class="step">
+      <span class="step-num">1</span>
+      <span class="step-title">Without Regularisation</span>
+      <div class="step-content">
+        Original Loss = 2.5, Weights: w₁=3.0, w₂=−2.5, w₃=1.8<br>
+        Total Loss = 2.5 + 0 = 2.5
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">2</span>
+      <span class="step-title">With λ = 0.1 (Light Regularisation)</span>
+      <div class="step-content">
+        Penalty = 0.1 × (3.0² + 2.5² + 1.8²) = 0.1 × (9.0 + 6.25 + 3.24) = 0.1 × 18.49 = 1.849<br>
+        Total Loss = 2.5 + 1.849 = 4.349<br>
+        Model must now balance fitting data (loss=2.5) against keeping weights small (penalty=1.849)
+      </div>
+    </div>
+    <div class="step">
+      <span class="step-num">3</span>
+      <span class="step-title">Effect on Weights</span>
+      <div class="step-content">
+        The optimiser will find weights that slightly increase training loss but are smaller in magnitude:<br>
+        New weights might be: w₁=2.1, w₂=−1.8, w₃=1.3 (all shrunk toward zero)<br>
+        New Loss: 2.9 (slightly worse) but Penalty: 0.1 × (4.41+3.24+1.69) = 0.934<br>
+        Total: 2.9 + 0.934 = 3.834 → better than 4.349
+      </div>
+    </div>
+  </div>
+
+  <h3>L1 Regularisation (Lasso)</h3>
+
+  <div class="definition-box">
+    <h4>Definition — L1 / Lasso Regularisation</h4>
+    <p><strong>L1 Regularisation</strong> adds the sum of absolute weights to the loss function. Unlike L2, it can drive weights to <strong>exactly zero</strong>, effectively performing automatic feature selection.</p>
+  </div>
+
+  <div class="formula">
+    <span class="label">L1 (Lasso) Loss</span>
+    L_Lasso = L_original + λ × Σᵢ |wᵢ|
+    <div class="formula-note">λ > 0: penalises large weights. Drives irrelevant feature weights to exactly 0.</div>
+  </div>
+
+  <h3>L1 vs L2 Comparison</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>L2 (Ridge)</th>
+        <th>L1 (Lasso)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Penalty</td>
+        <td>λ × Σwᵢ²</td>
+        <td>λ × Σ|wᵢ|</td>
+      </tr>
+      <tr>
+        <td>Effect on small weights</td>
+        <td>Shrinks toward zero</td>
+        <td>Can set to exactly zero</td>
+      </tr>
+      <tr>
+        <td>Feature selection</td>
+        <td>No — retains all features</td>
+        <td>Yes — zeroes out irrelevant features</td>
+      </tr>
+      <tr>
+        <td>When to use</td>
+        <td>All features potentially relevant</td>
+        <td>Many features, suspect some are irrelevant</td>
+      </tr>
+      <tr>
+        <td>Geometry</td>
+        <td>Circular constraint region (smooth)</td>
+        <td>Diamond constraint region (corners on axes)</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="analogy-box">
+    <h4>Analogy — Packing for a Trip</h4>
+    <p><strong>L2 (Ridge)</strong> is like a strict weight limit on your suitcase — you must reduce the weight of every item proportionally. Nothing gets left behind, but everything gets lighter. <strong>L1 (Lasso)</strong> is like a hard item limit — you can only bring 3 things. Some items get completely removed, while the ones you keep stay at full strength. The "diamond" shape of the L1 constraint means the optimal solution often lands on an axis (weight = 0).</p>
+  </div>
+
+  <h3>The Role of λ</h3>
+  <ul>
+    <li><strong>λ = 0:</strong> No regularisation — pure ERM (risk of overfitting)</li>
+    <li><strong>λ small:</strong> Light regularisation — slight shrinkage, mild protection against overfitting</li>
+    <li><strong>λ moderate:</strong> Balanced — the sweet spot found via cross-validation</li>
+    <li><strong>λ large:</strong> Heavy regularisation — all weights near zero (risk of underfitting)</li>
+  </ul>
+
+  <p>The optimal λ is chosen via <strong>cross-validation</strong>, treating it as a hyperparameter. This connects directly back to the ERM framework: regularisation addresses the problem of unknown true risk minimisers by constraining the hypothesis space.</p>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>L2 (Ridge) shrinks all weights — use when all features matter. L1 (Lasso) drives weights to zero — use for feature selection. λ controls the bias-variance trade-off: higher λ increases bias but decreases variance. Always tune λ via cross-validation.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 9: PREVENTING OVERFITTING
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="preventing-overfitting" data-progress-section>
+  <h2>Preventing Overfitting</h2>
+
+  <p>Overfitting is the most common failure mode in machine learning. Fortunately, there are multiple well-established techniques to combat it, each addressing different aspects of the bias-variance trade-off.</p>
+
+  <h3>Five Strategies</h3>
+
+  <h4>1. Regularisation</h4>
+  <p>Add a penalty term to the loss function that discourages large weights. This constrains the model's capacity without changing its architecture. Covered in detail in Section 8. Common types: L1 (Lasso), L2 (Ridge), Elastic Net (combination).</p>
+
+  <h4>2. More Training Data</h4>
+  <p>With more data, the training set becomes a better representation of the true distribution, reducing the chance of memorising noise. This is the most reliable remedy, but is often expensive or impossible. There is a point of diminishing returns — beyond a certain dataset size, adding more data yields negligible improvement.</p>
+
+  <div class="formula">
+    <span class="label">Learning Curve Intuition</span>
+    As n → ∞:  Training Error ↑ (harder to memorise more data)
+    <br>
+    As n → ∞:  Test Error ↓ (better estimate of true distribution)
+    <br>
+    As n → ∞:  Gap between train and test → 0 (generalisation improves)
+  </div>
+
+  <h4>3. Simpler Model</h4>
+  <p>Reduce model complexity directly. Examples: use fewer features, reduce tree depth, use fewer hidden layers in a neural network, decrease polynomial degree. This moves the model toward the underfitting side of the bias-variance trade-off.</p>
+
+  <h4>4. Dropout (Neural Networks)</h4>
+  <p>During training, randomly "turn off" (set to zero) a fraction of neurons at each layer. This prevents neurons from co-adapting and forces the network to learn redundant, robust representations. At test time, all neurons are active but their outputs are scaled down. Dropout is equivalent to training an ensemble of exponentially many sub-networks and averaging their predictions.</p>
+
+  <div class="formula">
+    <span class="label">Dropout Mechanism</span>
+    Training:  rⱼ ~ Bernoulli(1 − p)  (each neuron kept with probability 1−p)
+    <br>
+    ŷ = r ⊙ y   (element-wise multiply — zeroed neurons contribute nothing)
+    <br>
+    Testing:  ŷ = (1 − p) × y   (scaled to maintain expected output)
+  </div>
+
+  <h4>5. Early Stopping</h4>
+  <p>Monitor validation loss during training. Stop training when validation loss stops decreasing (or starts increasing), even if training loss is still falling. This prevents the model from over-training on the training set. Most practical for iterative algorithms like gradient descent.</p>
+
+  <div class="analogy-box">
+    <h4>Analogy — Studying for an Exam</h4>
+    <ul>
+      <li><strong>Regularisation:</strong> Setting a rule — "I will only study the top 3 most important topics deeply" — constrains what you focus on.</li>
+      <li><strong>More data:</strong> Getting additional past papers from previous years — more examples to study from.</li>
+      <li><strong>Simpler model:</strong> Choosing to study a concise summary guide instead of the entire textbook.</li>
+      <li><strong>Dropout:</strong> Occasionally closing your eyes and trying to recall a topic from memory — forces you to build robust understanding rather than relying on one specific cue.</li>
+      <li><strong>Early stopping:</strong> Recognising when further study is not improving your mock exam scores and stopping — more cramming won't help and may cause burnout.</li>
+    </ul>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>Preventing overfitting requires a multi-pronged approach. Regularisation and early stopping are the most universally applicable. Dropout is specific to neural networks. More data is the most reliable but often impractical. Simpler models trade some training performance for better generalisation. The best strategy often combines several of these techniques.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 10: FEATURE ENGINEERING
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="feature-engineering" data-progress-section>
+  <h2>Feature Engineering Inside the Pipeline</h2>
+
+  <p>Feature selection and engineering are powerful ways to reduce model complexity and prevent overfitting. However, they must be done <strong>inside</strong> the cross-validation pipeline — otherwise, information from the validation set leaks into training.</p>
+
+  <div class="definition-box">
+    <h4>Definition — Data Leakage via Feature Selection</h4>
+    <p>If you select features using the <em>entire</em> dataset before splitting for CV, the feature selection process has seen the validation data. The selected features may be optimal for the validation set, producing an overly optimistic CV score. Feature selection must happen <strong>only on the training fold</strong> within each CV iteration.</p>
+  </div>
+
+  <h3>Feature Importance Methods</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Method</th>
+        <th>How It Works</th>
+        <th>Best For</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Gini / Impurity Importance</strong></td>
+        <td>Sum of impurity reductions at splits using a feature, normalised</td>
+        <td>Tree-based models (Decision Trees, Random Forests, XGBoost)</td>
+      </tr>
+      <tr>
+        <td><strong>Permutation Importance</strong></td>
+        <td>Shuffle one feature at a time; measure the drop in model performance</td>
+        <td>Any model; model-agnostic; more reliable than impurity importance</td>
+      </tr>
+      <tr>
+        <td><strong>Correlation / VIF</strong></td>
+        <td>Correlation matrix or Variance Inflation Factor to detect multicollinearity</td>
+        <td>Linear models; identifying redundant features</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Correct vs Incorrect Pipeline</h3>
+
+  <div class="flex-row">
+    <div class="flex-1">
+      <h4 style="color: var(--accent-green);">&#10003; Correct Pipeline</h4>
+      <div class="worked-example">
+        <span class="example-title">Correct: Feature Selection Inside CV</span>
+        <div class="step">
+          <span class="step-num">1</span>
+          <span class="step-title">For each CV fold:</span>
+          <div class="step-content">
+            a) Split into train fold and validation fold<br>
+            b) Select top features using <strong>only</strong> the train fold<br>
+            c) Train model on selected features from train fold<br>
+            d) Evaluate on validation fold using <strong>same</strong> selected features<br>
+            → No information leakage
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex-1">
+      <h4 style="color: var(--accent-red);">&#10007; Incorrect Pipeline</h4>
+      <div class="worked-example">
+        <span class="example-title">Incorrect: Feature Selection Before CV</span>
+        <div class="step">
+          <span class="step-num">1</span>
+          <span class="step-title">Before any CV:</span>
+          <div class="step-content">
+            a) Select top features using <strong>entire dataset</strong><br>
+            b) Then run CV on the selected features<br>
+            → Validation folds influenced the selection<br>
+            → CV score is <strong>optimistically biased</strong><br>
+            → Real performance will be worse
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <h4>Data Leakage Checklist</h4>
+    <ul>
+      <li>Feature selection done before CV? <strong>Leakage!</strong></li>
+      <li>Scaling/normalisation done before CV? <strong>Leakage!</strong> (Use fit_transform on train, transform on validation)</li>
+      <li>Imputation done before CV? <strong>Leakage!</strong> (Learn imputation statistics from train only)</li>
+      <li>Feature engineering (e.g., target encoding) done before CV? <strong>Leakage!</strong></li>
+      <li>Any preprocessing that uses validation data statistics? <strong>Leakage!</strong></li>
+    </ul>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Key Takeaway</h4>
+    <p>All preprocessing — feature selection, scaling, imputation, encoding — must happen <strong>inside</strong> the CV loop, fitted only on the training fold. Using sklearn's <code>Pipeline</code> class makes this automatic and foolproof. Never fit any transformer on the full dataset before cross-validation.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SECTION 11: COMMON MISCONCEPTIONS
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="common-misconceptions" data-progress-section>
+  <h2>Common Misconceptions</h2>
+
+  <p>Several persistent myths can lead practitioners astray. Here we address the most common misconceptions about model evaluation and generalisation.</p>
+
+  <div class="collapsible">
+    <div class="collapsible-header">
+      <span>&#10007; Misconception 1: "High R² means a good model"</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="collapsible-body">
+      <p><strong>Reality:</strong> R² measures how much variance in the target variable is explained by the model — <em>on the training data</em>. A model with 100 features on 50 samples can achieve R² = 0.99 while being completely useless on new data. R² on training data tells you nothing about generalisation.</p>
+      <p><strong>Correct approach:</strong> Always report R² on the test set (or via cross-validation). Compare it to training R² — a large gap signals overfitting. Also check if R² is meaningfully above a simple baseline (e.g., predicting the mean).</p>
+      <div class="takeaway-box">
+        <h4>Key Point</h4>
+        <p>A high training R² with a low test R² is the textbook signature of overfitting. R² is only meaningful when measured on unseen data.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">
+      <span>&#10007; Misconception 2: "More features always improve the model"</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="collapsible-body">
+      <p><strong>Reality:</strong> Adding irrelevant features introduces noise and increases variance without reducing bias. This is the <strong>curse of dimensionality</strong> — in high-dimensional spaces, data becomes sparse and models struggle to find meaningful patterns. Adding features also increases computational cost and the risk of overfitting.</p>
+      <p><strong>Correct approach:</strong> Use feature selection (L1 regularisation, permutation importance, correlation analysis) to keep only informative features. A model with 10 well-chosen features often outperforms one with 100 noisy features.</p>
+      <div class="takeaway-box">
+        <h4>Key Point</h4>
+        <p>Quality trumps quantity in feature engineering. Irrelevant features increase variance, slow training, and can actually <em>decrease</em> test performance.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">
+      <span>&#10007; Misconception 3: "Cross-validation trains the final model"</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="collapsible-body">
+      <p><strong>Reality:</strong> Cross-validation is an <strong>evaluation procedure</strong>, not a training procedure. The models trained during CV folds are discarded — they exist only to estimate generalisation performance. The final model must be retrained on <strong>all available training data</strong> (train + validation) after CV is complete and hyperparameters are selected.</p>
+      <p><strong>The workflow:</strong></p>
+      <ol>
+        <li>Use CV on the training set to evaluate different configurations</li>
+        <li>Select the best hyperparameters based on CV scores</li>
+        <li>Retrain the final model on ALL training data with the selected hyperparameters</li>
+        <li>Evaluate once on the held-out test set</li>
+      </ol>
+      <div class="takeaway-box">
+        <h4>Key Point</h4>
+        <p>CV evaluates; it does not produce the final model. After selecting hyperparameters via CV, retrain on all training data before the final test evaluation.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">
+      <span>&#10007; Misconception 4: "Normalising/standardising always helps"</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="collapsible-body">
+      <p><strong>Reality:</strong> Feature scaling is essential for distance-based algorithms (KNN, SVM, K-Means) and gradient-based algorithms (neural networks, logistic regression). However, <strong>tree-based models (Decision Trees, Random Forests, Gradient Boosting)</strong> are invariant to feature scaling because they make splits based on individual feature thresholds, not distances or gradients. Scaling does not help them and adds unnecessary computation.</p>
+      <p><strong>Correct approach:</strong></p>
+      <ul>
+        <li><strong>Scale:</strong> Linear models, SVM, KNN, Neural Networks, PCA</li>
+        <li><strong>Don't bother:</strong> Decision Trees, Random Forests, XGBoost, LightGBM</li>
+        <li><strong>Always inside CV:</strong> When you do scale, use <code>fit_transform()</code> on training folds and <code>transform()</code> on validation folds</li>
+      </ul>
+      <div class="takeaway-box">
+        <h4>Key Point</h4>
+        <p>Scaling is algorithm-dependent. Tree-based methods don't need it. When scaling is needed, always fit the scaler on training data only to prevent leakage.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="warning-box">
+    <h4>Exam Tip</h4>
+    <p>These misconceptions are favourite exam traps. If a question states "the model achieved 99% R² on training data," always ask: "What is the R² on the test set?" If a question says "we added 50 features and training accuracy improved," ask: "Did test accuracy improve?"</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     FLASHCARDS
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="flashcards" data-progress-section>
+  <h2>Flashcards</h2>
+
+  <div class="flashcard-container">
+
+    <div class="flashcard-controls">
+      <button class="btn btn-sm btn-secondary flash-prev">&#9664; Prev</button>
+      <button class="btn btn-sm btn-primary flash-next">Next &#9654;</button>
+      <button class="btn btn-sm btn-secondary flash-shuffle">Shuffle</button>
+      <button class="btn btn-sm btn-secondary flash-filter">Show Unknown Only</button>
+      <span class="flashcard-counter"></span>
+    </div>
+
+    <!-- Card 1 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is the decomposition of expected test error?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>E[Error] = Bias² + Variance + Irreducible Noise (σ²)</strong></p>
+        <p>Bias² captures systematic error from model simplification. Variance captures sensitivity to training data fluctuations. Noise is inherent randomness that no model can eliminate.</p>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is the key difference between the validation set and the test set?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>The validation set is used for model selection and hyperparameter tuning.</strong> The test set is held out until the very end and is used only once for the final, unbiased performance estimate. Using the test set for decisions invalidates its role as an honest measure of generalisation.</p>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>Why is Leave-One-Out (LOO) cross-validation sometimes problematic?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>High computational cost (N model fits) and high variance in the estimate.</strong> Each training set differs by only one sample, so the K estimates are highly correlated. The overlap between training sets means the variance of the average can actually be higher than K-Fold CV with K=5 or K=10.</p>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is the difference between L1 and L2 regularisation?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>L2 (Ridge) shrinks all weights toward zero</strong> but never makes them exactly zero. <strong>L1 (Lasso) can set weights to exactly zero</strong>, performing automatic feature selection. L2 is preferred when all features are relevant; L1 when many features may be irrelevant.</p>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is data leakage and why is it dangerous?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>Data leakage occurs when information from outside the training set influences the model.</strong> It produces overly optimistic performance estimates that fail in production. Common causes: feature selection before CV, scaling before split, target leakage, temporal leakage.</p>
+      </div>
+    </div>
+
+    <!-- Card 6 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is the purpose of nested cross-validation?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>The outer loop provides an unbiased estimate of generalisation performance.</strong> The inner loop performs hyperparameter selection. Without nesting, the hyperparameter tuning process itself overfits to the validation data, producing an optimistically biased performance estimate.</p>
+      </div>
+    </div>
+
+    <!-- Card 7 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What are the five main strategies for preventing overfitting?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>1. Regularisation</strong> (L1/L2 penalty). <strong>2. More training data.</strong> <strong>3. Simpler model</strong> (fewer features, reduced complexity). <strong>4. Dropout</strong> (randomly zero neurons during training). <strong>5. Early stopping</strong> (halt training when validation loss stops improving).</p>
+      </div>
+    </div>
+
+    <!-- Card 8 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>Why must feature selection happen inside the CV loop?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>To prevent data leakage.</strong> If features are selected using the full dataset (including validation folds), the selected features may be optimised for the validation data, producing an overly optimistic CV score. Each fold's feature selection must use only that fold's training data.</p>
+      </div>
+    </div>
+
+    <!-- Card 9 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is an overfit model's characteristic error pattern?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>Training error → near zero; test error → very high.</strong> The gap between training and test error is large. The model has memorised noise and specific patterns of the training data rather than learning the general signal.</p>
+      </div>
+    </div>
+
+    <!-- Card 10 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>Which CV strategy should you use for time-series data and why?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>Time-Series Split.</strong> Standard K-Fold randomly assigns samples to folds, which can put future data in the training set and past data in the validation set — causing temporal leakage. Time-Series Split ensures the training set always precedes the validation set chronologically.</p>
+      </div>
+    </div>
+
+    <!-- Card 11 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What happens to model performance as λ (regularisation strength) increases?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>Bias increases, variance decreases.</strong> At λ=0: no regularisation (potential overfit). At optimal λ: balanced bias-variance. As λ→∞: all weights → 0, model predicts the mean always (severe underfit). The optimal λ is found via cross-validation.</p>
+      </div>
+    </div>
+
+    <!-- Card 12 -->
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>Does feature scaling help tree-based models like Random Forest?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>No.</strong> Tree-based models make splits based on individual feature thresholds, not distances or gradients. Scaling does not change the relative ordering of threshold-based splits. Scaling is useful for distance-based (KNN, SVM) and gradient-based (neural networks, logistic regression) methods.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     QUIZ
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="quiz" data-progress-section>
+  <h2>Quiz</h2>
+
+  <div class="quiz-container">
+
+    <!-- Q1 -->
+    <div class="quiz-question">
+      <div class="q-num">Question 1</div>
+      <div class="q-text">A model achieves 0.3% training error and 34% test error. What is the most likely diagnosis?</div>
+      <div class="quiz-option" data-correct="false">Underfitting — the model is too simple</div>
+      <div class="quiz-option" data-correct="true">Overfitting — the model has memorised the training data</div>
+      <div class="quiz-option" data-correct="false">Irreducible noise — the data is too noisy</div>
+      <div class="quiz-option" data-correct="false">The model is well-calibrated</div>
+      <div class="quiz-feedback correct">Correct! A near-zero training error with a large test error is the classic signature of overfitting. The model has memorised the training data (including noise) rather than learning the general pattern.</div>
+      <div class="quiz-feedback incorrect">Incorrect. Near-zero training error with high test error is the hallmark of overfitting, not underfitting. Underfitting would show high errors on both training and test.</div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-question">
+      <div class="q-num">Question 2</div>
+      <div class="q-text">In the bias-variance decomposition E[Error] = Bias² + Variance + σ², what does σ² represent?</div>
+      <div class="quiz-option" data-correct="false">The model's bias term</div>
+      <div class="quiz-option" data-correct="false">The variance of the model across different training sets</div>
+      <div class="quiz-option" data-correct="true">Irreducible noise — inherent randomness in the data that no model can eliminate</div>
+      <div class="quiz-option" data-correct="false">The generalisation gap between training and test error</div>
+      <div class="quiz-feedback correct">Correct! σ² (irreducible noise) represents the inherent randomness in the data-generating process — measurement error, missing variables, and stochastic effects. Even a perfect model with infinite data would still have this error.</div>
+      <div class="quiz-feedback incorrect">Incorrect. σ² is the irreducible noise term — the inherent randomness in the data that no model can eliminate. It sets the theoretical floor for model performance.</div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-question">
+      <div class="q-num">Question 3</div>
+      <div class="q-text">In 5-Fold Cross-Validation, how many times is the model trained?</div>
+      <div class="quiz-option" data-correct="false">1 time</div>
+      <div class="quiz-option" data-correct="true">5 times</div>
+      <div class="quiz-option" data-correct="false">25 times</div>
+      <div class="quiz-option" data-correct="false">4 times</div>
+      <div class="quiz-feedback correct">Correct! In K-Fold CV, the model is trained K times — once for each fold, where that fold serves as the validation set while the remaining K-1 folds form the training set.</div>
+      <div class="quiz-feedback incorrect">Incorrect. K-Fold CV trains the model K times — once for each iteration where a different fold is held out for validation. In 5-Fold CV, that means 5 training runs.</div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-question">
+      <div class="q-num">Question 4</div>
+      <div class="q-text">Which regularisation method can set feature weights to exactly zero?</div>
+      <div class="quiz-option" data-correct="false">L2 (Ridge)</div>
+      <div class="quiz-option" data-correct="true">L1 (Lasso)</div>
+      <div class="quiz-option" data-correct="false">Dropout</div>
+      <div class="quiz-option" data-correct="false">Early Stopping</div>
+      <div class="quiz-feedback correct">Correct! L1 (Lasso) regularisation uses the absolute value of weights as the penalty term. The geometry of the L1 constraint (a diamond) has corners on the axes, which means the optimal solution often lands exactly on an axis — setting that weight to zero. L2 (Ridge) uses squared weights and only shrinks toward zero, never reaching it exactly.</div>
+      <div class="quiz-feedback incorrect">Incorrect. L1 (Lasso) regularisation is the method that can set weights to exactly zero. Its penalty λΣ|wᵢ| has a geometric property (diamond-shaped constraint region with corners on axes) that promotes sparsity.</div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-question">
+      <div class="q-num">Question 5</div>
+      <div class="q-text">Why is it wrong to report the inner CV score as the final model performance in nested cross-validation?</div>
+      <div class="quiz-option" data-correct="false">Because inner CV uses too few folds</div>
+      <div class="quiz-option" data-correct="false">Because the inner CV score is always pessimistically biased</div>
+      <div class="quiz-option" data-correct="true">Because the inner CV score is optimistically biased — hyperparameters were selected to minimise it</div>
+      <div class="quiz-option" data-correct="false">Because inner CV and outer CV use different metrics</div>
+      <div class="quiz-feedback correct">Correct! The inner CV score is used to select hyperparameters. Since the hyperparameters were chosen to minimise the inner CV score, this score is an optimistically biased estimate of generalisation. The outer CV score provides the honest, unbiased estimate.</div>
+      <div class="quiz-feedback incorrect">Incorrect. The inner CV score is optimistically biased because the hyperparameters were specifically chosen to minimise it. It's like a student who practises with the answer key — the practice score will be higher than the real exam score.</div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="quiz-question">
+      <div class="q-num">Question 6</div>
+      <div class="q-text">Which of the following does NOT require feature scaling?</div>
+      <div class="quiz-option" data-correct="false">K-Nearest Neighbours (KNN)</div>
+      <div class="quiz-option" data-correct="false">Support Vector Machine (SVM)</div>
+      <div class="quiz-option" data-correct="true">Random Forest</div>
+      <div class="quiz-option" data-correct="false">Logistic Regression with gradient descent</div>
+      <div class="quiz-feedback correct">Correct! Random Forest (and other tree-based methods) make splits based on individual feature thresholds. The relative ordering of values is what matters, not their absolute scale. Scaling does not change the ordering, so it has no effect on tree-based models.</div>
+      <div class="quiz-feedback incorrect">Incorrect. Random Forest does not require feature scaling because it uses threshold-based splits on individual features. The ordering of values is invariant to linear scaling.</div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="quiz-question">
+      <div class="q-num">Question 7</div>
+      <div class="q-text">After using 10-Fold CV to select hyperparameters, what should you do before evaluating on the test set?</div>
+      <div class="quiz-option" data-correct="false">Use the model from the best CV fold directly</div>
+      <div class="quiz-option" data-correct="false">Run CV again with different random seeds</div>
+      <div class="quiz-option" data-correct="true">Retrain the model with the selected hyperparameters on ALL training data</div>
+      <div class="quiz-option" data-correct="false">Report the CV score as the final performance</div>
+      <div class="quiz-feedback correct">Correct! The CV models are only for evaluation — they are discarded. The final model should be retrained on all available training data (the full train+validation set) with the hyperparameters that achieved the best CV score. This maximises the data available for learning before the one-time test evaluation.</div>
+      <div class="quiz-feedback incorrect">Incorrect. CV models exist only for evaluation and are discarded. After selecting hyperparameters, retrain on ALL training data to maximise learning, then evaluate once on the held-out test set.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     FILL-IN-THE-BLANK
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="fill-blank" data-progress-section>
+  <h2>Fill-in-the-Blank</h2>
+
+  <div class="fill-blank-container" data-answer="Bias² + Variance + Irreducible Noise" data-alt-answers="bias squared + variance + irreducible noise|bias^2 + variance + noise">
+    <div class="fill-blank-question">
+      <h4>1. The expected test error decomposes as: E[Error] = <strong>______</strong> + σ²</h4>
+      <input type="text" class="fill-blank-input" placeholder="Type the two missing terms...">
+      <button class="btn btn-sm btn-primary btn-check">Check</button>
+      <p class="fill-blank-feedback">Answer: <strong>Bias² + Variance</strong> — the two controllable sources of error. σ² is the irreducible noise.</p>
+    </div>
+  </div>
+
+  <div class="fill-blank-container" data-answer="test set" data-alt-answers="testing set|held-out set">
+    <div class="fill-blank-question">
+      <h4>2. The <strong>______</strong> is NEVER used during training or hyperparameter tuning — it is reserved for the final, unbiased evaluation.</h4>
+      <input type="text" class="fill-blank-input" placeholder="Type the answer...">
+      <button class="btn btn-sm btn-primary btn-check">Check</button>
+      <p class="fill-blank-feedback">Answer: <strong>test set</strong> — it must remain untouched until the very end to provide an honest measure of generalisation.</p>
+    </div>
+  </div>
+
+  <div class="fill-blank-container" data-answer="Pipeline" data-alt-answers="pipeline|sklearn pipeline">
+    <div class="fill-blank-question">
+      <h4>3. In sklearn, the <strong>______</strong> class ensures that feature selection and scaling happen inside the CV loop, preventing data leakage.</h4>
+      <input type="text" class="fill-blank-input" placeholder="Type the class name...">
+      <button class="btn btn-sm btn-primary btn-check">Check</button>
+      <p class="fill-blank-feedback">Answer: <strong>Pipeline</strong> — sklearn's Pipeline chains preprocessing and model steps so that fit/transform are correctly applied within each CV fold.</p>
+    </div>
+  </div>
+
+  <div class="fill-blank-container" data-answer="exactly zero" data-alt-answers="zero|0">
+    <div class="fill-blank-question">
+      <h4>4. Unlike L2 (Ridge), L1 (Lasso) regularisation can shrink feature weights to <strong>______</strong>, performing automatic feature selection.</h4>
+      <input type="text" class="fill-blank-input" placeholder="Type the answer...">
+      <button class="btn btn-sm btn-primary btn-check">Check</button>
+      <p class="fill-blank-feedback">Answer: <strong>exactly zero</strong> — the diamond-shaped L1 constraint region has corners on the axes, which causes the optimiser to set some weights to precisely zero.</p>
+    </div>
+  </div>
+
+  <div class="fill-blank-container" data-answer="Time-Series Split" data-alt-answers="time series split|time-series-split|temporal split">
+    <div class="fill-blank-question">
+      <h4>5. For sequential data where observations are ordered in time, you should use <strong>______</strong> instead of standard K-Fold CV.</h4>
+      <input type="text" class="fill-blank-input" placeholder="Type the CV strategy...">
+      <button class="btn btn-sm btn-primary btn-check">Check</button>
+      <p class="fill-blank-feedback">Answer: <strong>Time-Series Split</strong> — it ensures the training set always precedes the validation set chronologically, preventing future information leakage.</p>
+    </div>
+  </div>
+
+  <div class="fill-blank-container" data-answer="λ" data-alt-answers="lambda|alpha">
+    <div class="fill-blank-question">
+      <h4>6. The hyperparameter <strong>______</strong> controls the strength of regularisation — higher values increase bias but decrease variance.</h4>
+      <input type="text" class="fill-blank-input" placeholder="Type the symbol or name...">
+      <button class="btn btn-sm btn-primary btn-check">Check</button>
+      <p class="fill-blank-feedback">Answer: <strong>λ (lambda)</strong> — the regularisation strength hyperparameter that controls the bias-variance trade-off.</p>
+    </div>
+  </div>
+
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SCENARIO QUESTION
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="scenario" data-progress-section>
+  <h2>Scenario Question</h2>
+
+  <div class="scenario-box" style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius); padding: 24px; margin: 20px 0;">
+    <h4>Scenario: Building a Disease Prediction Model</h4>
+    <p>A hospital wants to build a model to predict whether patients will develop a specific disease within 5 years. They have 2,000 patient records with 47 features each (age, blood pressure, cholesterol levels, genetic markers, lifestyle factors, etc.). The dataset is moderately imbalanced — 15% positive cases (diseased), 85% negative.</p>
+    <p>The data science team follows these steps:</p>
+    <ol>
+      <li>They compute correlation of each feature with the target, select the top 15 features using the entire dataset</li>
+      <li>They standardise all features using the full dataset statistics</li>
+      <li>They train a Logistic Regression model on 80% of the data (1,600 samples) and test on 20% (400 samples)</li>
+      <li>The model achieves 92% accuracy on the test set. The team celebrates and plans deployment</li>
+    </ol>
+
+    <h4>Questions:</h4>
+    <ol>
+      <li>Identify all data leakage issues in the team's pipeline.</li>
+      <li>Why is 92% accuracy potentially misleading given the class imbalance?</li>
+      <li>Describe the correct pipeline the team should follow instead.</li>
+      <li>What cross-validation strategy would you recommend and why?</li>
+      <li>How should the team handle the class imbalance in their model?</li>
+    </ol>
+  </div>
+
+  <div class="collapsible">
+    <div class="collapsible-header">
+      <span>Show Solution</span>
+      <span class="arrow">&#9660;</span>
+    </div>
+    <div class="collapsible-body">
+      <h4>1. Data Leakage Issues</h4>
+      <ul>
+        <li><strong>Feature selection before train/test split:</strong> Computing correlations with the target using the full dataset means information from the test set has influenced which features are selected. The 20% test set has "leaked" into the feature selection process.</li>
+        <li><strong>Standardisation before split:</strong> Computing mean and standard deviation from the full dataset means the test set statistics have influenced the scaling. The test set should be completely invisible until final evaluation.</li>
+      </ul>
+
+      <h4>2. Why 92% Accuracy is Misleading</h4>
+      <p>With 85% negative cases, a model that predicts "no disease" for every patient achieves 85% accuracy. The team's model only improves on this baseline by 7 percentage points. More importantly, accuracy does not distinguish between catching actual diseases (recall) and false alarms (precision). If the model has low recall, it is missing sick patients — which is the whole point of the system. The team should report precision, recall, F1 score, and AUC-ROC.</p>
+
+      <h4>3. Correct Pipeline</h4>
+      <ol>
+        <li>Split data into training (80%) and test (20%) sets <strong>once</strong>, stratified to preserve class balance</li>
+        <li>All preprocessing (feature selection, scaling, imputation) must happen <strong>inside</strong> the CV loop on training folds only</li>
+        <li>Use sklearn's <code>Pipeline</code> to chain preprocessing and model</li>
+        <li>Run Stratified K-Fold CV on the training set for model selection and hyperparameter tuning</li>
+        <li>Select best model, retrain on ALL training data</li>
+        <li>Evaluate once on the held-out test set</li>
+      </ol>
+
+      <h4>4. Recommended CV Strategy</h4>
+      <p><strong>Stratified K-Fold CV (K=5 or K=10)</strong> because the dataset is moderately imbalanced (15% positive). Stratification ensures each fold preserves the 15/85 class ratio, preventing folds that happen to have too few or too many positive cases. Standard K-Fold might create folds with very few positive examples, producing unreliable estimates.</p>
+
+      <h4>5. Handling Class Imbalance</h4>
+      <ul>
+        <li><strong>class_weight='balanced'</strong> in Logistic Regression — automatically adjusts weights inversely proportional to class frequencies</li>
+        <li><strong>Use appropriate metrics:</strong> F1 score, AUC-ROC, or precision-recall AUC instead of accuracy</li>
+        <li><strong>Threshold tuning:</strong> The default 0.5 threshold may not be optimal for imbalanced data; adjust based on the precision-recall trade-off</li>
+        <li><strong>Consider SMOTE or other resampling</strong> techniques inside the CV pipeline (not before splitting)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     FINAL RECAP
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="recap" data-progress-section>
+  <h2>Final Recap</h2>
+
+  <div class="recap-box">
+    <h4>Key Concepts Summary</h4>
+    <ul>
+      <li><strong>Generalisation</strong> is the ability to perform well on unseen data. Overfitting occurs when a model memorises training noise instead of learning the true signal — producing near-zero training error but very high test error.</li>
+      <li><strong>The Three-Way Split</strong> separates data into training (model fitting), validation (model selection / hyperparameter tuning), and test (final unbiased evaluation). The test set must NEVER be used for any decisions.</li>
+      <li><strong>Bias-Variance Decomposition:</strong> E[Error] = Bias² + Variance + σ². Increasing model complexity reduces bias but increases variance. The optimal model sits at the minimum of the U-shaped total error curve.</li>
+      <li><strong>K-Fold Cross-Validation</strong> rotates which data serves as validation, giving every sample a chance to be both training and validation. K=5 or K=10 are standard choices; LOO for very small datasets.</li>
+      <li><strong>CV Strategies:</strong> Standard K-Fold (general), Stratified K-Fold (imbalanced classification), Time-Series Split (temporal data), Group K-Fold (grouped/correlated data), LOO (tiny datasets).</li>
+      <li><strong>Hyperparameter Optimisation:</strong> Grid Search (exhaustive), Random Search (faster, often comparable), Bayesian (uses past evaluations to guide search). Nested CV separates tuning from evaluation to avoid optimistic bias.</li>
+      <li><strong>ERM Re-Anchor:</strong> K-Fold CV solves the overfitting problem; regularisation constrains the hypothesis space; hyperparameter optimisation selects the hypothesis class.</li>
+      <li><strong>Regularisation:</strong> L2 (Ridge) shrinks all weights; L1 (Lasso) drives weights to exactly zero for feature selection. λ controls the bias-variance trade-off and is tuned via CV.</li>
+      <li><strong>Preventing Overfitting:</strong> Regularisation, more data, simpler models, dropout, and early stopping — often used in combination.</li>
+      <li><strong>Feature Engineering:</strong> All preprocessing must happen inside the CV pipeline to prevent data leakage. Use sklearn's Pipeline for automatic, correct application.</li>
+      <li><strong>Common Misconceptions:</strong> High training R² ≠ good model; more features ≠ always better; CV evaluates, it doesn't train; scaling doesn't help tree-based models.</li>
+    </ul>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Big Picture Takeaway</h4>
+    <p>Model validation and generalisation form the bridge between building a model and deploying it reliably. The bias-variance trade-off provides the theoretical framework; cross-validation, regularisation, and hyperparameter optimisation provide the practical tools. The single most important principle is this: <strong>never evaluate your model on data that has influenced any of your decisions</strong> — whether those decisions involve feature selection, hyperparameter tuning, or model architecture. Keeping this discipline gives you honest, deployable models.</p>
+  </div>
+</section>
+
+</main>
+<!-- ═══════════════════════════ END MAIN CONTENT ═══════════════════════════ -->
+
+<script src="script.js"></script>
+</body>
+</html>

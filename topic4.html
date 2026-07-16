@@ -1,0 +1,1768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 4: Non-Linear Decision Structures – Decision Trees &amp; Random Forests</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════ TOP NAV ═══════════════════════════ -->
+<nav class="top-nav">
+  <a href="index.html" class="nav-home">Lecture Notes</a>
+  <span class="nav-separator">|</span>
+  <span class="nav-current">Topic 4 – Decision Trees &amp; Random Forests</span>
+  <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme"><span class="icon">&#9728;</span> Toggle Theme</button>
+</nav>
+
+<!-- ═══════════════════════════ SIDEBAR ═══════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2>Topic 4</h2>
+    <p class="sidebar-subtitle">Decision Trees &amp; Random Forests</p>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-bar" id="progress-bar"></div>
+    <span class="progress-text" id="progress-text">0% complete</span>
+  </div>
+
+  <nav class="section-nav" id="section-nav">
+    <ul>
+      <li><a href="#part-a-fundamentals">Part A – Fundamentals</a></li>
+      <li><a href="#why-linear-fails">Why Linear Models Fail</a></li>
+      <li><a href="#what-is-dt">What is a Decision Tree?</a></li>
+      <li><a href="#dt-anatomy">Anatomy of a Decision Tree</a></li>
+      <li><a href="#dt-properties">Key Properties</a></li>
+      <li><a href="#dt-construction">Construction Algorithm</a></li>
+      <li><a href="#stopping-criteria">Stopping Criteria</a></li>
+      <li><a href="#loan-example">Loan Approval Example</a></li>
+      <li><a href="#splitting-criteria">Splitting Criteria</a></li>
+      <li><a href="#gini-impurity">Gini Impurity</a></li>
+      <li><a href="#gini-gain">Gini Gain</a></li>
+      <li><a href="#entropy">Entropy &amp; Information Gain</a></li>
+      <li><a href="#gini-vs-entropy">Gini vs Entropy</a></li>
+      <li><a href="#overfitting-pruning">Overfitting &amp; Pruning</a></li>
+      <li><a href="#pre-pruning">Pre-Pruning</a></li>
+      <li><a href="#post-pruning">Post-Pruning</a></li>
+      <li><a href="#bias-variance-tree">Bias-Variance Tradeoff</a></li>
+      <li><a href="#feature-importance">Feature Importance</a></li>
+      <li><a href="#dt-regression">Decision Trees for Regression</a></li>
+      <li><a href="#part-b-ensembles">Part B – Ensemble Methods</a></li>
+      <li><a href="#why-ensembles">Why Ensembles?</a></li>
+      <li><a href="#bootstrap-bagging">Bootstrap Sampling (Bagging)</a></li>
+      <li><a href="#feature-randomisation">Feature Randomisation</a></li>
+      <li><a href="#rf-architecture">Random Forest Architecture</a></li>
+      <li><a href="#rf-hyperparameters">Key Hyperparameters</a></li>
+      <li><a href="#part-c-applications">Part C – Applications &amp; Evaluation</a></li>
+      <li><a href="#medical-diagnosis">Medical Diagnosis</a></li>
+      <li><a href="#credit-risk">Credit Risk Scoring</a></li>
+      <li><a href="#customer-churn">Customer Churn</a></li>
+      <li><a href="#evaluation-metrics">Evaluation Metrics</a></li>
+      <li><a href="#confusion-matrix">Confusion Matrix</a></li>
+      <li><a href="#flashcards">Flashcards</a></li>
+      <li><a href="#quiz">Quiz</a></li>
+      <li><a href="#fill-blank">Fill-in-the-Blank</a></li>
+      <li><a href="#scenario">Scenario Question</a></li>
+      <li><a href="#recap">Final Recap</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<!-- ═══════════════════════════ MAIN CONTENT ═══════════════════════════ -->
+<main class="main-content" id="main-content">
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PART A – FUNDAMENTALS
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="part-a-fundamentals" data-progress-section>
+  <h1>Part A – Fundamentals</h1>
+  <p>We begin by understanding <em>why</em> linear models hit a wall, then build the intuition behind decision trees from the ground up.</p>
+</section>
+
+<!-- ───────── WHY LINEAR MODELS FAIL ───────── -->
+<section id="why-linear-fails" data-progress-section>
+  <h2>Why Linear Models Fail</h2>
+
+  <div class="analogy-box">
+    <h4>Analogy — Painting with a Ruler</h4>
+    <p>Imagine you are given a ruler and asked to trace the outline of a coffee cup. You can approximate straight edges well, but the curved handle is impossible to capture accurately. A linear model is that ruler — it draws straight decision boundaries. When the true boundary is curved, no amount of cleverness with the ruler will produce an accurate result.</p>
+  </div>
+
+  <p>Linear classifiers (logistic regression, linear SVM) learn a boundary of the form:</p>
+
+  <div class="formula">
+    <p>w₁x₁ + w₂x₂ + … + wₙxₙ + b = 0</p>
+  </div>
+
+  <p>This is a <strong>hyperplane</strong> — a flat surface that separates the feature space into exactly two half-spaces. It works beautifully when the classes are linearly separable. But what happens when they are not?</p>
+
+  <h3>The XOR Problem</h3>
+  <p>The classic counter-example is the XOR (exclusive OR) function with two binary features:</p>
+
+  <table>
+    <thead>
+      <tr><th>x₁</th><th>x₂</th><th>Label</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>0</td><td>0</td><td>0</td></tr>
+      <tr><td>0</td><td>1</td><td>1</td></tr>
+      <tr><td>1</td><td>0</td><td>1</td></tr>
+      <tr><td>1</td><td>1</td><td>0</td></tr>
+    </tbody>
+  </table>
+
+  <p>No single straight line can separate the 1s from the 0s. A linear model is forced to predict at most 50% accuracy — it has <strong>irreducible underfitting</strong>. A decision tree, however, can draw two axis-aligned cuts and perfectly separate the classes.</p>
+
+  <h3>Curved Boundaries in Practice</h3>
+  <p>Real-world data rarely falls into neat linear partitions. Consider:</p>
+  <ul>
+    <li><strong>Customer segmentation:</strong> High-income and low-income customers behave similarly (both buy luxury goods), while middle-income customers behave differently. The decision boundary curves around the middle.</li>
+    <li><strong>Medical diagnosis:</strong> Both very low and very high blood pressure are dangerous — the risk surface is U-shaped, not linear.</li>
+    <li><strong>Image classification:</strong> A pixel-intensity boundary between a cat and a dog is wildly non-linear.</li>
+  </ul>
+
+  <div class="warning-box">
+    <h4>Key Limitation</h4>
+    <p>Linear models assume the decision boundary is a flat hyperplane. When the true boundary is curved, piecewise-linear, or involves feature interactions, linear models underfit. Decision trees solve this by recursively partitioning the feature space into rectangular regions, each with its own prediction.</p>
+  </div>
+</section>
+
+<!-- ───────── WHAT IS A DECISION TREE ───────── -->
+<section id="what-is-dt" data-progress-section>
+  <h2>What is a Decision Tree?</h2>
+
+  <div class="definition-box">
+    <h4>Definition</h4>
+    <p>A <strong>decision tree</strong> is a supervised, non-parametric, tree-structured model that partitions the feature space into axis-aligned rectangular regions by recursively applying binary splits on individual features, and assigns a prediction (class label or numeric value) to each region.</p>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy — The 20 Questions Game</h4>
+    <p>Think of a decision tree as a game of "20 Questions." You start with the entire dataset and ask one yes/no question at a time — each answer narrows the possibilities until you arrive at a final answer. "Is age &gt; 40?" → Yes → "Is income &gt; 70k?" → No → Predict: <em>Low Risk</em>. Each question is a split; each answer leads you down a branch; the final answer is a leaf.</p>
+  </div>
+
+  <p>More formally, a decision tree defines a <strong>piecewise-constant function</strong> over the feature space. Each leaf node corresponds to a rectangular region Rⱼ, and the prediction for any point in that region is the same — the majority class (classification) or the mean (regression).</p>
+
+  <div class="formula">
+    <p>Classification: ŷ = mode(y | x ∈ Rⱼ)</p>
+    <p>Regression: ŷ = (1/|Rⱼ|) Σ yᵢ for all i where xᵢ ∈ Rⱼ</p>
+  </div>
+
+  <h3>Axis-Aligned Partitions</h3>
+  <p>Every split in a standard decision tree tests a <strong>single feature</strong> against a <strong>threshold</strong> (e.g., "age ≤ 35?" or "income ≤ 50000?"). This means the decision boundaries are always parallel to the coordinate axes — horizontal or vertical lines in 2D, axis-aligned hyperplanes in higher dimensions.</p>
+
+  <div class="warning-box">
+    <h4>Why Axis-Aligned?</h4>
+    <p>Axis-aligned splits are simple, fast to evaluate, and interpretable. A single split partitions the current region into exactly two sub-regions. Oblique splits (e.g., "x₁ + x₂ ≤ 5") can reduce the number of splits needed but are harder to optimise and less interpretable. Standard implementations (scikit-learn, CART) use axis-aligned splits only.</p>
+  </div>
+
+  <h3>Visual Intuition</h3>
+  <p>Imagine a 2D scatter plot of two features. The first split draws a vertical line, dividing the plane into left and right. The second split draws a horizontal line inside one of those halves. Each subsequent split adds another line. After many splits, you have a patchwork of rectangles, each labelled with a class. This is the decision tree's partition of the feature space.</p>
+</section>
+
+<!-- ───────── ANATOMY ───────── -->
+<section id="dt-anatomy" data-progress-section>
+  <h2>Anatomy of a Decision Tree</h2>
+
+  <p>Every decision tree consists of three types of nodes connected by branches:</p>
+
+  <table>
+    <thead>
+      <tr><th>Node Type</th><th>Role</th><th>Visual Cue</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Root Node</strong></td>
+        <td>The very first node at the top. Contains the entire dataset. Performs the first split.</td>
+        <td>Top of the tree, no incoming branch</td>
+      </tr>
+      <tr>
+        <td><strong>Internal Nodes</strong></td>
+        <td>Intermediate nodes that perform further splits on subsets of data.</td>
+        <td>Has both incoming and outgoing branches</td>
+      </tr>
+      <tr>
+        <td><strong>Leaf Nodes (Terminal)</strong></td>
+        <td>Endpoints that make predictions. No further splits occur here.</td>
+        <td>Bottom of the tree, no outgoing branches</td>
+      </tr>
+      <tr>
+        <td><strong>Branches</strong></td>
+        <td>Edges connecting nodes. Each branch represents the outcome of a test (e.g., Yes/No, Left/Right).</td>
+        <td>Lines between nodes</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="analogy-box">
+    <h4>Analogy — Flowchart</h4>
+    <p>A decision tree is essentially a flowchart. The root is "Start here." Each internal node is a diamond-shaped decision box. Each branch is an arrow labeled "Yes" or "No." Each leaf is a rectangular outcome box. The path from root to leaf is one complete decision path.</p>
+  </div>
+
+  <h3>Path from Root to Leaf</h3>
+  <p>For any given data point, the prediction is determined by following the branches from root to leaf:</p>
+  <ol>
+    <li>Start at the root node (all data).</li>
+    <li>At each internal node, evaluate the splitting condition (e.g., "age ≤ 35?").</li>
+    <li>Follow the left branch if True, right branch if False.</li>
+    <li>Repeat until you reach a leaf node.</li>
+    <li>The leaf node's prediction is your output.</li>
+  </ol>
+
+  <p>The <strong>depth</strong> of a tree is the maximum number of edges from the root to any leaf. The <strong>size</strong> is the total number of nodes (internal + leaves). A tree of depth d can have at most 2ᵈ leaf nodes.</p>
+
+  <div class="formula">
+    <p>Max leaves at depth d: L_max = 2ᵈ</p>
+    <p>Min depth to accommodate n leaves: d ≥ ⌈log₂(n)⌉</p>
+  </div>
+</section>
+
+<!-- ───────── KEY PROPERTIES ───────── -->
+<section id="dt-properties" data-progress-section>
+  <h2>Key Properties of Decision Trees</h2>
+
+  <h3>1. Non-Parametric</h3>
+  <p>Decision trees make <strong>no assumptions</strong> about the functional form of the relationship between features and target. Unlike linear regression (which assumes y = wx + b), a tree can learn arbitrarily complex mappings. The model's complexity grows with the data — more data can lead to deeper, more detailed trees.</p>
+
+  <div class="warning-box">
+    <h4>Caveat</h4>
+    <p>"Non-parametric" does not mean "no parameters." Trees have many structural parameters (depth, split conditions, leaf predictions). It means the number and nature of parameters are not fixed in advance.</p>
+  </div>
+
+  <h3>2. Handles Mixed Feature Types</h3>
+  <p>Decision trees natively handle:</p>
+  <ul>
+    <li><strong>Numerical features</strong> — split on thresholds (e.g., "income ≤ 50000")</li>
+    <li><strong>Categorical features</strong> — split on subsets of categories (e.g., "color ∈ {red, blue}?")</li>
+  </ul>
+  <p>Many other algorithms (SVM, linear regression) require all-numeric or one-hot-encoded inputs. Trees also handle missing values gracefully — some implementations route missing values down both branches with weighted contributions.</p>
+
+  <h3>3. Naturally Multi-Class</h3>
+  <p>Decision trees classify into any number of classes without modification. The splitting criteria (Gini, Entropy) generalise naturally: they compute impurity across all k classes, not just two. No need for one-vs-rest or one-vs-one strategies.</p>
+
+  <h3>4. Feature Importance is Built-In</h3>
+  <p>Because each split selects the feature that reduces impurity the most, the tree naturally ranks features by importance. A feature used at the root, with high impurity reduction, is more important than a feature used near the leaves with small reductions.</p>
+
+  <h3>5. Interpretable</h3>
+  <p>A trained decision tree can be visualised as a flowchart. Any stakeholder — doctor, loan officer, business manager — can trace the path from root to leaf and understand exactly why a prediction was made. This is a major advantage over black-box models.</p>
+
+  <div class="takeaway-box">
+    <h4>Takeaway</h4>
+    <p>Decision trees are powerful, flexible, interpretable models that make no distributional assumptions. Their main weakness — overfitting — is addressed by pruning and ensemble methods (Part B).</p>
+  </div>
+</section>
+
+<!-- ───────── CONSTRUCTION ALGORITHM ───────── -->
+<section id="dt-construction" data-progress-section>
+  <h2>Step-by-Step Construction Algorithm</h2>
+
+  <p>Decision trees are built top-down via a greedy, recursive partitioning algorithm (CART — Classification and Regression Trees). Here is the full procedure:</p>
+
+  <div class="collapsible">
+    <button class="collapsible-toggle">Algorithm: Recursive Partitioning (CART)</button>
+    <div class="collapsible-content">
+      <ol>
+        <li><strong>Start</strong> with the entire dataset D at the root node.</li>
+        <li><strong>For each feature f</strong> and each possible threshold t:
+          <ul>
+            <li>Split D into left subset D_L = {x ∈ D : f(x) ≤ t} and right subset D_R = {x ∈ D : f(x) &gt; t}.</li>
+            <li>Compute the impurity reduction (gain) of this split.</li>
+          </ul>
+        </li>
+        <li><strong>Select</strong> the (feature, threshold) pair that maximises the impurity reduction.</li>
+        <li><strong>Apply</strong> this split, creating two child nodes.</li>
+        <li><strong>Recursively</strong> repeat steps 2–4 on each child node.</li>
+        <li><strong>Stop</strong> when a stopping criterion is met (see next section).</li>
+        <li><strong>Assign</strong> predictions to leaf nodes:
+          <ul>
+            <li>Classification: majority class in the leaf.</li>
+            <li>Regression: mean of target values in the leaf.</li>
+          </ul>
+        </li>
+      </ol>
+    </div>
+  </div>
+
+  <h3>Computational Complexity</h3>
+  <p>At each node, the algorithm must evaluate every feature at every unique threshold. For a dataset with n samples and p features:</p>
+  <div class="formula">
+    <p>Per node: O(p × n × log n)</p>
+    <p>Total tree building: O(p × n × log n × depth)</p>
+  </div>
+  <p>Sorting feature values reduces threshold evaluation to O(n) per feature after an initial O(n log n) sort. With early stopping and pruning, the effective depth is much smaller than n.</p>
+
+  <h3>Greedy Nature</h3>
+  <div class="warning-box">
+    <h4>Greedy ≠ Global Optimum</h4>
+    <p>The CART algorithm is <strong>greedy</strong>: it picks the best split at each node without considering the impact on future splits. The globally optimal tree (which minimises total impurity across all leaves) is an NP-hard problem. Greedy construction is fast and produces near-optimal trees in practice.</p>
+  </div>
+</section>
+
+<!-- ───────── STOPPING CRITERIA ───────── -->
+<section id="stopping-criteria" data-progress-section>
+  <h2>Stopping Criteria</h2>
+
+  <p>If a tree is allowed to grow without restriction, it will keep splitting until every leaf is pure (all samples in the leaf belong to one class). This leads to severe overfitting. Stopping criteria halt tree growth early:</p>
+
+  <table>
+    <thead>
+      <tr><th>Criterion</th><th>Parameter (sklearn)</th><th>Effect</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Maximum depth</td>
+        <td><code>max_depth</code></td>
+        <td>Stops splitting when depth reaches the limit. Smaller values → simpler tree.</td>
+      </tr>
+      <tr>
+        <td>Minimum samples to split</td>
+        <td><code>min_samples_split</code></td>
+        <td>A node must have at least this many samples to be split further.</td>
+      </tr>
+      <tr>
+        <td>Minimum samples in leaf</td>
+        <td><code>min_samples_leaf</code></td>
+        <td>Every leaf must contain at least this many samples. Prevents tiny, overfit leaves.</td>
+      </tr>
+      <tr>
+        <td>Minimum impurity decrease</td>
+        <td><code>min_impurity_decrease</code></td>
+        <td>A split must reduce impurity by at least this amount to be accepted.</td>
+      </tr>
+      <tr>
+        <td>Maximum leaf nodes</td>
+        <td><code>max_leaf_nodes</code></td>
+        <td>Builds a best-first tree with at most this many leaves.</td>
+      </tr>
+      <tr>
+        <td>Maximum features</td>
+        <td><code>max_features</code></td>
+        <td>Number of features to consider per split (mainly for ensembles).</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="takeaway-box">
+    <h4>Takeaway</h4>
+    <p>No single criterion is universally best. In practice, <code>max_depth</code>, <code>min_samples_leaf</code>, and <code>min_samples_split</code> are the most commonly tuned. Cross-validation is essential for selecting optimal values.</p>
+  </div>
+</section>
+
+<!-- ───────── LOAN EXAMPLE ───────── -->
+<section id="loan-example" data-progress-section>
+  <h2>Worked Example — Loan Approval</h2>
+
+  <p>Consider a bank deciding whether to approve loans based on three features:</p>
+  <ul>
+    <li><strong>Income</strong> (k$ per year): 25, 50, 75, 100, 35, 80, 45, 60, 90, 55</li>
+    <li><strong>Credit Score</strong>: 600, 680, 720, 750, 620, 710, 650, 690, 740, 670</li>
+    <li><strong>Employment</strong> (years): 1, 5, 8, 12, 2, 7, 3, 6, 10, 4</li>
+  </ul>
+  <p>Target: <strong>Approved</strong> (1) or <strong>Denied</strong> (0)</p>
+
+  <div class="worked-example">
+    <h4>Step 1 — Root Node (All 10 samples)</h4>
+    <p>6 Approved, 4 Denied.</p>
+    <p>We evaluate every possible split for each feature:</p>
+    <p><strong>Try Income ≤ 50k:</strong> Left: {25k(D), 35k(D), 45k(D)} → 0 Approved, 3 Denied. Right: {50k(A), 75k(A), 100k(A), 80k(A), 60k(A), 90k(A), 55k(A)} → 6 Approved, 0 Denied.</p>
+    <p>This split achieves <strong>perfect purity</strong> on both sides — Gini Gain is maximised. This is selected as the root split.</p>
+  </div>
+
+  <div class="worked-example">
+    <h4>Step 2 — Right Child (Income &gt; 50k)</h4>
+    <p>All 7 samples are Approved. This node is pure (Gini = 0). It becomes a <strong>leaf node</strong> with prediction: Approve.</p>
+  </div>
+
+  <div class="worked-example">
+    <h4>Step 3 — Left Child (Income ≤ 50k)</h4>
+    <p>3 samples: all Denied. Pure leaf → prediction: Deny.</p>
+  </div>
+
+  <p>The resulting tree is extremely simple: just one split at the root! This is the greedy algorithm at work — it found the most informative feature first and got lucky with a perfect split.</p>
+
+  <div class="takeaway-box">
+    <h4>Takeaway</h4>
+    <p>In practice, perfect splits are rare. The algorithm picks the best available split at each step, even if it doesn't achieve perfect purity. Multiple levels of splitting are usually needed to reach acceptable impurity in all leaves.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SPLITTING CRITERIA
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="splitting-criteria" data-progress-section>
+  <h2>Splitting Criteria</h2>
+  <p>How does the algorithm choose which split is "best"? It uses an <strong>impurity measure</strong> — a function that quantifies how mixed the classes are in a node. The best split maximises the <strong>impurity reduction</strong> (gain) from parent to children.</p>
+  <p>The two most widely used criteria are <strong>Gini Impurity</strong> and <strong>Entropy</strong>. Both are derived from information theory and probability theory.</p>
+</section>
+
+<!-- ───────── GINI IMPURITY ───────── -->
+<section id="gini-impurity" data-progress-section>
+  <h2>Gini Impurity</h2>
+
+  <div class="definition-box">
+    <h4>Definition</h4>
+    <p>Gini Impurity measures the probability that a randomly chosen sample from a node would be misclassified if it were labelled according to the class distribution of that node. A Gini of 0 means the node is pure (all one class); a Gini of 0.5 (for binary classification) means maximum impurity (50/50 split).</p>
+  </div>
+
+  <div class="formula">
+    <h4>Gini Impurity Formula</h4>
+    <p>Gini(t) = 1 − Σᵢ₌₁ᵏ pᵢ²</p>
+    <p>where:</p>
+    <ul>
+      <li>t = the node (subset of data)</li>
+      <li>k = number of classes</li>
+      <li>pᵢ = proportion of samples belonging to class i in node t</li>
+    </ul>
+    <p><strong>Range:</strong> 0 (pure) to 1 − 1/k (maximum impurity)</p>
+    <p>For binary classification (k=2): range is [0, 0.5]</p>
+  </div>
+
+  <h3>Worked Example — Node A</h3>
+  <div class="worked-example">
+    <h4>Node A contains: 40 cats, 10 dogs (50 samples total)</h4>
+    <p>p_cat = 40/50 = 0.8</p>
+    <p>p_dog = 10/50 = 0.2</p>
+    <p>Gini(A) = 1 − (0.8² + 0.2²)</p>
+    <p>Gini(A) = 1 − (0.64 + 0.04)</p>
+    <p>Gini(A) = 1 − 0.68</p>
+    <p><strong>Gini(A) = 0.32</strong></p>
+  </div>
+
+  <h3>Worked Example — Node B</h3>
+  <div class="worked-example">
+    <h4>Node B contains: 25 cats, 25 dogs (50 samples total)</h4>
+    <p>p_cat = 25/50 = 0.5</p>
+    <p>p_dog = 25/50 = 0.5</p>
+    <p>Gini(B) = 1 − (0.5² + 0.5²)</p>
+    <p>Gini(B) = 1 − (0.25 + 0.25)</p>
+    <p>Gini(B) = 1 − 0.50</p>
+    <p><strong>Gini(B) = 0.50</strong> (maximum impurity for binary)</p>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy — Coin Fairness</h4>
+    <p>Gini Impurity is like measuring how "fair" a coin is. A loaded coin (80/20 heads/tails) has low impurity — you can predict the outcome most of the time. A perfectly fair coin (50/50) has maximum impurity — you're essentially guessing. Gini of 0 means the coin always lands the same way (pure node).</p>
+  </div>
+
+  <h3>Why Squared Proportions?</h3>
+  <p>The term pᵢ² is the probability that two randomly drawn samples (with replacement) from the node both belong to class i. The sum Σpᵢ² is the probability that both samples agree. Therefore 1 − Σpᵢ² is the probability they <strong>disagree</strong> — which is exactly the "impurity" or "confusion" in the node.</p>
+
+  <div class="takeaway-box">
+    <h4>Takeaway</h4>
+    <p>Gini Impurity is intuitive, fast to compute, and the default criterion in scikit-learn's <code>DecisionTreeClassifier</code>. It penalises distributions that are far from concentrated (pure) and rewards splits that create purer children.</p>
+  </div>
+</section>
+
+<!-- ───────── GINI GAIN ───────── -->
+<section id="gini-gain" data-progress-section>
+  <h2>Gini Gain (Impurity Reduction)</h2>
+
+  <p>To evaluate a potential split, we compute the <strong>Gini Gain</strong> — how much impurity is reduced by splitting the parent into left and right children:</p>
+
+  <div class="formula">
+    <h4>Gini Gain Formula</h4>
+    <p>Gini_Gain = Gini(parent) − [ (N_L / N) × Gini(left) + (N_R / N) × Gini(right) ]</p>
+    <p>where:</p>
+    <ul>
+      <li>N = total samples in parent</li>
+      <li>N_L = samples in left child</li>
+      <li>N_R = samples in right child</li>
+      <li>N_L + N_R = N</li>
+    </ul>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy — Sorting Laundry</h4>
+    <p>Imagine a pile of mixed laundry (shirts and pants). Before sorting, the "impurity" is high — you can't predict what you'll grab. After sorting into two baskets (shirts vs pants), each basket has low impurity. The Gini Gain measures how much "cleaner" the baskets are compared to the original pile. A good sort maximises this improvement.</p>
+  </div>
+
+  <h3>Full Worked Calculation Example</h3>
+  <div class="worked-example">
+    <h4>Setup: 100 samples — 60 cats, 40 dogs at the parent node</h4>
+    <p><strong>Parent Gini:</strong></p>
+    <p>p_cat = 0.6, p_dog = 0.4</p>
+    <p>Gini(parent) = 1 − (0.6² + 0.4²) = 1 − (0.36 + 0.16) = 1 − 0.52 = <strong>0.48</strong></p>
+
+    <h4>Evaluate Split: "Weight ≤ 15 kg"</h4>
+    <p><strong>Left child (Weight ≤ 15 kg):</strong> 45 samples — 30 cats, 15 dogs</p>
+    <p>p_cat = 30/45 = 0.667, p_dog = 15/45 = 0.333</p>
+    <p>Gini(left) = 1 − (0.667² + 0.333²) = 1 − (0.444 + 0.111) = 1 − 0.555 = <strong>0.444</strong></p>
+
+    <p><strong>Right child (Weight &gt; 15 kg):</strong> 55 samples — 30 cats, 25 dogs</p>
+    <p>p_cat = 30/55 = 0.545, p_dog = 25/55 = 0.455</p>
+    <p>Gini(right) = 1 − (0.545² + 0.455²) = 1 − (0.297 + 0.207) = 1 − 0.504 = <strong>0.496</strong></p>
+
+    <h4>Weighted Average Child Impurity:</h4>
+    <p>W = (45/100) × 0.444 + (55/100) × 0.496</p>
+    <p>W = 0.45 × 0.444 + 0.55 × 0.496</p>
+    <p>W = 0.1998 + 0.2728 = <strong>0.4726</strong></p>
+
+    <h4>Gini Gain:</h4>
+    <p>Gini_Gain = 0.48 − 0.4726 = <strong>0.0074</strong></p>
+  </div>
+
+  <p>The algorithm would compare this gain against gains from all other possible splits (other features, other thresholds) and choose the one with the <strong>highest Gini Gain</strong>.</p>
+
+  <h3>Worked Example — A Better Split</h3>
+  <div class="worked-example">
+    <h4>Alternative Split: "Ear Length ≤ 3 cm"</h4>
+    <p><strong>Left (Ear ≤ 3 cm):</strong> 40 samples — 38 cats, 2 dogs</p>
+    <p>p_cat = 0.95, p_dog = 0.05</p>
+    <p>Gini(left) = 1 − (0.9025 + 0.0025) = 1 − 0.905 = <strong>0.095</strong></p>
+
+    <p><strong>Right (Ear &gt; 3 cm):</strong> 60 samples — 22 cats, 38 dogs</p>
+    <p>p_cat = 0.367, p_dog = 0.633</p>
+    <p>Gini(right) = 1 − (0.134 + 0.401) = 1 − 0.535 = <strong>0.465</strong></p>
+
+    <h4>Weighted Average:</h4>
+    <p>W = (40/100) × 0.095 + (60/100) × 0.465 = 0.038 + 0.279 = <strong>0.317</strong></p>
+
+    <h4>Gini Gain:</h4>
+    <p>Gini_Gain = 0.48 − 0.317 = <strong>0.163</strong></p>
+  </div>
+
+  <p>This split has a gain of 0.163, much higher than the weight split (0.0074). The algorithm would choose the ear length split — it does a far better job of separating cats from dogs.</p>
+</section>
+
+<!-- ───────── ENTROPY ───────── -->
+<section id="entropy" data-progress-section>
+  <h2>Entropy &amp; Information Gain</h2>
+
+  <div class="definition-box">
+    <h4>Definition — Entropy</h4>
+    <p>Entropy (Shannon Entropy) measures the uncertainty or disorder in a node. It originates from information theory and quantifies the average number of bits needed to encode the class label of a randomly chosen sample.</p>
+  </div>
+
+  <div class="formula">
+    <h4>Entropy Formula</h4>
+    <p>H(t) = − Σᵢ₌₁ᵏ pᵢ · log₂(pᵢ)</p>
+    <p>where:</p>
+    <ul>
+      <li>t = the node</li>
+      <li>k = number of classes</li>
+      <li>pᵢ = proportion of class i in node t</li>
+      <li>Convention: 0 · log₂(0) = 0</li>
+    </ul>
+    <p><strong>Range:</strong> 0 (pure) to log₂(k) (maximum impurity)</p>
+    <p>For binary classification: [0, 1]</p>
+  </div>
+
+  <h3>Worked Example — Entropy Calculation</h3>
+  <div class="worked-example">
+    <h4>Node with 70 positive, 30 negative (100 samples)</h4>
+    <p>p_pos = 0.7, p_neg = 0.3</p>
+    <p>H(t) = −[0.7 · log₂(0.7) + 0.3 · log₂(0.3)]</p>
+    <p>log₂(0.7) = log(0.7)/log(2) = −0.1549/0.3010 = −0.5146</p>
+    <p>log₂(0.3) = log(0.3)/log(2) = −0.5229/0.3010 = −1.7370</p>
+    <p>H(t) = −[0.7 × (−0.5146) + 0.3 × (−1.7370)]</p>
+    <p>H(t) = −[−0.3602 + (−0.5211)]</p>
+    <p>H(t) = −[−0.8813]</p>
+    <p><strong>H(t) = 0.8813 bits</strong></p>
+  </div>
+
+  <h3>Worked Example — Pure Node</h3>
+  <div class="worked-example">
+    <h4>Node with 100 positive, 0 negative</h4>
+    <p>p_pos = 1.0, p_neg = 0.0</p>
+    <p>H(t) = −[1.0 · log₂(1.0) + 0.0 · log₂(0.0)]</p>
+    <p>H(t) = −[1.0 × 0 + 0] = <strong>0</strong></p>
+    <p>Pure nodes have zero entropy — no uncertainty at all.</p>
+  </div>
+
+  <h3>Information Gain</h3>
+  <div class="definition-box">
+    <h4>Definition</h4>
+    <p>Information Gain (IG) measures the reduction in entropy achieved by a split. It is the entropic analogue of Gini Gain.</p>
+  </div>
+
+  <div class="formula">
+    <h4>Information Gain Formula</h4>
+    <p>IG = H(parent) − Σⱼ (|childⱼ| / |parent|) × H(childⱼ)</p>
+  </div>
+
+  <div class="worked-example">
+    <h4>Full IG Calculation</h4>
+    <p><strong>Parent:</strong> 60 positive, 40 negative (100 samples)</p>
+    <p>H(parent) = −[0.6 · log₂(0.6) + 0.4 · log₂(0.4)]</p>
+    <p>= −[0.6 × (−0.737) + 0.4 × (−1.322)]</p>
+    <p>= −[−0.442 + (−0.529)] = −[−0.971] = <strong>0.971</strong></p>
+
+    <h4>After Split "Feature X ≤ 5":</h4>
+    <p>Left: 50 samples — 45 pos, 5 neg</p>
+    <p>H(left) = −[0.9·log₂(0.9) + 0.1·log₂(0.1)] = −[0.9×(−0.152) + 0.1×(−3.322)] = 0.469</p>
+
+    <p>Right: 50 samples — 15 pos, 35 neg</p>
+    <p>H(right) = −[0.3·log₂(0.3) + 0.7·log₂(0.7)] = −[0.3×(−1.737) + 0.7×(−0.515)] = 0.881</p>
+
+    <h4>Weighted Child Entropy:</h4>
+    <p>W = (50/100) × 0.469 + (50/100) × 0.881 = 0.2345 + 0.4405 = <strong>0.675</strong></p>
+
+    <h4>Information Gain:</h4>
+    <p>IG = 0.971 − 0.675 = <strong>0.296 bits</strong></p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Takeaway</h4>
+    <p>Information Gain is the criterion used by the ID3 and C4.5 algorithms. It favours splits that create the largest reduction in uncertainty. The split with the highest IG is selected at each node.</p>
+  </div>
+</section>
+
+<!-- ───────── GINI VS ENTROPY ───────── -->
+<section id="gini-vs-entropy" data-progress-section>
+  <h2>Gini Impurity vs Entropy — Comparison</h2>
+
+  <table>
+    <thead>
+      <tr><th>Aspect</th><th>Gini Impurity</th><th>Entropy (Information Gain)</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Formula</td>
+        <td>1 − Σpᵢ²</td>
+        <td>−Σpᵢ · log₂(pᵢ)</td>
+      </tr>
+      <tr>
+        <td>Range (binary)</td>
+        <td>[0, 0.5]</td>
+        <td>[0, 1]</td>
+      </tr>
+      <tr>
+        <td>Computation</td>
+        <td>Faster (no logarithm)</td>
+        <td>Slower (logarithm per class)</td>
+      </tr>
+      <tr>
+        <td>Default in sklearn</td>
+        <td>Yes (<code>criterion='gini'</code>)</td>
+        <td>No (<code>criterion='entropy'</code>)</td>
+      </tr>
+      <tr>
+        <td>Behavior</td>
+        <td>Tends to isolate the most frequent class into its own branch</td>
+        <td>Tends to produce slightly more balanced trees</td>
+      </tr>
+      <tr>
+        <td>Practical difference</td>
+        <td colspan="2">Almost identical in most cases. Differences are negligible (&lt;1% in accuracy) for most datasets.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="analogy-box">
+    <h4>Analogy — Measuring Messiness</h4>
+    <p>Gini and Entropy are like two different ways to measure how "messy" a room is. Gini counts the probability that two randomly picked items don't match. Entropy counts how many bits you'd need to describe the mess. Both agree on what's clean vs messy — they just measure it slightly differently. In practice, either measure gives you the same cleaning strategy.</p>
+  </div>
+
+  <div class="warning-box">
+    <h4>When It Matters</h4>
+    <p>For very large datasets or when class distributions are extremely skewed, Gini can be slightly faster. For small datasets with many classes, Entropy may produce slightly better-calibrated probability estimates. In practice, try both and pick the one that cross-validates better — but don't expect dramatic differences.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     OVERFITTING & PRUNING
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="overfitting-pruning" data-progress-section>
+  <h2>Overfitting &amp; Pruning</h2>
+
+  <div class="definition-box">
+    <h4>Why Trees Overfit</h4>
+    <p>An unconstrained decision tree will keep splitting until every leaf is pure — meaning each leaf contains only samples of one class. In effect, it <strong>memorises</strong> the training data, including noise and outliers. A tree with 10,000 leaves on 10,000 training samples has essentially built a lookup table — it will classify every training sample correctly but generalise terribly to new data.</p>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy — Studying for an Exam</h4>
+    <p>An overfit tree is like a student who memorises every exact question and answer from past exams but doesn't understand the underlying concepts. When the real exam has slightly different wording, they fail. A well-pruned tree is like a student who learns the general principles — they can handle variations they haven't seen before.</p>
+  </div>
+
+  <p>There are two main strategies to combat overfitting: <strong>pre-pruning</strong> (stop early) and <strong>post-pruning</strong> (grow fully, then trim).</p>
+</section>
+
+<!-- ───────── PRE-PRUNING ───────── -->
+<section id="pre-pruning" data-progress-section>
+  <h2>Pre-Pruning (Early Stopping)</h2>
+
+  <p>Pre-pruning stops tree growth before it becomes too complex by setting constraints:</p>
+
+  <h3>max_depth</h3>
+  <div class="worked-example">
+    <h4>Example: max_depth=3</h4>
+    <p>The tree can have at most 3 levels of splits below the root. This produces at most 2³ = 8 leaf nodes. Each leaf represents a relatively large region of the feature space, reducing the risk of fitting noise.</p>
+    <p>Depth 0 (root): 1 node → 1 region</p>
+    <p>Depth 1: 2 nodes → 2 regions</p>
+    <p>Depth 2: 4 nodes → 4 regions</p>
+    <p>Depth 3: up to 8 nodes → up to 8 regions</p>
+  </div>
+
+  <h3>min_samples_split</h3>
+  <p>A node will only be split if it contains at least <code>min_samples_split</code> samples. Default is 2. Setting this to, say, 20 means nodes with fewer than 20 samples are never split, even if impure.</p>
+
+  <h3>min_samples_leaf</h3>
+  <p>Every leaf must contain at least <code>min_samples_leaf</code> samples. This prevents the creation of tiny leaves that capture individual data points (overfitting to outliers).</p>
+
+  <div class="formula">
+    <h4>Rule of Thumb for min_samples_leaf</h4>
+    <p>A common heuristic: min_samples_leaf ≈ 0.5% to 1% of total training samples.</p>
+    <p>For n=10,000: min_samples_leaf ∈ [50, 100]</p>
+  </div>
+
+  <div class="warning-box">
+    <h4>Trade-Off</h4>
+    <p>Pre-pruning is fast but can be too aggressive — it may stop splitting before the tree has captured important patterns (underfitting). This is called the <strong>horizon effect</strong>: a split that looks unpromising in isolation might lead to very informative splits deeper in the tree.</p>
+  </div>
+</section>
+
+<!-- ───────── POST-PRUNING ───────── -->
+<section id="post-pruning" data-progress-section>
+  <h2>Post-Pruning</h2>
+
+  <p>Post-pruning lets the tree grow fully, then removes branches that don't improve generalisation. The most principled method is <strong>Cost-Complexity Pruning</strong> (used by CART and scikit-learn).</p>
+
+  <div class="formula">
+    <h4>Cost-Complexity Function</h4>
+    <p>R_α(T) = R(T) + α × |T̃|</p>
+    <p>where:</p>
+    <ul>
+      <li>R(T) = total impurity of tree T (sum of impurities in all leaves, weighted by sample count)</li>
+      <li>|T̃| = number of leaf nodes in T</li>
+      <li>α (ccp_alpha) = complexity parameter — controls the penalty for having more leaves</li>
+    </ul>
+  </div>
+
+  <p>The pruning algorithm works as follows:</p>
+  <ol>
+    <li>Grow a full, unpruned tree T_max.</li>
+    <li>For each internal node, compute the <strong>effective alpha</strong> at which it would be pruned:</li>
+  </ol>
+
+  <div class="formula">
+    <p>α_eff = (R(t) − R(T_t)) / (|T̃_t| − 1)</p>
+    <p>where t is the node, T_t is the subtree rooted at t</p>
+  </div>
+
+  <ol start="3">
+    <li>Prune the node with the smallest α_eff (least valuable subtree).</li>
+    <li>Repeat until only the root remains.</li>
+    <li>Use cross-validation to select the optimal α from the resulting sequence of trees.</li>
+  </ol>
+
+  <div class="worked-example">
+    <h4>Worked Example</h4>
+    <p>Node t has impurity R(t) = 0.30 and its subtree has 4 leaves with total impurity R(T_t) = 0.20.</p>
+    <p>α_eff = (0.30 − 0.20) / (4 − 1) = 0.10 / 3 = <strong>0.033</strong></p>
+    <p>If ccp_alpha is set to 0.05, this node <strong>would be pruned</strong> because α_eff (0.033) &lt; ccp_alpha (0.05).</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Takeaway</h4>
+    <p>Post-pruning is generally more reliable than pre-pruning because it lets the tree explore the full structure first, then decides what to keep. In scikit-learn, use <code>ccp_alpha</code> with cross-validation to find the optimal pruning level.</p>
+  </div>
+</section>
+
+<!-- ───────── BIAS-VARIANCE TRADEOFF ───────── -->
+<section id="bias-variance-tree" data-progress-section>
+  <h2>Bias-Variance Tradeoff in Trees</h2>
+
+  <table>
+    <thead>
+      <tr><th>Tree Type</th><th>Bias</th><th>Variance</th><th>When to Use</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Shallow</strong> (depth 2–3)</td>
+        <td>High — misses complex patterns</td>
+        <td>Low — stable across datasets</td>
+        <td>Small datasets, need interpretability, baseline model</td>
+      </tr>
+      <tr>
+        <td><strong>Deep</strong> (unconstrained)</td>
+        <td>Low — captures fine details</td>
+        <td>High — varies wildly with training data</td>
+        <td>Ensembles (random forests, gradient boosting) where variance is averaged out</td>
+      </tr>
+      <tr>
+        <td><strong>Balanced</strong> (pruned/regularised)</td>
+        <td>Moderate</td>
+        <td>Moderate</td>
+        <td>Single-tree deployment, interpretability + reasonable accuracy</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="formula">
+    <h4>Bias-Variance Decomposition (for squared error loss)</h4>
+    <p>E[(y − f̂(x))²] = Bias²(f̂) + Var(f̂) + σ²</p>
+    <p>where σ² is irreducible noise.</p>
+    <p>Shallow tree: high Bias², low Var → total error dominated by bias</p>
+    <p>Deep tree: low Bias², high Var → total error dominated by variance</p>
+    <p>Goal: find the sweet spot that minimises total error.</p>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy — Camera Focus</h4>
+    <p>A shallow tree is like a photo that's slightly blurry everywhere (high bias, low variance). A deep tree is like a photo that's razor-sharp on the subject but noisy in the background (low bias, high variance). The balanced tree is like a well-focused photo — sharp where it matters, clean elsewhere.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     FEATURE IMPORTANCE
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="feature-importance" data-progress-section>
+  <h2>Feature Importance</h2>
+
+  <p>Decision trees naturally rank features by how useful they are for prediction. There are two main approaches:</p>
+
+  <h3>1. Impurity-Based Importance (Default in sklearn)</h3>
+
+  <div class="formula">
+    <h4>Formula</h4>
+    <p>Importance(f) = Σ_{splits using f} (N_s / N) × ΔImpurity(s)</p>
+    <p>where:</p>
+    <ul>
+      <li>N_s = number of samples at split s</li>
+      <li>N = total samples at root</li>
+      <li>ΔImpurity(s) = impurity reduction of split s</li>
+    </ul>
+    <p>The sum is normalised so all features sum to 1.0.</p>
+  </div>
+
+  <div class="worked-example">
+    <h4>Example</h4>
+    <p>A tree uses "Income" at the root (100 samples, ΔGini = 0.30) and "Age" at depth 1 (40 samples, ΔGini = 0.10).</p>
+    <p>Income: (100/100) × 0.30 = 0.30</p>
+    <p>Age: (40/100) × 0.10 = 0.04</p>
+    <p>After normalisation across all features, Income might have importance 0.75 and Age 0.10 (with other features summing to 0.15).</p>
+  </div>
+
+  <h3>2. Permutation Importance (More Reliable)</h3>
+  <p>Randomly shuffle one feature's values and measure the drop in model accuracy. A large drop means the feature is important. This doesn't suffer from the bias towards high-cardinality features that impurity-based importance has.</p>
+
+  <div class="warning-box">
+    <h4>Caveat</h4>
+    <p>Impurity-based importance is biased towards features with many unique values (high cardinality). For example, a unique ID column would have high impurity-based importance but zero predictive value. Permutation importance is more trustworthy but computationally more expensive.</p>
+  </div>
+
+  <h3>In scikit-learn</h3>
+  <div class="worked-example">
+    <h4>Accessing Feature Importances</h4>
+    <p><code>tree.feature_importances_</code> — returns the normalised impurity-based importances as a numpy array.</p>
+    <p><code>forest.feature_importances_</code> — for a Random Forest, this averages importance across all trees.</p>
+    <p>To visualise: use <code>plot_tree()</code> or create a horizontal bar chart of importances.</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Takeaway</h4>
+    <p>Feature importance from trees is a quick, interpretable way to understand which features drive predictions. Use impurity-based importance for speed, permutation importance for reliability. Always check for correlated features, which can dilute importance scores.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     DECISION TREES FOR REGRESSION
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="dt-regression" data-progress-section>
+  <h2>Decision Trees for Regression</h2>
+
+  <p>Decision trees can predict continuous values, not just classes. The key differences from classification:</p>
+
+  <table>
+    <thead>
+      <tr><th>Aspect</th><th>Classification Tree</th><th>Regression Tree</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Target</td>
+        <td>Discrete class labels</td>
+        <td>Continuous numerical values</td>
+      </tr>
+      <tr>
+        <td>Leaf prediction</td>
+        <td>Majority class</td>
+        <td>Mean of training samples in the leaf</td>
+      </tr>
+      <tr>
+        <td>Splitting criterion</td>
+        <td>Gini Impurity / Entropy</td>
+        <td>Variance Reduction (MSE)</td>
+      </tr>
+      <tr>
+        <td>Impurity measure</td>
+        <td>Class proportions</td>
+        <td>Variance (or MSE) of target values</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="formula">
+    <h4>Variance Reduction Criterion</h4>
+    <p>Split quality is measured by the reduction in Mean Squared Error (MSE):</p>
+    <p>MSE(node) = (1/|node|) Σ (yᵢ − ȳ)²</p>
+    <p>where ȳ is the mean of the node.</p>
+    <p>Gain = MSE(parent) − [(N_L/N) × MSE(left) + (N_R/N) × MSE(right)]</p>
+  </div>
+
+  <div class="worked-example">
+    <h4>Worked Example — House Prices</h4>
+    <p><strong>Parent node:</strong> [200k, 250k, 300k, 350k, 400k] → ȳ = 300k</p>
+    <p>MSE(parent) = [(200−300)² + (250−300)² + (300−300)² + (350−300)² + (400−300)²] / 5</p>
+    <p>= [10000 + 2500 + 0 + 2500 + 10000] / 5 = 25000 / 5 = <strong>5000</strong></p>
+
+    <h4>After split "Sq Footage ≤ 1500":</h4>
+    <p>Left: [200k, 250k] → ȳ = 225k, MSE = 625</p>
+    <p>Right: [300k, 350k, 400k] → ȳ = 350k, MSE = 1667</p>
+    <p>Weighted MSE = (2/5)×625 + (3/5)×1667 = 250 + 1000 = <strong>1250</strong></p>
+    <p>Gain = 5000 − 1250 = <strong>3750</strong></p>
+  </div>
+
+  <h3>Step Function Output</h3>
+  <div class="warning-box">
+    <h4>No Extrapolation</h4>
+    <p>A regression tree produces a <strong>step function</strong> — it predicts the same constant value for every sample in a leaf. The prediction is always the mean of training values in that leaf, which means:</p>
+    <ul>
+      <li>It can never predict a value outside the range of the training data (no extrapolation).</li>
+      <li>The output is piecewise-constant, not smooth.</li>
+      <li>For extrapolation tasks (e.g., predicting future stock prices), regression trees alone are inadequate. Gradient boosting (Topic 5) addresses this.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PART B – ENSEMBLE METHODS
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="part-b-ensembles" data-progress-section>
+  <h1>Part B – Ensemble Methods</h1>
+  <p>Single decision trees are powerful but unstable. Ensemble methods combine many trees to produce predictions that are more accurate and more stable than any individual tree.</p>
+</section>
+
+<!-- ───────── WHY ENSEMBLES ───────── -->
+<section id="why-ensembles" data-progress-section>
+  <h2>Why Ensembles? The Problem with One Tree</h2>
+
+  <div class="warning-box">
+    <h4>The Instability Problem</h4>
+    <p>Decision trees have <strong>high variance</strong>. If you change the training data slightly (add or remove a few samples), the resulting tree can be dramatically different — different splits, different structure, different predictions. This instability is the fundamental motivation for ensemble methods.</p>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy — Asking One Expert vs a Panel</h4>
+    <p>If you ask one doctor for a diagnosis, you get one opinion — possibly brilliant, possibly wrong. If you ask 100 doctors and take a majority vote, you're much more likely to get the right answer, even if some individual doctors are wrong. Random Forests are the "panel of experts" approach to machine learning.</p>
+  </div>
+
+  <p>The mathematical foundation comes from the bias-variance decomposition:</p>
+  <div class="formula">
+    <p>If each tree has variance σ² and correlation ρ between trees, the ensemble variance is:</p>
+    <p>Var(ensemble) = ρσ² + (1−ρ)σ²/n</p>
+    <p>where n = number of trees.</p>
+    <p>As n → ∞: Var(ensemble) → ρσ²</p>
+    <p>To minimise ensemble variance, we need to minimise ρ (correlation between trees). Random Forests achieve this via bootstrap sampling AND feature randomisation.</p>
+  </div>
+</section>
+
+<!-- ───────── BOOTSTRAP BAGGING ───────── -->
+<section id="bootstrap-bagging" data-progress-section>
+  <h2>Bootstrap Sampling (Bagging)</h2>
+
+  <div class="definition-box">
+    <h4>Bootstrap Sampling</h4>
+    <p>A bootstrap sample is a random sample of size n drawn <strong>with replacement</strong> from the original dataset of size n. Each bootstrap sample is a different "view" of the data — some samples appear multiple times, others not at all.</p>
+  </div>
+
+  <div class="formula">
+    <h4>The 63-2 Rule</h4>
+    <p>Probability that a specific sample is NOT included in one bootstrap draw:</p>
+    <p>P(not selected once) = (1 − 1/n)ⁿ</p>
+    <p>As n → ∞: (1 − 1/n)ⁿ → 1/e ≈ 0.368 = 36.8%</p>
+    <p>So approximately 36.8% of samples are <strong>left out</strong> (Out-of-Bag samples) on average.</p>
+    <p>Conversely, approximately 63.2% of original samples appear at least once in the bootstrap sample.</p>
+  </div>
+
+  <div class="worked-example">
+    <h4>Worked Example — n=10</h4>
+    <p>P(a specific sample is not in one draw) = 9/10 = 0.9</p>
+    <p>P(not in any of 10 draws) = 0.9¹⁰ = 0.3487 ≈ 34.9%</p>
+    <p>Close to the theoretical 36.8% — the approximation improves with larger n.</p>
+  </div>
+
+  <h3>Out-of-Bag (OOB) Samples</h3>
+  <p>The ~37% of samples not used in a particular bootstrap are called <strong>Out-of-Bag (OOB) samples</strong> for that tree. They serve as a built-in validation set:</p>
+  <ul>
+    <li>Each tree is tested on its OOB samples (never seen during training).</li>
+    <li>OOB predictions across all trees are aggregated → <strong>OOB score</strong>.</li>
+    <li>OOB score ≈ cross-validation score, but computed for free (no extra training needed).</li>
+  </ul>
+
+  <div class="formula">
+    <h4>OOB Score Computation</h4>
+    <p>For each training sample xᵢ:</p>
+    <ol>
+      <li>Identify all trees where xᵢ was NOT in the bootstrap sample (its OOB trees).</li>
+      <li>Get predictions from these OOB trees only.</li>
+      <li>Aggregate (vote for classification, average for regression).</li>
+      <li>Compare to the true label yᵢ.</li>
+    </ol>
+    <p>OOB score = proportion of correctly classified samples across all xᵢ.</p>
+  </div>
+
+  <h3>Bagging Algorithm</h3>
+  <div class="collapsible">
+    <button class="collapsible-toggle">Bagging (Bootstrap Aggregating) Algorithm</button>
+    <div class="collapsible-content">
+      <ol>
+        <li>Draw n_trees bootstrap samples from the training data.</li>
+        <li>Train one decision tree on each bootstrap sample.</li>
+        <li>For a new prediction:
+          <ul>
+            <li>Classification: majority vote across all trees.</li>
+            <li>Regression: average of all tree predictions.</li>
+          </ul>
+        </li>
+      </ol>
+      <p>Bagging alone reduces variance significantly, but trees trained on different bootstrap samples are still somewhat correlated (they see similar data). Feature randomisation further reduces this correlation.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── FEATURE RANDOMISATION ───────── -->
+<section id="feature-randomisation" data-progress-section>
+  <h2>Feature Randomisation</h2>
+
+  <p>In a standard decision tree, every split considers <strong>all p features</strong>. In a Random Forest, each split considers only a <strong>random subset of m features</strong>. This decorrelates the trees — different trees focus on different features, making their errors more independent.</p>
+
+  <div class="formula">
+    <h4>Default Feature Subset Sizes</h4>
+    <p>Classification: m = √p (square root of total features)</p>
+    <p>Regression: m = p/3 (one-third of total features)</p>
+  </div>
+
+  <div class="worked-example">
+    <h4>Worked Example — p=16 features</h4>
+    <p>Classification: m = √16 = 4 features considered per split</p>
+    <p>Regression: m = 16/3 ≈ 5 features considered per split</p>
+    <p>At each node, the algorithm randomly selects 4 (or 5) features, then picks the best split among only those features.</p>
+  </div>
+
+  <h3>max_features Parameter Options</h3>
+  <table>
+    <thead>
+      <tr><th>Value</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>'sqrt'</code></td><td>√p features (default for classification)</td></tr>
+      <tr><td><code>'log2'</code></td><td>log₂(p) features (more aggressive randomisation)</td></tr>
+      <tr><td><code>'None'</code></td><td>All p features (equivalent to bagging, no randomisation)</td></tr>
+      <tr><td>Integer n</td><td>Exactly n features per split</td></tr>
+      <tr><td>Float f (0,1]</td><td>f × p features per split (e.g., 0.3 means 30%)</td></tr>
+    </tbody>
+  </table>
+
+  <div class="analogy-box">
+    <h4>Analogy — Committee with Diverse Expertise</h4>
+    <p>Imagine assembling a committee to solve a problem. If every member has identical expertise (all p features), their opinions will be highly correlated — you don't gain much from the ensemble. But if each member specialises in a random subset of skills (m features), the committee is more diverse, and the collective wisdom is greater than any individual.</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Takeaway</h4>
+    <p>Feature randomisation is the key ingredient that makes Random Forests better than plain bagging. By restricting each tree to a random subset of features at each split, it forces the trees to be different from each other, which reduces ensemble variance and improves generalisation.</p>
+  </div>
+</section>
+
+<!-- ───────── RANDOM FOREST ARCHITECTURE ───────── -->
+<section id="rf-architecture" data-progress-section>
+  <h2>Random Forest Architecture</h2>
+
+  <div class="definition-box">
+    <h4>Definition</h4>
+    <p>A <strong>Random Forest</strong> is an ensemble of decision trees where: (1) each tree is trained on a different bootstrap sample, and (2) at each split, only a random subset of features is considered. Predictions are aggregated by majority vote (classification) or averaging (regression).</p>
+  </div>
+
+  <div class="collapsible">
+    <button class="collapsible-toggle">Architecture Diagram (Text Description)</button>
+    <div class="collapsible-content">
+      <h4>Random Forest Architecture</h4>
+      <pre style="font-family: monospace; line-height: 1.6;">
+                    ┌─────────────────────┐
+                    │   Training Data D    │
+                    │   (n samples, p      │
+                    │    features)         │
+                    └──────────┬──────────┘
+                               │
+              ┌────────────────┼────────────────┐
+              │                │                │
+     ┌────────▼──────┐ ┌──────▼────────┐ ┌─────▼───────┐
+     │ Bootstrap 1   │ │ Bootstrap 2   │ │ Bootstrap B  │
+     │ (n samples    │ │ (n samples    │ │ (n samples   │
+     │  w/ replace)  │ │  w/ replace)  │ │  w/ replace) │
+     └────────┬──────┘ └──────┬────────┘ └─────┬───────┘
+              │                │                │
+     ┌────────▼──────┐ ┌──────▼────────┐ ┌─────▼───────┐
+     │  Decision     │ │  Decision     │ │  Decision    │
+     │  Tree 1       │ │  Tree 2       │ │  Tree B      │
+     │  (m features  │ │  (m features  │ │  (m features │
+     │  per split)   │ │  per split)   │ │  per split)  │
+     └────────┬──────┘ └──────┬────────┘ └─────┬───────┘
+              │                │                │
+              └────────────────┼────────────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │    Aggregation      │
+                    │  Vote (classify)    │
+                    │  Average (regress)  │
+                    └──────────┬──────────┘
+                               │
+                    ┌──────────▼──────────┐
+                    │   Final Prediction  │
+                    └─────────────────────┘
+      </pre>
+      <p><strong>Key properties:</strong></p>
+      <ul>
+        <li>Each tree is independent — can be trained in parallel.</li>
+        <li>Each tree sees a different subset of data AND features.</li>
+        <li>OOB samples for each tree provide free validation.</li>
+        <li>Ensemble variance decreases with more trees (diminishing returns).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ───────── KEY HYPERPARAMETERS ───────── -->
+<section id="rf-hyperparameters" data-progress-section>
+  <h2>Key Hyperparameters of Random Forests</h2>
+
+  <table>
+    <thead>
+      <tr><th>Parameter</th><th>Default (sklearn)</th><th>Effect</th><th>Recommendation</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>n_estimators</code></td>
+        <td>100</td>
+        <td>Number of trees in the forest. More trees → better performance but slower. Diminishing returns after ~200-500.</td>
+        <td>Start with 100, increase to 200-500 if needed.</td>
+      </tr>
+      <tr>
+        <td><code>max_depth</code></td>
+        <td>None (unlimited)</td>
+        <td>Maximum depth of each tree. Deeper trees → more complex, more overfitting risk.</td>
+        <td>For large datasets: None is fine (ensemble handles variance). For small datasets: 10-20.</td>
+      </tr>
+      <tr>
+        <td><code>max_features</code></td>
+        <td>'sqrt' (classification) / 1.0 (regression)</td>
+        <td>Features per split. Fewer → more diverse trees, less overfitting. More → trees more similar, less variance reduction.</td>
+        <td>'sqrt' for classification, 'None' or p/3 for regression.</td>
+      </tr>
+      <tr>
+        <td><code>min_samples_leaf</code></td>
+        <td>1</td>
+        <td>Minimum samples per leaf. Larger values → smoother predictions, less overfitting.</td>
+        <td>1 for large datasets. 5-20 for noisy/small datasets.</td>
+      </tr>
+      <tr>
+        <td><code>oob_score</code></td>
+        <td>False</td>
+        <td>If True, computes OOB score after training — free validation estimate.</td>
+        <td>Set to True for quick model evaluation without cross-validation.</td>
+      </tr>
+      <tr>
+        <td><code>n_jobs</code></td>
+        <td>None (1)</td>
+        <td>Number of CPU cores for parallel training. -1 uses all cores.</td>
+        <td>Set to -1 for faster training on multi-core machines.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="warning-box">
+    <h4>Important Notes</h4>
+    <ul>
+      <li><strong>n_estimators:</strong> Unlike most models, more trees virtually never hurt Random Forests (no overfitting from more trees), but training time increases linearly.</li>
+      <li><strong>max_depth:</strong> In Random Forests, allowing deep trees is often fine because the averaging over many trees controls variance. But for very large forests (1000+ trees), you can increase depth for better accuracy.</li>
+      <li><strong>max_features:</strong> This is the most important hyperparameter for controlling the bias-variance tradeoff in the ensemble. Lower values → more diversity → lower variance → but potentially higher bias.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     PART C – APPLICATIONS & EVALUATION
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="part-c-applications" data-progress-section>
+  <h1>Part C – Applications &amp; Evaluation</h1>
+  <p>Decision trees and Random Forests are applied across industries. In this section, we explore real-world use cases and the metrics used to evaluate them.</p>
+</section>
+
+<!-- ───────── MEDICAL DIAGNOSIS ───────── -->
+<section id="medical-diagnosis" data-progress-section>
+  <h2>Application — Medical Diagnosis (Diabetes)</h2>
+
+  <p>Predicting whether a patient has diabetes based on features like glucose level, BMI, age, blood pressure, and insulin.</p>
+
+  <h3>Why Random Forests?</h3>
+  <ul>
+    <li><strong>Interpretability:</strong> Feature importance tells doctors which measurements matter most (e.g., glucose level, BMI).</li>
+    <li><strong>Handles mixed data:</strong> Numeric (glucose, age) and categorical (family history) features work seamlessly.</li>
+    <li><strong>Robust to noise:</strong> Medical data often has measurement errors; ensemble averaging smooths these out.</li>
+    <li><strong>Non-linear relationships:</strong> Diabetes risk has complex interactions (e.g., BMI matters more for certain age groups).</li>
+  </ul>
+
+  <h3>Evaluation Metric: Recall (Sensitivity)</h3>
+  <div class="definition-box">
+    <h4>Definition</h4>
+    <p>Recall = TP / (TP + FN) — the proportion of actual positives correctly identified.</p>
+  </div>
+  <div class="formula">
+    <p>In diabetes diagnosis:</p>
+    <p>High recall = few missed diabetes cases (low false negatives).</p>
+    <p>This is critical because missing a diabetes case can lead to untreated disease, complications, and even death. A false alarm (false positive) is inconvenient but far less dangerous.</p>
+  </div>
+
+  <div class="worked-example">
+    <h4>Example Calculation</h4>
+    <p>A Random Forest classifier tested on 200 patients:</p>
+    <p>True Positives (diabetic, correctly flagged): 85</p>
+    <p>False Negatives (diabetic, missed): 15</p>
+    <p>False Positives (healthy, flagged as diabetic): 20</p>
+    <p>True Negatives (healthy, correctly cleared): 80</p>
+    <p>Recall = 85 / (85 + 15) = 85/100 = <strong>0.85 (85%)</strong></p>
+    <p>Precision = 85 / (85 + 20) = 85/105 = <strong>0.810 (81%)</strong></p>
+  </div>
+</section>
+
+<!-- ───────── CREDIT RISK ───────── -->
+<section id="credit-risk" data-progress-section>
+  <h2>Application — Credit Risk Scoring</h2>
+
+  <p>Banks use Random Forests to predict the probability of loan default. Features include income, credit history, employment status, debt-to-income ratio, and loan amount.</p>
+
+  <h3>Fairness Considerations</h3>
+  <div class="warning-box">
+    <h4>Fairness in Credit Scoring</h4>
+    <p>Models must not discriminate based on protected attributes (race, gender, age). Even if these features are excluded, correlated features (zip code, education) can encode bias. Auditing with fairness metrics (demographic parity, equalised odds) is essential.</p>
+  </div>
+
+  <h3>Explainability with SHAP</h3>
+  <p>SHAP (SHapley Additive exPlanations) provides per-patient explanations of the model's prediction. For each loan applicant, SHAP shows which features pushed the prediction toward "default" vs "no default" and by how much. This satisfies regulatory requirements (e.g., "right to explanation" under GDPR).</p>
+
+  <h3>Evaluation Metric: Precision at Top Decile</h3>
+  <div class="formula">
+    <p><strong>Precision@Top Decile:</strong> Of the top 10% highest-risk applicants (as ranked by the model), what fraction actually defaulted?</p>
+    <p>This metric focuses on the most actionable segment — the bank will investigate or deny the top 10%. Higher precision here means fewer false alarms in the investigation queue.</p>
+  </div>
+
+  <div class="worked-example">
+    <h4>Example</h4>
+    <p>1000 applicants, 100 actual defaults.</p>
+    <p>Model ranks applicants by predicted default probability. Top 100 (top decile) are flagged.</p>
+    <p>Of these 100 flagged: 45 actually defaulted.</p>
+    <p>Precision@TopDecile = 45/100 = <strong>0.45 (45%)</strong></p>
+    <p>This means 45% of the flagged applicants are true defaults — the bank catches 45/100 = 45% of all defaults while only investigating 10% of applicants.</p>
+  </div>
+</section>
+
+<!-- ───────── CUSTOMER CHURN ───────── -->
+<section id="customer-churn" data-progress-section>
+  <h2>Application — Customer Churn Prediction</h2>
+
+  <p>Predicting which customers will cancel their subscription. Features include usage frequency, contract length, monthly charges, tenure, and support calls.</p>
+
+  <h3>Business-Aligned Metric Design</h3>
+  <div class="definition-box">
+    <h4>Why Accuracy is Misleading</h4>
+    <p>If 95% of customers don't churn, a model that predicts "no churn" for everyone achieves 95% accuracy but catches zero churners. We need metrics aligned with the business goal.</p>
+  </div>
+
+  <h3>Cost-Sensitive Evaluation</h3>
+  <div class="formula">
+    <p><strong>Business Cost Matrix:</strong></p>
+    <p>False Negative (missed churner): Cost = $500 (lost lifetime value)</p>
+    <p>False Positive (false alarm): Cost = $50 (unnecessary retention offer)</p>
+    <p>Total Cost = FN × $500 + FP × $50</p>
+    <p>The optimal model minimises total cost, not total errors.</p>
+  </div>
+
+  <div class="worked-example">
+    <h4>Model Comparison</h4>
+    <p><strong>Model A:</strong> 90% recall, 30% precision → catches 90 churners, but 210 false alarms. Cost = 10×500 + 210×50 = $5,000 + $10,500 = <strong>$15,500</strong></p>
+    <p><strong>Model B:</strong> 75% recall, 60% precision → catches 75 churners, 50 false alarms. Cost = 25×500 + 50×50 = $12,500 + $2,500 = <strong>$15,000</strong></p>
+    <p>Model B is better despite lower recall — the cost savings from fewer false alarms outweigh the missed churners.</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Takeaway</h4>
+    <p>Always design evaluation metrics around the actual business objective. Accuracy, F1, and AUC are useful diagnostics, but the final model selection should be based on cost minimisation or revenue maximisation.</p>
+  </div>
+</section>
+
+<!-- ───────── EVALUATION METRICS ───────── -->
+<section id="evaluation-metrics" data-progress-section>
+  <h2>Evaluation Metrics — Comprehensive Table</h2>
+
+  <table>
+    <thead>
+      <tr><th>Metric</th><th>Formula</th><th>Range</th><th>Best For</th><th>Interpretation</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Accuracy</strong></td>
+        <td>(TP + TN) / (TP + TN + FP + FN)</td>
+        <td>[0, 1]</td>
+        <td>Balanced classes</td>
+        <td>Overall correctness</td>
+      </tr>
+      <tr>
+        <td><strong>Precision</strong></td>
+        <td>TP / (TP + FP)</td>
+        <td>[0, 1]</td>
+        <td>When false positives are costly (spam filter)</td>
+        <td>"Of predicted positives, how many are correct?"</td>
+      </tr>
+      <tr>
+        <td><strong>Recall</strong></td>
+        <td>TP / (TP + FN)</td>
+        <td>[0, 1]</td>
+        <td>When false negatives are costly (cancer detection)</td>
+        <td>"Of actual positives, how many did we catch?"</td>
+      </tr>
+      <tr>
+        <td><strong>F1 Score</strong></td>
+        <td>2 × (Precision × Recall) / (Precision + Recall)</td>
+        <td>[0, 1]</td>
+        <td>Imbalanced classes, balance P & R</td>
+        <td>Harmonic mean of precision and recall</td>
+      </tr>
+      <tr>
+        <td><strong>ROC-AUC</strong></td>
+        <td>Area under ROC curve (TPR vs FPR at all thresholds)</td>
+        <td>[0, 1]</td>
+        <td>Threshold-independent evaluation</td>
+        <td>Probability that a random positive is ranked higher than a random negative</td>
+      </tr>
+      <tr>
+        <td><strong>Gini Coefficient</strong></td>
+        <td>2 × AUC − 1</td>
+        <td>[0, 1]</td>
+        <td>Credit scoring, ranking quality</td>
+        <td>Measures ranking power: 1 = perfect, 0 = random</td>
+      </tr>
+      <tr>
+        <td><strong>OOB Error</strong></td>
+        <td>1 − OOB Score</td>
+        <td>[0, 1]</td>
+        <td>Random Forest internal validation</td>
+        <td>Cross-validation-like estimate without separate validation set</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="formula">
+    <h4>Gini Coefficient (for model evaluation)</h4>
+    <p>Gini = 2 × AUC − 1</p>
+    <p>AUC of 0.5 (random) → Gini = 0 (no discrimination)</p>
+    <p>AUC of 1.0 (perfect) → Gini = 1.0 (perfect discrimination)</p>
+    <p>Industry standard in credit scoring: Gini &gt; 0.4 is good, &gt; 0.6 is excellent.</p>
+  </div>
+
+  <div class="warning-box">
+    <h4>Choosing the Right Metric</h4>
+    <ul>
+      <li>Binary classification with balanced classes → Accuracy or F1</li>
+      <li>Imbalanced classes → F1, ROC-AUC, or Precision-Recall AUC</li>
+      <li>Cost-sensitive decisions → custom cost matrix</li>
+      <li>Ranking tasks (credit scoring) → Gini or AUC</li>
+      <li>Quick internal validation → OOB Error</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ───────── CONFUSION MATRIX ───────── -->
+<section id="confusion-matrix" data-progress-section>
+  <h2>Confusion Matrix — Foundation of All Metrics</h2>
+
+  <div class="definition-box">
+    <h4>Definition</h4>
+    <p>A confusion matrix is a 2×2 table (for binary classification) that shows the counts of True Positives, False Positives, True Negatives, and False Negatives. All classification metrics are derived from these four numbers.</p>
+  </div>
+
+  <div class="formula">
+    <pre style="font-family: monospace; line-height: 1.8;">
+                        Predicted
+                   ┌─────────┬─────────┐
+                   │   Pos   │   Neg   │
+        ┌──────────┼─────────┼─────────┤
+  Actual│   Pos    │   TP    │   FN    │
+        ├──────────┼─────────┼─────────┤
+        │   Neg    │   FP    │   TN    │
+        └──────────┴─────────┴─────────┘
+
+  TP = True Positive:  predicted positive, actually positive
+  FN = False Negative: predicted negative, actually positive (MISS!)
+  FP = False Positive: predicted positive, actually negative (FALSE ALARM!)
+  TN = True Negative:  predicted negative, actually negative
+    </pre>
+  </div>
+
+  <div class="worked-example">
+    <h4>Worked Example — Diabetes Dataset</h4>
+    <p>200 patients tested with a Random Forest classifier:</p>
+    <pre style="font-family: monospace; line-height: 1.8;">
+                        Predicted
+                   ┌─────────┬─────────┐
+                   │ Diabetes│ Healthy │
+        ┌──────────┼─────────┼─────────┤
+  Actual│ Diabetes │   85    │   15    │
+        ├──────────┼─────────┼─────────┤
+        │ Healthy  │   20    │   80    │
+        └──────────┴─────────┴─────────┘
+
+  TP = 85, FN = 15, FP = 20, TN = 80
+    </pre>
+    <p>Accuracy  = (85+80)/(85+15+20+80) = 165/200 = 0.825</p>
+    <p>Precision = 85/(85+20) = 85/105 = 0.810</p>
+    <p>Recall    = 85/(85+15) = 85/100 = 0.850</p>
+    <p>F1        = 2×(0.810×0.850)/(0.810+0.850) = 2×0.6885/1.660 = 0.830</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Takeaway</h4>
+    <p>The confusion matrix is the single source of truth for all classification evaluation. Always start here — compute the four counts, then derive whatever metrics you need. It reveals the type of errors the model makes, which is more informative than any single scalar metric.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     FLASHCARDS
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="flashcards" data-progress-section>
+  <h2>Flashcards</h2>
+  <p>Click a card to reveal the answer.</p>
+
+  <div class="flashcard-container">
+
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is the range of Gini Impurity for binary classification?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>[0, 0.5]</strong> — 0 means pure (all one class), 0.5 means maximum impurity (50/50 split).</p>
+      </div>
+    </div>
+
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is the formula for Gini Impurity?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>Gini(t) = 1 − Σᵢ pᵢ²</strong></p>
+        <p>where pᵢ is the proportion of class i in node t.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What percentage of samples are Out-of-Bag (OOB) in a bootstrap sample, approximately?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>≈ 36.8%</strong> — derived from the limit (1 − 1/n)ⁿ → 1/e ≈ 0.368 as n → ∞.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>Why do Random Forests use feature randomisation at each split?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>To decorrelate the trees.</strong> If all trees used all features, they would be highly correlated and the ensemble variance reduction would be limited. Random subsets force trees to be diverse.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is the default max_features for Random Forest classification in sklearn?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>'sqrt'</strong> — the square root of the total number of features (p).</p>
+      </div>
+    </div>
+
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is Information Gain?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>IG = H(parent) − Σⱼ (|childⱼ|/|parent|) × H(childⱼ)</strong></p>
+        <p>The reduction in entropy achieved by splitting a node. The split with the highest IG is selected.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What does cost-complexity pruning (ccp_alpha) do?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>It penalises trees with more leaves.</strong> The cost function is R_α(T) = R(T) + α|T̃|. Higher α → more pruning → simpler tree. Cross-validation selects the optimal α.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is the splitting criterion for regression trees?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>Variance Reduction (MSE)</strong> — the split that maximises the reduction in Mean Squared Error of the target variable. Leaf predictions are the mean of the training samples in that leaf.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>Can decision trees extrapolate (predict values outside the training range)?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>No.</strong> Regression trees produce a step function where each leaf predicts the mean of its training samples. The prediction can never exceed the min or max of the training targets.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is the Gini Coefficient used for in credit scoring?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>Measuring ranking power:</strong> Gini = 2 × AUC − 1. It quantifies how well the model separates good borrowers from bad ones. A Gini of 0 means random, 1 means perfect separation.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What is the formula for the Entropy of a binary node with proportion p of the positive class?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>H = −p·log₂(p) − (1−p)·log₂(1−p)</strong></p>
+        <p>Range: [0, 1] for binary classification. Maximum at p=0.5.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" onclick="this.classList.toggle('flipped')">
+      <div class="flashcard-front">
+        <p>What problem does Random Forest solve that a single decision tree cannot?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>High variance (instability).</strong> A single tree's predictions change dramatically with small data changes. Averaging many decorrelated trees reduces variance while maintaining low bias.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     QUIZ
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="quiz" data-progress-section>
+  <h2>Quiz</h2>
+
+  <div class="quiz-container">
+
+    <!-- Q1 -->
+    <div class="quiz-question" data-correct="b">
+      <h4>1. A node has 80 samples of Class A and 20 samples of Class B. What is the Gini Impurity?</h4>
+      <label><input type="radio" name="q1" value="a"> 0.32</label>
+      <label><input type="radio" name="q1" value="b"> 0.32</label>
+      <label><input type="radio" name="q1" value="c"> 0.20</label>
+      <label><input type="radio" name="q1" value="d"> 0.50</label>
+      <p class="quiz-feedback">Gini = 1 − (0.8² + 0.2²) = 1 − (0.64 + 0.04) = 1 − 0.68 = <strong>0.32</strong>.</p>
+    </div>
+
+    <!-- Q2 -->
+    <div class="quiz-question" data-correct="c">
+      <h4>2. Approximately what percentage of samples are OOB in each bootstrap sample?</h4>
+      <label><input type="radio" name="q2" value="a"> 50%</label>
+      <label><input type="radio" name="q2" value="b"> 25%</label>
+      <label><input type="radio" name="q2" value="c"> 36.8%</label>
+      <label><input type="radio" name="q2" value="d"> 63.2%</label>
+      <p class="quiz-feedback">(1 − 1/n)ⁿ → 1/e ≈ 0.368 = <strong>36.8%</strong> are left out. About 63.2% appear at least once.</p>
+    </div>
+
+    <!-- Q3 -->
+    <div class="quiz-question" data-correct="a">
+      <h4>3. Which parameter in Random Forests controls the number of features considered at each split?</h4>
+      <label><input type="radio" name="q3" value="a"> max_features</label>
+      <label><input type="radio" name="q3" value="b"> n_estimators</label>
+      <label><input type="radio" name="q3" value="c"> max_depth</label>
+      <label><input type="radio" name="q3" value="d"> min_samples_leaf</label>
+      <p class="quiz-feedback"><strong>max_features</strong> controls the subset size at each split. n_estimators = number of trees, max_depth = tree depth, min_samples_leaf = minimum leaf size.</p>
+    </div>
+
+    <!-- Q4 -->
+    <div class="quiz-question" data-correct="d">
+      <h4>4. What does the Entropy of a perfectly pure node equal?</h4>
+      <label><input type="radio" name="q4" value="a"> 1.0</label>
+      <label><input type="radio" name="q4" value="b"> 0.5</label>
+      <label><input type="radio" name="q4" value="c"> log₂(k)</label>
+      <label><input type="radio" name="q4" value="d"> 0</label>
+      <p class="quiz-feedback">A pure node has p₁ = 1.0, so H = −1.0·log₂(1.0) = <strong>0</strong>. No uncertainty = no entropy.</p>
+    </div>
+
+    <!-- Q5 -->
+    <div class="quiz-question" data-correct="b">
+      <h4>5. Why can't regression trees extrapolate?</h4>
+      <label><input type="radio" name="q5" value="a"> They use linear functions</label>
+      <label><input type="radio" name="q5" value="b"> Leaf predictions are means of training values, bounded by training range</label>
+      <label><input type="radio" name="q5" value="c"> They only work with classification targets</label>
+      <label><input type="radio" name="q5" value="d"> They require normalised features</label>
+      <p class="quiz-feedback">Each leaf predicts the <strong>mean of training values</strong> in that region. The mean of a set cannot exceed its maximum or fall below its minimum.</p>
+    </div>
+
+    <!-- Q6 -->
+    <div class="quiz-question" data-correct="a">
+      <h4>6. What is the purpose of cost-complexity pruning (ccp_alpha)?</h4>
+      <label><input type="radio" name="q6" value="a"> Penalises tree complexity to find the optimal balance between fit and simplicity</label>
+      <label><input type="radio" name="q6" value="b"> Increases tree depth to capture more patterns</label>
+      <label><input type="radio" name="q6" value="c"> Adds noise to training data for regularization</label>
+      <label><input type="radio" name="q6" value="d"> Reduces the number of features used</label>
+      <p class="quiz-feedback">Cost-complexity pruning adds a penalty α × |leaves| to the tree's total impurity. Cross-validation selects the α that minimises the combined cost <strong>(fit + complexity penalty)</strong>.</p>
+    </div>
+
+    <!-- Q7 -->
+    <div class="quiz-question" data-correct="c">
+      <h4>7. In a medical diagnosis scenario, which metric is most important if missing a disease is dangerous?</h4>
+      <label><input type="radio" name="q7" value="a"> Precision</label>
+      <label><input type="radio" name="q7" value="b"> Accuracy</label>
+      <label><input type="radio" name="q7" value="c"> Recall</label>
+      <label><input type="radio" name="q7" value="d"> Specificity</label>
+      <p class="quiz-feedback"><strong>Recall</strong> (sensitivity) measures what fraction of actual cases are caught. When false negatives (missed cases) are costly, maximise recall.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     FILL-IN-THE-BLANK
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="fill-blank" data-progress-section>
+  <h2>Fill-in-the-Blank</h2>
+
+  <div class="fill-blank-container">
+
+    <div class="fill-blank-question">
+      <h4>1. The Gini Impurity formula is: Gini(t) = 1 − Σᵢ₌₁ᵏ <strong>______</strong></h4>
+      <input type="text" class="fill-blank-input" data-answer="pᵢ²" placeholder="Type your answer...">
+      <p class="fill-blank-feedback">Answer: <strong>pᵢ²</strong> — the sum of squared class proportions.</p>
+    </div>
+
+    <div class="fill-blank-question">
+      <h4>2. A bootstrap sample of size n drawn from n samples contains approximately <strong>______</strong>% unique samples (on average).</h4>
+      <input type="text" class="fill-blank-input" data-answer="63.2" placeholder="Type your answer...">
+      <p class="fill-blank-feedback">Answer: <strong>63.2%</strong> — the 1 − 1/e fraction that appear at least once.</p>
+    </div>
+
+    <div class="fill-blank-question">
+      <h4>3. For Random Forest classification, the default max_features is <strong>______</strong> of the total features.</h4>
+      <input type="text" class="fill-blank-input" data-answer="sqrt" placeholder="Type your answer...">
+      <p class="fill-blank-feedback">Answer: <strong>sqrt</strong> (√p) — the square root of the number of features.</p>
+    </div>
+
+    <div class="fill-blank-question">
+      <h4>4. Decision trees partition the feature space into axis-aligned <strong>______</strong> (rectangular regions).</h4>
+      <input type="text" class="fill-blank-input" data-answer="rectangles" placeholder="Type your answer...">
+      <p class="fill-blank-feedback">Answer: <strong>rectangles</strong> — each leaf defines a rectangular region of the feature space.</p>
+    </div>
+
+    <div class="fill-blank-question">
+      <h4>5. The splitting criterion for regression trees is <strong>______</strong> Reduction, which minimises MSE.</h4>
+      <input type="text" class="fill-blank-input" data-answer="Variance" placeholder="Type your answer...">
+      <p class="fill-blank-feedback">Answer: <strong>Variance</strong> — the split that maximises variance (MSE) reduction.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SCENARIO QUESTION
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="scenario" data-progress-section>
+  <h2>Scenario Question</h2>
+
+  <div class="scenario-box">
+    <h4>Scenario: Fraud Detection at a Payment Company</h4>
+    <p>A payment processing company wants to detect fraudulent transactions. They have 10 million transactions per day, of which only 0.1% (10,000) are fraudulent. They plan to deploy a Random Forest model and need to evaluate its performance.</p>
+    <p>The team's initial model achieves 99.9% accuracy by predicting "not fraud" for every transaction. The CFO is delighted, but the data science team is concerned.</p>
+
+    <h4>Questions:</h4>
+    <ol>
+      <li>Why is 99.9% accuracy misleading in this scenario?</li>
+      <li>What metrics should the team focus on instead, and why?</li>
+      <li>The team retrains with a tuned Random Forest (max_features='sqrt', n_estimators=500, min_samples_leaf=10). The new confusion matrix shows: TP=8,500, FN=1,500, FP=50,000, TN=9,940,000. Calculate: Accuracy, Precision, Recall, F1.</li>
+      <li>If each missed fraud costs $200 and each false alarm costs $5, what is the total daily cost of this model? Is it better or worse than the "predict all not fraud" baseline?</li>
+      <li>What hyperparameter changes could reduce false alarms without sacrificing too much recall?</li>
+    </ol>
+  </div>
+
+  <div class="collapsible">
+    <button class="collapsible-toggle">Show Solution</button>
+    <div class="collapsible-content">
+      <h4>1. Why 99.9% Accuracy is Misleading</h4>
+      <p>A "predict all not fraud" model achieves 99.9% accuracy because 99.9% of transactions are legitimate. But it catches <strong>zero frauds</strong> — its recall is 0%. The model is useless for its intended purpose. Accuracy is meaningless with extreme class imbalance.</p>
+
+      <h4>2. Better Metrics</h4>
+      <ul>
+        <li><strong>Recall:</strong> Of actual frauds, how many did we catch? Critical — missed frauds cost real money.</li>
+        <li><strong>Precision:</strong> Of flagged transactions, how many are actually fraud? Important because investigations have costs.</li>
+        <li><strong>F1 Score:</strong> Balances precision and recall.</li>
+        <li><strong>Cost-based metric:</strong> Total cost = FN × $200 + FP × $5. This is the ultimate business metric.</li>
+        <li><strong>Precision-Recall AUC:</strong> Better than ROC-AUC for highly imbalanced data.</li>
+      </ul>
+
+      <h4>3. Calculations</h4>
+      <p>TP=8,500, FN=1,500, FP=50,000, TN=9,940,000, Total=10,000,000</p>
+      <p>Accuracy  = (8,500 + 9,940,000) / 10,000,000 = 9,948,500 / 10,000,000 = <strong>99.485%</strong></p>
+      <p>Precision = 8,500 / (8,500 + 50,000) = 8,500 / 58,500 = <strong>0.1453 (14.53%)</strong></p>
+      <p>Recall    = 8,500 / (8,500 + 1,500) = 8,500 / 10,000 = <strong>0.85 (85%)</strong></p>
+      <p>F1        = 2 × (0.1453 × 0.85) / (0.1453 + 0.85) = 2 × 0.1235 / 0.9953 = <strong>0.2481</strong></p>
+
+      <h4>4. Cost Analysis</h4>
+      <p><strong>Tuned model:</strong> Cost = 1,500 × $200 + 50,000 × $5 = $300,000 + $250,000 = <strong>$550,000/day</strong></p>
+      <p><strong>"All not fraud" baseline:</strong> Cost = 10,000 × $200 + 0 × $5 = <strong>$2,000,000/day</strong></p>
+      <p>The tuned model saves <strong>$1,450,000/day</strong> — a massive improvement despite the low precision. Even flagging many false alarms is worth it because each caught fraud saves $200 and each false alarm only costs $5.</p>
+
+      <h4>5. Reducing False Alarms</h4>
+      <ul>
+        <li>Increase <code>min_samples_leaf</code> → smoother decision boundary, fewer edge-case flags.</li>
+        <li>Increase <code>min_impurity_decrease</code> → only split on highly informative features.</li>
+        <li>Increase <code>max_depth</code> slightly → deeper trees can learn more nuanced patterns, potentially reducing false positives.</li>
+        <li>Adjust the <strong>classification threshold</strong> → raise it to be more conservative about flagging fraud.</li>
+        <li>Use <strong>class_weight='balanced'</strong> to upweight the minority class without over-flagging.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     FINAL RECAP
+     ═══════════════════════════════════════════════════════════════════ -->
+<section id="recap" data-progress-section>
+  <h2>Final Recap</h2>
+
+  <div class="recap-box">
+    <h4>Key Concepts Summary</h4>
+    <ul>
+      <li><strong>Decision Trees</strong> partition feature space into axis-aligned rectangles via recursive greedy splitting. They are non-parametric, handle mixed features, and are naturally interpretable.</li>
+      <li><strong>Splitting Criteria:</strong> Gini Impurity (1 − Σpᵢ², range [0, 0.5] for binary) and Entropy (−Σpᵢ log₂pᵢ, range [0, 1] for binary) measure node impurity. The best split maximises the impurity reduction (gain).</li>
+      <li><strong>Overfitting</strong> is the main weakness of single trees. Combat it with pre-pruning (max_depth, min_samples_leaf) or post-pruning (cost-complexity pruning with ccp_alpha).</li>
+      <li><strong>Feature Importance</strong> is computed from the sum of impurity reductions at each split using that feature, normalised across all features.</li>
+      <li><strong>Regression Trees</strong> use variance (MSE) reduction and predict the leaf mean. They produce step functions and cannot extrapolate.</li>
+      <li><strong>Random Forests</strong> ensemble many decorrelated trees via bootstrap sampling (Bagging) and feature randomisation (m = √p for classification, p/3 for regression).</li>
+      <li><strong>OOB Samples</strong> (~37% of data) provide free validation — OOB score ≈ cross-validation performance.</li>
+      <li><strong>Evaluation</strong> requires choosing metrics aligned with the business objective: recall for medical diagnosis, precision@top decile for credit scoring, cost matrices for churn prediction.</li>
+      <li><strong>The Confusion Matrix</strong> (TP, FP, TN, FN) is the foundation from which all classification metrics derive.</li>
+    </ul>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Big Picture Takeaway</h4>
+    <p>Decision trees provide the building blocks; Random Forests provide the engineering that makes them production-ready. Understanding the bias-variance tradeoff, splitting criteria, and ensemble mechanics gives you the foundation to build, tune, and evaluate tree-based models for any classification or regression task.</p>
+  </div>
+</section>
+
+</main>
+<!-- ═══════════════════════════ END MAIN CONTENT ═══════════════════════════ -->
+
+<script src="script.js"></script>
+</body>
+</html>

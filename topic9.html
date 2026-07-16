@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 9 – Convolutional Neural Networks (CNN)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Top Navigation -->
+<nav class="top-nav" id="topNav">
+  <a href="index.html" class="nav-home">← All Topics</a>
+  <span class="nav-title">Topic 9: Convolutional Neural Networks</span>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">🌙</button>
+</nav>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <nav class="section-nav" id="sectionNav">
+    <a href="#section1" data-section="section1">1 – Why CNN</a>
+    <a href="#section2" data-section="section2">2 – Coarse-to-Fine</a>
+    <a href="#section3" data-section="section3">3 – Filters / Kernels</a>
+    <a href="#section4" data-section="section4">4 – Images as Grids</a>
+    <a href="#section5" data-section="section5">5 – Convolution Operation</a>
+    <a href="#section6" data-section="section6">6 – Stride, Padding, Size</a>
+    <a href="#section7" data-section="section7">7 – Hand Calculation</a>
+    <a href="#section8" data-section="section8">8 – ReLU</a>
+    <a href="#section9" data-section="section9">9 – Pooling</a>
+    <a href="#section10" data-section="section10">10 – Full Conv Block</a>
+    <a href="#section11" data-section="section11">11 – Dead ReLU</a>
+    <a href="#section12" data-section="section12">12 – Feature Hierarchy</a>
+    <a href="#section13" data-section="section13">13 – CNN Architecture</a>
+    <a href="#section14" data-section="section14">14 – Weight Counting</a>
+    <a href="#section15" data-section="section15">15 – Common Mistakes</a>
+    <a href="#flashcards-section" data-section="flashcards-section">Flashcards</a>
+    <a href="#quiz-section" data-section="quiz-section">Quizzes</a>
+    <a href="#fillblanks-section" data-section="fillblanks-section">Fill-in-Blank</a>
+    <a href="#scenarios-section" data-section="scenarios-section">Scenarios</a>
+  </nav>
+</aside>
+
+<!-- Main Content -->
+<main class="content" id="mainContent">
+
+  <!-- ============ SECTION 1 ============ -->
+  <section id="section1" data-progress-section>
+    <h2>1. Why CNNs? – Images Break Fully-Connected Networks</h2>
+
+    <div class="analogy-box">
+      <strong>Analogy:</strong> Imagine being asked to identify a friend's face, but someone smashes the photo into a long strip of 120,000 tiny pieces and scatters them on a table. You have no idea which piece was next to which. That is what happens when you <em>flatten</em> an image and feed it to a fully-connected network — you destroy all spatial structure.
+    </div>
+
+    <p>A 200×200 colour image has 200 × 200 × 3 = <strong>120,000 pixel values</strong>. If the first hidden layer has just 1,000 neurons, you need <strong>120,000,000 weights</strong> for that single layer. This is:</p>
+
+    <div class="warning-box">
+      <strong>The Parameter Explosion Problem</strong><br>
+      • Massive memory &amp; compute cost.<br>
+      • Extreme overfitting — far more parameters than training samples.<br>
+      • No guarantee the network learns anything useful.
+    </div>
+
+    <h3>Two More Critical Failures</h3>
+    <p><strong>No spatial awareness:</strong> Flattening treats pixel (0,0) and pixel (199,199) as equally related to every hidden neuron. The network must <em>re-learn</em> which pixels are neighbours — an enormously wasteful task.</p>
+    <p><strong>Not translation invariant:</strong> If a cat appears in the top-left of training images but the centre of test images, a fully-connected network has never seen it in that position and will likely fail.</p>
+
+    <div class="definition-box">
+      <strong>CNN Insight — Three Principles:</strong><br>
+      1. <strong>Local connectivity:</strong> Each neuron looks only at a small patch of the input.<br>
+      2. <strong>Weight sharing:</strong> The same small set of weights (a filter) is reused at every position.<br>
+      3. <strong>Translation equivariance:</strong> If the input shifts, the output feature map shifts by the same amount — the network doesn't care <em>where</em> a feature is.
+    </div>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> CNNs replace the "see everything at once" approach of fully-connected layers with a "scan with a small stamp" approach — massively reducing parameters while preserving spatial structure.
+    </div>
+  </section>
+
+  <!-- ============ SECTION 2 ============ -->
+  <section id="section2" data-progress-section>
+    <h2>2. The Coarse-to-Fine Hierarchy</h2>
+
+    <div class="analogy-box">
+      <strong>Analogy — How You Recognise Faces:</strong> When you look at a person, your brain first registers basic edges and contrasts. Then it assembles those into features: "there's an eye here, a nose there." Only then does it combine those features into "that's a face" and "that's my friend." You never jump straight from raw pixels to identity — it's a hierarchy.
+    </div>
+
+    <p>A CNN mirrors this process exactly:</p>
+
+    <div class="recap-box">
+      <strong>The Hierarchy:</strong><br>
+      <strong>Layer 1 (Conv1):</strong> Detects simple edges — horizontal, vertical, diagonal.<br>
+      <strong>Layer 2 (Deeper Conv):</strong> Combines edges into textures, corners, and small patterns (an eye, a nostril).<br>
+      <strong>Layer 3+ (Even Deeper):</strong> Assembles parts into whole objects — a face, a car, a dog.<br>
+      <strong>Dense + Classifier:</strong> Maps the high-level representation to a class label.
+    </div>
+
+    <div class="definition-box">
+      <strong>Representation Learning:</strong> The CNN does not require you to hand-engineer which features matter. It <em>automatically discovers</em> the best intermediate representations (edges → parts → objects) through gradient descent on the task loss.
+    </div>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> The power of CNNs is that they learn a hierarchy of increasingly abstract features — from raw pixels all the way to semantic concepts — entirely from data.
+    </div>
+  </section>
+
+  <!-- ============ SECTION 3 ============ -->
+  <section id="section3" data-progress-section>
+    <h2>3. Filters (Kernels)</h2>
+
+    <div class="analogy-box">
+      <strong>Analogy — A Rubber Stamp:</strong> Imagine you have a small rubber stamp painted with a pattern (say, a horizontal line). You press that stamp all over the page, sliding it one cell at a time. Every time you stamp, you note how well the pattern "matches" the ink underneath. The result is a new sheet that highlights everywhere the horizontal line appeared. That is exactly what a CNN filter does.
+    </div>
+
+    <p>A <strong>filter</strong> (also called a <strong>kernel</strong>) is a small matrix of weights — typically 3×3 or 5×5 — that slides across the input image.</p>
+
+    <div class="definition-box">
+      <strong>How it works:</strong><br>
+      1. <strong>Pick a pattern:</strong> The filter encodes a pattern (e.g. "horizontal edge") via its weights.<br>
+      2. <strong>Slide across the image:</strong> At each position, overlay the filter on the corresponding image patch.<br>
+      3. <strong>Record match scores:</strong> Multiply element-wise, sum, add bias → single number per position.<br>
+      4. The resulting grid is called a <strong>feature map</strong>.
+    </div>
+
+    <h3>Horizontal Edge Detector Example</h3>
+    <div class="formula">
+      K_horizontal = <br>
+      ┌             ┐<br>
+      │  1   1   1  │<br>
+      │  0   0   0  │<br>
+      │ -1  -1  -1  │<br>
+      └             ┘
+    </div>
+    <p>This filter gives a <strong>high positive score</strong> when the top rows are bright and bottom rows are dark (a horizontal edge), and a <strong>negative score</strong> for the reverse.</p>
+
+    <div class="definition-box">
+      <strong>Weight Sharing:</strong> The <em>same</em> filter is applied at every position. A 3×3 filter has only 9 weights + 1 bias = <strong>10 parameters</strong>, regardless of image size. This is the key to CNN efficiency.
+    </div>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> A filter is a tiny, reusable pattern detector. It slides across the image to produce a feature map showing where that pattern appears.
+    </div>
+  </section>
+
+  <!-- ============ SECTION 4 ============ -->
+  <section id="section4" data-progress-section>
+    <h2>4. Images as Grids of Numbers</h2>
+
+    <p>Before we can do any math, we need to understand how images are represented.</p>
+
+    <h3>Greyscale Image</h3>
+    <p>A greyscale image is a single 2D grid of numbers (one channel):</p>
+    <div class="formula">
+      Shape: H × W × 1<br>
+      Each value: 0 (black) to 255 (white)
+    </div>
+    <p>Example — a 4×4 greyscale patch:</p>
+    <div class="worked-example">
+      ┌                    ┐<br>
+      │  50   80  120  200 │<br>
+      │  60   90  130  180 │<br>
+      │  70  100  140  160 │<br>
+      │  40   70  110  150 │<br>
+      └                    ┘
+    </div>
+
+    <h3>Colour (RGB) Image</h3>
+    <p>A colour image has three channels stacked along the depth axis:</p>
+    <div class="formula">
+      Shape: H × W × 3<br>
+      Channel 0: Red values<br>
+      Channel 1: Green values<br>
+      Channel 2: Blue values
+    </div>
+
+    <div class="warning-box">
+      <strong>Common Mistake:</strong> Students often think the "×3" means each pixel is a 3-element vector. It's more accurate to think of it as <em>three separate 2D grids</em> stacked on top of each other — like three sheets of graph paper, one for each colour.
+    </div>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> Images are just numbers in a grid. Greyscale = H×W×1, Colour = H×W×3. The CNN operates directly on these numerical grids.
+    </div>
+  </section>
+
+  <!-- ============ SECTION 5 ============ -->
+  <section id="section5" data-progress-section>
+    <h2>5. The Convolution Operation</h2>
+
+    <p>The core operation of a CNN layer is (technically) <strong>cross-correlation</strong>, though the community calls it "convolution."</p>
+
+    <div class="formula">
+      Z(i, j) = Σ<sub>m</sub> Σ<sub>n</sub> I(i+m, j+n) · K(m, n) + b
+    </div>
+    <p>Where:</p>
+    <ul>
+      <li><strong>I</strong> = input image (or feature map)</li>
+      <li><strong>K</strong> = filter/kernel matrix</li>
+      <li><strong>b</strong> = scalar bias</li>
+      <li><strong>Z</strong> = output feature map</li>
+      <li><strong>(i, j)</strong> = position in the output feature map</li>
+    </ul>
+
+    <div class="definition-box">
+      <strong>Feature Map:</strong> The 2D grid produced by sliding one filter across the entire input. Each cell is a match score: "how much does this filter's pattern exist at this position?"
+    </div>
+
+    <div class="definition-box">
+      <strong>Receptive Field:</strong> The region of the input that a single output neuron "sees." For a 3×3 filter, each output neuron has a 3×3 receptive field — it only knows about those 9 input values (per channel).
+    </div>
+
+    <div class="definition-box">
+      <strong>Weight Sharing:</strong> The same filter weights K(m,n) and bias b are used at <em>every</em> output position. Position (0,0) and position (5,5) use the exact same 9 weights. This is what makes CNNs parameter-efficient.
+    </div>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> Convolution = place the filter at each position, element-wise multiply with the input patch, sum everything, add bias. Result = one cell of the feature map.
+    </div>
+  </section>
+
+  <!-- ============ SECTION 6 ============ -->
+  <section id="section6" data-progress-section>
+    <h2>6. Stride, Padding, and Output Size</h2>
+
+    <div class="definition-box">
+      <strong>Stride (S):</strong> How many pixels the filter moves at each step. Stride=1 → move 1 pixel. Stride=2 → skip every other position (halves the output size approximately).
+    </div>
+
+    <div class="definition-box">
+      <strong>Padding (P):</strong> Zeros added around the border of the input. Padding=1 adds a 1-pixel ring of zeros, allowing the filter to process edge pixels and control the output size.
+    </div>
+
+    <div class="formula">
+      O = ⌊(W − F + 2P) / S⌋ + 1
+    </div>
+    <p>Where:</p>
+    <ul>
+      <li><strong>O</strong> = output spatial dimension</li>
+      <li><strong>W</strong> = input spatial dimension</li>
+      <li><strong>F</strong> = filter size</li>
+      <li><strong>P</strong> = padding</li>
+      <li><strong>S</strong> = stride</li>
+    </ul>
+
+    <h3>Worked Examples</h3>
+    <div class="worked-example">
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--text-color);">
+            <th style="padding:8px; text-align:left;">W</th>
+            <th style="padding:8px; text-align:left;">F</th>
+            <th style="padding:8px; text-align:left;">P</th>
+            <th style="padding:8px; text-align:left;">S</th>
+            <th style="padding:8px; text-align:left;">Calculation</th>
+            <th style="padding:8px; text-align:left;">O</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding:8px;">5</td>
+            <td style="padding:8px;">3</td>
+            <td style="padding:8px;">0</td>
+            <td style="padding:8px;">1</td>
+            <td style="padding:8px;">⌊(5−3+0)/1⌋+1 = 2+1</td>
+            <td style="padding:8px;"><strong>3</strong></td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding:8px;">32</td>
+            <td style="padding:8px;">5</td>
+            <td style="padding:8px;">0</td>
+            <td style="padding:8px;">1</td>
+            <td style="padding:8px;">⌊(32−5+0)/1⌋+1 = 27+1</td>
+            <td style="padding:8px;"><strong>28</strong></td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding:8px;">32</td>
+            <td style="padding:8px;">5</td>
+            <td style="padding:8px;">2</td>
+            <td style="padding:8px;">1</td>
+            <td style="padding:8px;">⌊(32−5+4)/1⌋+1 = 31+1</td>
+            <td style="padding:8px;"><strong>32</strong> (same padding)</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding:8px;">7</td>
+            <td style="padding:8px;">3</td>
+            <td style="padding:8px;">0</td>
+            <td style="padding:8px;">2</td>
+            <td style="padding:8px;">⌊(7−3+0)/2⌋+1 = 2+1</td>
+            <td style="padding:8px;"><strong>3</strong></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="analogy-box">
+      <strong>Analogy — "Same" Padding:</strong> Think of "same" padding as putting a frame around a painting so the frame can be measured too. Without the frame (padding=0), the edges of the painting are measured less often than the centre. With a frame, every pixel gets equal attention, and the output size stays the same as the input.
+    </div>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> The output formula O = ⌊(W−F+2P)/S⌋+1 controls spatial dimensions. Larger stride → smaller output. More padding → larger output. "Same" padding keeps output = input.
+    </div>
+  </section>
+
+  <!-- ============ SECTION 7 ============ -->
+  <section id="section7" data-progress-section>
+    <h2>7. Hand Calculation — Full Convolution</h2>
+
+    <p>Let's trace through a complete convolution by hand to see every multiplication and addition.</p>
+
+    <h3>Setup</h3>
+    <div class="worked-example">
+      <strong>Input I (5×5):</strong><br>
+      ┌                    ┐<br>
+      │  2   1   3   0   1 │<br>
+      │  1   2   1   1   0 │<br>
+      │  0   1   2   3   2 │<br>
+      │  3   0   1   2   1 │<br>
+      │  1   2   0   1   3 │<br>
+      └                    ┘<br><br>
+      <strong>Filter K (3×3) — Horizontal Edge Detector:</strong><br>
+      ┌             ┐<br>
+      │  1   1   1  │<br>
+      │  0   0   0  │<br>
+      │ -1  -1  -1  │<br>
+      └             ┘<br><br>
+      <strong>Bias b = −1</strong> | <strong>Stride = 1</strong> | <strong>Padding = 0</strong>
+    </div>
+
+    <h3>Output Size</h3>
+    <div class="formula">
+      O = ⌊(5 − 3 + 0) / 1⌋ + 1 = 2 + 1 = <strong>3</strong>
+    </div>
+    <p>We get a 3×3 feature map.</p>
+
+    <h3>Position Z(0, 0) — Top-Left</h3>
+    <div class="worked-example">
+      <strong>Patch from I:</strong><br>
+      2  1  3<br>
+      1  2  1<br>
+      0  1  2<br><br>
+      <strong>Element-wise multiply with K:</strong><br>
+      (2·1)+(1·1)+(3·1) = 2+1+3 = <strong>6</strong>  (top row)<br>
+      (1·0)+(2·0)+(1·0) = 0+0+0 = <strong>0</strong>  (middle row)<br>
+      (0·(−1))+(1·(−1))+(2·(−1)) = 0−1−2 = <strong>−3</strong>  (bottom row)<br><br>
+      <strong>Sum + Bias:</strong> 6 + 0 + (−3) + (−1) = <strong>2</strong><br>
+      ∴ Z(0,0) = 2
+    </div>
+
+    <h3>Position Z(0, 1) — Top-Middle</h3>
+    <div class="worked-example">
+      <strong>Patch from I:</strong><br>
+      1  3  0<br>
+      2  1  1<br>
+      1  2  3<br><br>
+      <strong>Element-wise multiply with K:</strong><br>
+      (1·1)+(3·1)+(0·1) = 1+3+0 = <strong>4</strong><br>
+      (2·0)+(1·0)+(1·0) = 0+0+0 = <strong>0</strong><br>
+      (1·(−1))+(2·(−1))+(3·(−1)) = −1−2−3 = <strong>−6</strong><br><br>
+      <strong>Sum + Bias:</strong> 4 + 0 + (−6) + (−1) = <strong>−3</strong><br>
+      ∴ Z(0,1) = −3
+    </div>
+
+    <h3>Position Z(0, 2) — Top-Right</h3>
+    <div class="worked-example">
+      <strong>Patch from I:</strong><br>
+      3  0  1<br>
+      1  1  0<br>
+      2  3  2<br><br>
+      <strong>Element-wise multiply with K:</strong><br>
+      (3·1)+(0·1)+(1·1) = 3+0+1 = <strong>4</strong><br>
+      (1·0)+(1·0)+(0·0) = 0+0+0 = <strong>0</strong><br>
+      (2·(−1))+(3·(−1))+(2·(−1)) = −2−3−2 = <strong>−7</strong><br><br>
+      <strong>Sum + Bias:</strong> 4 + 0 + (−7) + (−1) = <strong>−4</strong><br>
+      ∴ Z(0,2) = −4
+    </div>
+
+    <h3>Position Z(1, 0) — Middle-Left</h3>
+    <div class="worked-example">
+      <strong>Patch from I:</strong><br>
+      1  2  1<br>
+      0  1  2<br>
+      3  0  1<br><br>
+      <strong>Element-wise multiply with K:</strong><br>
+      (1·1)+(2·1)+(1·1) = 1+2+1 = <strong>4</strong><br>
+      (0·0)+(1·0)+(2·0) = 0+0+0 = <strong>0</strong><br>
+      (3·(−1))+(0·(−1))+(1·(−1)) = −3+0−1 = <strong>−4</strong><br><br>
+      <strong>Sum + Bias:</strong> 4 + 0 + (−4) + (−1) = <strong>−1</strong><br>
+      ∴ Z(1,0) = −1
+    </div>
+
+    <h3>Position Z(1, 1) — Centre</h3>
+    <div class="worked-example">
+      <strong>Patch from I:</strong><br>
+      2  1  1<br>
+      1  2  3<br>
+      0  1  2<br><br>
+      <strong>Element-wise multiply with K:</strong><br>
+      (2·1)+(1·1)+(1·1) = 2+1+1 = <strong>4</strong><br>
+      (1·0)+(2·0)+(3·0) = 0+0+0 = <strong>0</strong><br>
+      (0·(−1))+(1·(−1))+(2·(−1)) = 0−1−2 = <strong>−3</strong><br><br>
+      <strong>Sum + Bias:</strong> 4 + 0 + (−3) + (−1) = <strong>0</strong><br>
+      ∴ Z(1,1) = 0
+    </div>
+
+    <h3>Position Z(1, 2) — Middle-Right</h3>
+    <div class="worked-example">
+      <strong>Patch from I:</strong><br>
+      1  1  0<br>
+      2  3  2<br>
+      1  2  1<br><br>
+      <strong>Element-wise multiply with K:</strong><br>
+      (1·1)+(1·1)+(0·1) = 1+1+0 = <strong>2</strong><br>
+      (2·0)+(3·0)+(2·0) = 0+0+0 = <strong>0</strong><br>
+      (1·(−1))+(2·(−1))+(1·(−1)) = −1−2−1 = <strong>−4</strong><br><br>
+      <strong>Sum + Bias:</strong> 2 + 0 + (−4) + (−1) = <strong>−3</strong><br>
+      ∴ Z(1,2) = −3
+    </div>
+
+    <h3>Position Z(2, 0) — Bottom-Left</h3>
+    <div class="worked-example">
+      <strong>Patch from I:</strong><br>
+      0  1  2<br>
+      3  0  1<br>
+      1  2  0<br><br>
+      <strong>Element-wise multiply with K:</strong><br>
+      (0·1)+(1·1)+(2·1) = 0+1+2 = <strong>3</strong><br>
+      (3·0)+(0·0)+(1·0) = 0+0+0 = <strong>0</strong><br>
+      (1·(−1))+(2·(−1))+(0·(−1)) = −1−2+0 = <strong>−3</strong><br><br>
+      <strong>Sum + Bias:</strong> 3 + 0 + (−3) + (−1) = <strong>−1</strong><br>
+      ∴ Z(2,0) = −1
+    </div>
+
+    <h3>Position Z(2, 1) — Bottom-Middle</h3>
+    <div class="worked-example">
+      <strong>Patch from I:</strong><br>
+      1  2  3<br>
+      0  1  2<br>
+      2  0  1<br><br>
+      <strong>Element-wise multiply with K:</strong><br>
+      (1·1)+(2·1)+(3·1) = 1+2+3 = <strong>6</strong><br>
+      (0·0)+(1·0)+(2·0) = 0+0+0 = <strong>0</strong><br>
+      (2·(−1))+(0·(−1))+(1·(−1)) = −2+0−1 = <strong>−3</strong><br><br>
+      <strong>Sum + Bias:</strong> 6 + 0 + (−3) + (−1) = <strong>2</strong><br>
+      ∴ Z(2,1) = 2
+    </div>
+
+    <h3>Position Z(2, 2) — Bottom-Right</h3>
+    <div class="worked-example">
+      <strong>Patch from I:</strong><br>
+      2  3  2<br>
+      1  2  1<br>
+      0  1  3<br><br>
+      <strong>Element-wise multiply with K:</strong><br>
+      (2·1)+(3·1)+(2·1) = 2+3+2 = <strong>7</strong><br>
+      (1·0)+(2·0)+(1·0) = 0+0+0 = <strong>0</strong><br>
+      (0·(−1))+(1·(−1))+(3·(−1)) = 0−1−3 = <strong>−4</strong><br><br>
+      <strong>Sum + Bias:</strong> 7 + 0 + (−4) + (−1) = <strong>2</strong><br>
+      ∴ Z(2,2) = 2
+    </div>
+
+    <h3>Complete Feature Map Z</h3>
+    <div class="worked-example">
+      <strong>Z (3×3):</strong><br>
+      ┌            ┐<br>
+      │  2  -3  -4 │<br>
+      │ -1   0  -3 │<br>
+      │ -1   2   2 │<br>
+      └            ┘
+    </div>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> Every output cell is computed by: overlay → element-wise multiply → sum → add bias. The filter slides to every valid position, producing the full feature map.
+    </div>
+  </section>
+
+  <!-- ============ SECTION 8 ============ -->
+  <section id="section8" data-progress-section>
+    <h2>8. ReLU on the Feature Map</h2>
+
+    <p>After convolution, we apply an <strong>activation function</strong>. The most common is <strong>ReLU (Rectified Linear Unit)</strong>.</p>
+
+    <div class="formula">
+      ReLU(Z) = max(0, Z) — applied element-wise
+    </div>
+
+    <p>Applied to our feature map from Section 7:</p>
+    <div class="worked-example">
+      <strong>Z:</strong>            <strong>ReLU(Z):</strong><br>
+       2  -3  -4       →      2   0   0<br>
+      -1   0  -3       →      0   0   0<br>
+      -1   2   2       →      0   2   2<br><br>
+      <strong>Three cells are now zero</strong> (were negative or zero).
+    </div>
+
+    <h3>Why ReLU?</h3>
+    <ul>
+      <li><strong>Adds non-linearity:</strong> Without it, stacking conv layers is just one big linear operation — no more expressive than a single layer.</li>
+      <li><strong>Computationally cheap:</strong> Just a single comparison per element — no exponentials like sigmoid or tanh.</li>
+      <li><strong>Sparse activation:</strong> Many zeros in the output. This is biologically plausible and computationally efficient.</li>
+    </ul>
+
+    <div class="warning-box">
+      <strong>Dead ReLU Risk:</strong> If a neuron always receives negative input (its weights update to always produce negatives), ReLU always outputs 0. That neuron is "dead" — it never contributes and its gradient is always 0, so it can never recover. We'll cover this in depth in Section 11.
+    </div>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> ReLU turns all negative values to zero while passing positives through unchanged. It adds the non-linearity the network needs, and is cheap to compute.
+    </div>
+  </section>
+
+  <!-- ============ SECTION 9 ============ -->
+  <section id="section9" data-progress-section>
+    <h2>9. Pooling</h2>
+
+    <p>Pooling <strong>down-samples</strong> a feature map, reducing its spatial dimensions while keeping the most important information.</p>
+
+    <h3>Max Pooling</h3>
+    <p>Slide a window across the feature map and output the <strong>maximum value</strong> in each region.</p>
+
+    <div class="worked-example">
+      <strong>Input (3×3) after ReLU:</strong><br>
+      ┌         ┐<br>
+      │ 2  0  0 │<br>
+      │ 0  0  0 │<br>
+      │ 0  2  2 │<br>
+      └         ┘<br><br>
+      <strong>2×2 Max Pool, Stride = 1:</strong><br><br>
+      P(0,0) = max(2, 0, 0, 0) = <strong>2</strong><br>
+      P(0,1) = max(0, 0, 0, 0) = <strong>0</strong><br>
+      P(1,0) = max(0, 0, 0, 2) = <strong>2</strong><br>
+      P(1,1) = max(0, 0, 2, 2) = <strong>2</strong><br><br>
+      <strong>Output (2×2):</strong><br>
+      ┌       ┐<br>
+      │ 2   0 │<br>
+      │ 2   2 │<br>
+      └       ┘<br><br>
+      <strong>Output size:</strong> O = ⌊(3 − 2) / 1⌋ + 1 = 1 + 1 = <strong>2</strong>
+    </div>
+
+    <h3>Average Pooling</h3>
+    <p>Instead of max, take the <strong>mean</strong> of each region. Less common in modern architectures but used in some designs.</p>
+
+    <div class="definition-box">
+      <strong>Benefits of Pooling:</strong><br>
+      1. <strong>Down-sampling:</strong> Reduces spatial dimensions → fewer parameters in subsequent layers.<br>
+      2. <strong>Translation invariance:</strong> Small shifts in the input don't change the max/average much → more robust features.<br>
+      3. <strong>Extracts dominant features:</strong> Keeps the strongest signal in each region.
+    </div>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> Pooling reduces spatial size while retaining the strongest features. Max pooling keeps the most prominent activation; average pooling keeps the general trend.
+    </div>
+  </section>
+
+  <!-- ============ SECTION 10 ============ -->
+  <section id="section10" data-progress-section>
+    <h2>10. Complete Convolutional Block — End to End</h2>
+
+    <p>Let's trace a single convolutional block from start to finish with real numbers.</p>
+
+    <div class="worked-example">
+      <strong>INPUT:</strong> 5×5 image<br>
+      ┌                    ┐<br>
+      │  2   1   3   0   1 │<br>
+      │  1   2   1   1   0 │<br>
+      │  0   1   2   3   2 │<br>
+      │  3   0   1   2   1 │<br>
+      │  1   2   0   1   3 │<br>
+      └                    ┘<br><br>
+      <strong>STEP 1 — CONV:</strong> 3×3 horizontal edge filter, bias = −1, stride = 1, no padding<br>
+      → 3×3 feature map:<br>
+       2  -3  -4<br>
+      -1   0  -3<br>
+      -1   2   2<br><br>
+      <strong>STEP 2 — ReLU:</strong> max(0, ·) element-wise<br>
+      → 3×3 activated map:<br>
+       2   0   0<br>
+       0   0   0<br>
+       0   2   2<br><br>
+      <strong>STEP 3 — MAX POOL (2×2, stride 1):</strong><br>
+      → 2×2 output:<br>
+       2   0<br>
+       2   2
+    </div>
+
+    <div class="recap-box">
+      <strong>Full Chain Summary:</strong><br>
+      5×5 input → [Conv 3×3] → 3×3 feature map → [ReLU] → 3×3 activated → [Pool 2×2] → <strong>2×2 output</strong><br><br>
+      The spatial dimensions shrunk from 5×5 to 2×2, but the output now encodes "where horizontal edges are" — a meaningful high-level feature.
+    </div>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> A conv block chains three operations: Convolution (extract features), ReLU (add non-linearity), Pooling (down-sample). Each block progressively transforms raw pixels into meaningful features.
+    </div>
+  </section>
+
+  <!-- ============ SECTION 11 ============ -->
+  <section id="section11" data-progress-section>
+    <h2>11. Dead ReLU in CNNs</h2>
+
+    <p>Dead ReLU is a common training pathology where a neuron permanently outputs zero and stops learning.</p>
+
+    <h3>How It Happens</h3>
+    <div class="worked-example">
+      <strong>Healthy neuron:</strong> Cell value = 2<br>
+      → ReLU output = 2 (positive, gradient = 1)<br>
+      → Backprop: gradient flows through, weights update<br><br>
+      <strong>Dead neuron:</strong> Cell value = −3<br>
+      → ReLU output = 0 (clamped, gradient = 0)<br>
+      → Backprop: gradient is zero, weights receive NO update<br>
+      → Next forward pass: still negative → still zero → permanently dead
+    </div>
+
+    <p>If a filter's weights drift such that it always produces negative values for all training inputs, it can never recover because the gradient is always zero.</p>
+
+    <div class="warning-box">
+      <strong>Why This Matters:</strong> A network with many dead neurons has reduced capacity — it's effectively a smaller network. If too many neurons die, training stalls.
+    </div>
+
+    <h3>Mitigation Strategies</h3>
+    <div class="recap-box">
+      <strong>Solutions:</strong><br>
+      1. <strong>Leaky ReLU:</strong> Instead of 0 for negatives, use f(x) = 0.01x for x &lt; 0. Small gradient always flows.<br>
+      2. <strong>Lower learning rate:</strong> Prevents weights from overshooting into permanently-negative territory.<br>
+      3. <strong>He initialization:</strong> Initialize weights from N(0, √(2/n_in)) — keeps initial activations centred around zero.
+    </div>
+
+    <div class="formula">
+      Leaky ReLU(x) = { x, if x > 0;  αx, if x ≤ 0 }  where α = 0.01
+    </div>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> Dead ReLU occurs when neurons get stuck outputting zero with zero gradient. Leaky ReLU, careful initialization, and moderate learning rates prevent this.
+    </div>
+  </section>
+
+  <!-- ============ SECTION 12 ============ -->
+  <section id="section12" data-progress-section>
+    <h2>12. Hierarchical Feature Learning</h2>
+
+    <p>One of the most remarkable properties of CNNs is that they automatically learn a <strong>hierarchy of features</strong> — no manual feature engineering required.</p>
+
+    <div class="analogy-box">
+      <strong>Analogy — Painting a Portrait:</strong> A painter starts with broad strokes (background, overall shape), then adds features (eyes, nose, mouth), then fine details (pupils, eyelashes). Each layer of detail builds on the previous. A CNN does the same: coarse features feed into finer features.
+    </div>
+
+    <h3>The Feature Hierarchy</h3>
+    <div class="recap-box">
+      <strong>Layer 1:</strong> Edges and lines — horizontal, vertical, diagonal, gradients<br>
+      <strong>Layer 2:</strong> Textures and corners — repeated edge patterns, blob detectors, corner detectors<br>
+      <strong>Layer 3:</strong> Parts — eyes, wheels, ears, letters<br>
+      <strong>Layer 4:</strong> Whole objects — faces, cars, animals, words<br>
+    </div>
+
+    <p>This is learned <strong>automatically</strong> through loss minimization. The network discovers that detecting edges is useful because it helps detect corners, which helps detect eyes, which helps detect faces, which minimises the classification loss.</p>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> CNNs learn features in a hierarchy — from low-level (edges) to high-level (objects) — entirely through end-to-end training on the task loss.
+    </div>
+  </section>
+
+  <!-- ============ SECTION 13 ============ -->
+  <section id="section13" data-progress-section>
+    <h2>13. Complete CNN Architecture</h2>
+
+    <p>A full CNN has two main parts: a <strong>feature extractor</strong> and a <strong>classifier head</strong>.</p>
+
+    <div class="worked-example">
+      <strong>FEATURE EXTRACTOR (Conv/Pool Stack):</strong><br><br>
+      Input Image → [Conv → ReLU → Pool] → [Conv → ReLU → Pool] → ... → Feature Tensor<br><br>
+      Each block extracts increasingly abstract features.<br><br>
+      <strong>CLASSIFIER HEAD:</strong><br><br>
+      Feature Tensor → [Flatten] → [Dense] → [Softmax] → Class Probabilities
+    </div>
+
+    <h3>Example: Simple CNN for 32×32 Images, 10 Classes</h3>
+    <div class="worked-example">
+      <table style="width:100%; border-collapse:collapse;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--text-color);">
+            <th style="padding:8px; text-align:left;">Layer</th>
+            <th style="padding:8px; text-align:left;">Operation</th>
+            <th style="padding:8px; text-align:left;">Output Shape</th>
+            <th style="padding:8px; text-align:left;">Params</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding:8px;">Input</td>
+            <td style="padding:8px;">Image</td>
+            <td style="padding:8px;">32 × 32 × 3</td>
+            <td style="padding:8px;">—</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding:8px;">Conv1</td>
+            <td style="padding:8px;">3×3 filter, 8 filters, ReLU</td>
+            <td style="padding:8px;">30 × 30 × 8</td>
+            <td style="padding:8px;">8 × (3×3×3 + 1) = 224</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding:8px;">Pool1</td>
+            <td style="padding:8px;">2×2 max pool, stride 2</td>
+            <td style="padding:8px;">15 × 15 × 8</td>
+            <td style="padding:8px;">0</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding:8px;">Conv2</td>
+            <td style="padding:8px;">3×3 filter, 16 filters, ReLU</td>
+            <td style="padding:8px;">13 × 13 × 16</td>
+            <td style="padding:8px;">16 × (3×3×8 + 1) = 1,168</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding:8px;">Pool2</td>
+            <td style="padding:8px;">2×2 max pool, stride 2</td>
+            <td style="padding:8px;">6 × 6 × 16</td>
+            <td style="padding:8px;">0</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding:8px;">Flatten</td>
+            <td style="padding:8px;">Reshape to vector</td>
+            <td style="padding:8px;">576</td>
+            <td style="padding:8px;">0</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding:8px;">Dense</td>
+            <td style="padding:8px;">Fully-connected, ReLU</td>
+            <td style="padding:8px;">64</td>
+            <td style="padding:8px;">576 × 64 + 64 = 36,928</td>
+          </tr>
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding:8px;">Output</td>
+            <td style="padding:8px;">Softmax</td>
+            <td style="padding:8px;">10</td>
+            <td style="padding:8px;">64 × 10 + 10 = 650</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> A CNN architecture is a feature extractor (conv/pool blocks) followed by a classifier (flatten → dense → softmax). The entire network is trained end-to-end by backpropagation.
+    </div>
+  </section>
+
+  <!-- ============ SECTION 14 ============ -->
+  <section id="section14" data-progress-section>
+    <h2>14. Weight Sharing — Parameter Counting</h2>
+
+    <p>Weight sharing is the fundamental reason CNNs are so much more efficient than fully-connected networks.</p>
+
+    <h3>Fully-Connected vs. Convolutional</h3>
+    <div class="worked-example">
+      <strong>Fully-Connected:</strong> 5×5 input → 3×3 output<br>
+      Flattened input: 25 neurons. Output: 9 neurons.<br>
+      Weights: 25 × 9 = <strong>225 weights</strong> + 9 biases = <strong>234 parameters</strong><br><br>
+      <strong>Convolutional:</strong> Same task with a 3×3 filter<br>
+      One 3×3 filter = 9 weights + 1 bias = <strong>10 parameters</strong><br>
+      (And this filter works for ANY input size!)
+    </div>
+
+    <div class="formula">
+      Parameters per filter = (F × F × C<sub>in</sub> + 1) × C<sub>out</sub>
+    </div>
+    <p>Where:</p>
+    <ul>
+      <li><strong>F</strong> = filter spatial size</li>
+      <li><strong>C<sub>in</sub></strong> = number of input channels</li>
+      <li><strong>C<sub>out</sub></strong> = number of output filters (output channels)</li>
+      <li><strong>+1</strong> = bias per filter</li>
+    </ul>
+
+    <h3>Example: 3×3 filters, 3 input channels, 16 output feature maps</h3>
+    <div class="worked-example">
+      Per filter: (3 × 3 × 3 + 1) = 28 parameters<br>
+      Total: 28 × 16 = <strong>448 parameters</strong><br><br>
+      Compare: the same spatial operation in a fully-connected layer would need:<br>
+      (H × W × 3) × (H' × W' × 16) parameters — potentially millions.
+    </div>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> Weight sharing means one filter has (F² × C<sub>in</sub> + 1) parameters regardless of image size. A fully-connected layer with the same connectivity would need orders of magnitude more.
+    </div>
+  </section>
+
+  <!-- ============ SECTION 15 ============ -->
+  <section id="section15" data-progress-section>
+    <h2>15. Common Calculation Mistakes</h2>
+
+    <p>These are the errors students make most often on exams and in practice:</p>
+
+    <div class="warning-box">
+      <strong>Mistake 1: Wrong output size (forgetting +1)</strong><br>
+      Students compute ⌊(W−F+2P)/S⌋ and forget to add 1.<br>
+      <strong>Correct:</strong> O = ⌊(5−3)/1⌋ + 1 = 2 + 1 = <strong>3</strong>, not 2.
+    </div>
+
+    <div class="warning-box">
+      <strong>Mistake 2: Forgetting the bias</strong><br>
+      Students compute only the sum of element-wise products and omit the bias term.<br>
+      <strong>Correct:</strong> Z(i,j) = Σ Σ (I·K) <strong>+ b</strong>
+    </div>
+
+    <div class="warning-box">
+      <strong>Mistake 3: Applying ReLU before the sum</strong><br>
+      Students apply ReLU to individual products before summing.<br>
+      <strong>Correct:</strong> First compute the full weighted sum + bias, THEN apply ReLU to the result.
+    </div>
+
+    <div class="warning-box">
+      <strong>Mistake 4: Pooling stride confusion</strong><br>
+      Students use the pool window size as the stride (always) or forget to apply the output size formula to pooling.<br>
+      <strong>Correct:</strong> For 2×2 pool with stride 1 on a 3×3 input: O = ⌊(3−2)/1⌋ + 1 = 2, not 1.
+    </div>
+
+    <div class="warning-box">
+      <strong>Mistake 5: Flipping the filter</strong><br>
+      In mathematically true convolution, the filter is flipped before sliding. In CNN practice, we do <strong>cross-correlation</strong> (no flip). Students sometimes flip K and produce wrong results.<br>
+      <strong>Correct:</strong> In deep learning, just overlay and multiply — do NOT flip.
+    </div>
+
+    <div class="warning-box">
+      <strong>Mistake 6: Miscounting zeros after ReLU</strong><br>
+      Students count zeros incorrectly — sometimes missing that 0 is also clamped (ReLU(0) = 0), or counting negatives as if they passed through.<br>
+      <strong>Correct:</strong> ReLU(x) = 0 for ALL x ≤ 0, including zero itself.
+    </div>
+
+    <div class="takeaway-box">
+      <strong>Key Takeaway:</strong> The six most common mistakes are: forgetting +1, dropping the bias, ReLU before sum, pool stride confusion, flipping the filter, and miscounting ReLU zeros. Double-check each step systematically.
+    </div>
+  </section>
+
+  <!-- ============ FLASHCARDS ============ -->
+  <section id="flashcards-section" data-progress-section>
+    <h2>Flashcards</h2>
+    <div class="flashcard-container" id="flashcardContainer">
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+        <div class="flashcard-front">
+          <strong>CNN (Convolutional Neural Network)</strong><br><br>
+          What is it?
+        </div>
+        <div class="flashcard-back">
+          A neural network that uses convolution operations with learnable filters to process grid-structured data (like images), exploiting local connectivity, weight sharing, and translation equivariance.
+        </div>
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+        <div class="flashcard-front">
+          <strong>Convolution</strong><br><br>
+          What is the CNN convolution operation?
+        </div>
+        <div class="flashcard-back">
+          Sliding a filter across the input, performing element-wise multiplication with the local patch, summing all products, and adding a bias. Produces one value per position in the output feature map. (Technically cross-correlation in DL.)
+        </div>
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+        <div class="flashcard-front">
+          <strong>Filter / Kernel</strong><br><br>
+          What is a filter?
+        </div>
+        <div class="flashcard-back">
+          A small matrix of learnable weights (typically 3×3 or 5×5) that detects a specific pattern (e.g. horizontal edge). It is slid across the entire input to produce a feature map.
+        </div>
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+        <div class="flashcard-front">
+          <strong>Receptive Field</strong><br><br>
+          What is it?
+        </div>
+        <div class="flashcard-back">
+          The region of the input that a single output neuron "sees" or depends on. For a 3×3 filter, each output neuron has a 3×3 receptive field — it only uses values from that patch.
+        </div>
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+        <div class="flashcard-front">
+          <strong>Stride</strong><br><br>
+          What does stride control?
+        </div>
+        <div class="flashcard-back">
+          The number of pixels the filter moves at each step. Stride=1 means the filter shifts one pixel at a time (full overlap). Stride=2 means it skips every other position, reducing output size by roughly half.
+        </div>
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+        <div class="flashcard-front">
+          <strong>Padding</strong><br><br>
+          What is padding and why use it?
+        </div>
+        <div class="flashcard-back">
+          Zeros added around the border of the input before convolution. Padding allows edge pixels to be centred in the filter, and "same" padding (P=(F−1)/2) keeps the output size equal to the input size.
+        </div>
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+        <div class="flashcard-front">
+          <strong>Feature Map</strong><br><br>
+          What is a feature map?
+        </div>
+        <div class="flashcard-back">
+          The 2D output produced by applying one filter across the entire input. Each cell is a match score indicating how strongly the filter's pattern is present at that spatial position.
+        </div>
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+        <div class="flashcard-front">
+          <strong>Max Pooling</strong><br><br>
+          What does max pooling do?
+        </div>
+        <div class="flashcard-back">
+          Slides a window (e.g. 2×2) across a feature map and outputs the maximum value in each region. Down-samples the spatial dimensions while keeping the most prominent activation.
+        </div>
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+        <div class="flashcard-front">
+          <strong>Weight Sharing</strong><br><br>
+          What is weight sharing in CNNs?
+        </div>
+        <div class="flashcard-back">
+          The same filter (same weights and bias) is applied at every spatial position. A 3×3 filter always has 9 weights + 1 bias = 10 parameters, regardless of image size. This dramatically reduces parameter count.
+        </div>
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+        <div class="flashcard-front">
+          <strong>Translation Equivariance</strong><br><br>
+          What does it mean?
+        </div>
+        <div class="flashcard-back">
+          If the input shifts by some amount, the output feature map shifts by the same amount. The CNN detects the same features regardless of where they appear in the image.
+        </div>
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+        <div class="flashcard-front">
+          <strong>Pooling</strong><br><br>
+          What are the three benefits of pooling?
+        </div>
+        <div class="flashcard-back">
+          1. Down-sampling — reduces spatial size for efficiency.<br>
+          2. Translation invariance — small shifts don't change the output much.<br>
+          3. Dominant feature extraction — keeps the strongest signal per region.
+        </div>
+      </div>
+
+      <div class="flashcard" onclick="this.classList.toggle('flipped')">
+        <div class="flashcard-front">
+          <strong>Feature Hierarchy</strong><br><br>
+          What is the CNN feature hierarchy?
+        </div>
+        <div class="flashcard-back">
+          Layer 1: edges and lines. Layer 2: textures and corners. Layer 3: object parts (eyes, wheels). Layer 4: whole objects (faces, cars). Learned automatically through end-to-end training.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ QUIZZES ============ -->
+  <section id="quiz-section" data-progress-section>
+    <h2>Quizzes</h2>
+    <div class="quiz-container" id="quizContainer">
+
+      <!-- Quiz 1 -->
+      <div class="quiz-item">
+        <p><strong>Quiz 1:</strong> What is the output size of a convolution with input W=32, filter F=5, padding P=2, stride S=1?</p>
+        <button onclick="checkQuiz(this, false)">A) 28</button>
+        <button onclick="checkQuiz(this, false)">B) 30</button>
+        <button onclick="checkQuiz(this, true)">C) 32</button>
+        <button onclick="checkQuiz(this, false)">D) 34</button>
+        <div class="quiz-feedback" style="display:none;"></div>
+      </div>
+
+      <!-- Quiz 2 -->
+      <div class="quiz-item">
+        <p><strong>Quiz 2:</strong> How many parameters does a single 3×3 filter have for a single-channel (greyscale) input?</p>
+        <button onclick="checkQuiz(this, false)">A) 9</button>
+        <button onclick="checkQuiz(this, true)">B) 10</button>
+        <button onclick="checkQuiz(this, false)">C) 18</button>
+        <button onclick="checkQuiz(this, false)">D) 27</button>
+        <div class="quiz-feedback" style="display:none;"></div>
+      </div>
+
+      <!-- Quiz 3 -->
+      <div class="quiz-item">
+        <p><strong>Quiz 3:</strong> What is ReLU(−5)?</p>
+        <button onclick="checkQuiz(this, false)">A) −5</button>
+        <button onclick="checkQuiz(this, true)">B) 0</button>
+        <button onclick="checkQuiz(this, false)">C) 5</button>
+        <button onclick="checkQuiz(this, false)">D) 1</button>
+        <div class="quiz-feedback" style="display:none;"></div>
+      </div>
+
+      <!-- Quiz 4 -->
+      <div class="quiz-item">
+        <p><strong>Quiz 4:</strong> What does "weight sharing" mean in a CNN?</p>
+        <button onclick="checkQuiz(this, false)">A) All layers share the same weights</button>
+        <button onclick="checkQuiz(this, true)">B) The same filter is applied at every spatial position</button>
+        <button onclick="checkQuiz(this, false)">C) Each pixel has its own weight</button>
+        <button onclick="checkQuiz(this, false)">D) Weights are shared between the input and output</button>
+        <div class="quiz-feedback" style="display:none;"></div>
+      </div>
+
+      <!-- Quiz 5 -->
+      <div class="quiz-item">
+        <p><strong>Quiz 5:</strong> A 5×5 input is convolved with a 3×3 filter (stride 1, no padding). The result is 3×3. After 2×2 max pooling with stride 1, what is the output size?</p>
+        <button onclick="checkQuiz(this, false)">A) 1×1</button>
+        <button onclick="checkQuiz(this, true)">B) 2×2</button>
+        <button onclick="checkQuiz(this, false)">C) 3×3</button>
+        <button onclick="checkQuiz(this, false)">D) 4×4</button>
+        <div class="quiz-feedback" style="display:none;"></div>
+      </div>
+
+      <!-- Quiz 6 -->
+      <div class="quiz-item">
+        <p><strong>Quiz 6:</strong> Why does ReLU help the network learn non-linear patterns?</p>
+        <button onclick="checkQuiz(this, false)">A) It normalises the data</button>
+        <button onclick="checkQuiz(this, false)">B) It adds dropout between layers</button>
+        <button onclick="checkQuiz(this, true)">C) It introduces a non-linear element-wise operation, breaking linearity</button>
+        <button onclick="checkQuiz(this, false)">D) It reduces the number of parameters</button>
+        <div class="quiz-feedback" style="display:none;"></div>
+      </div>
+
+      <!-- Quiz 7 -->
+      <div class="quiz-item">
+        <p><strong>Quiz 7:</strong> How many parameters total for a conv layer with sixteen 3×3 filters operating on an 8-channel input?</p>
+        <button onclick="checkQuiz(this, false)">A) 144</button>
+        <button onclick="checkQuiz(this, false)">B) 432</button>
+        <button onclick="checkQuiz(this, true)">C) 448</button>
+        <button onclick="checkQuiz(this, false)">D) 1,152</button>
+        <div class="quiz-feedback" style="display:none;"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ FILL-IN-BLANK ============ -->
+  <section id="fillblanks-section" data-progress-section>
+    <h2>Fill-in-the-Blank</h2>
+    <div class="fill-blank-container" id="fillBlankContainer">
+
+      <!-- FB 1 -->
+      <div class="fill-blank-item">
+        <p><strong>1.</strong> The formula for the output size of a convolution is O = ⌊(W − F + 2P) / S⌋ + <span class="blank" data-answer="1">_____</span>.</p>
+        <button onclick="checkFillBlank(this)">Check</button>
+        <div class="fill-feedback" style="display:none;"></div>
+      </div>
+
+      <!-- FB 2 -->
+      <div class="fill-blank-item">
+        <p><strong>2.</strong> A CNN filter slides across the input and produces a <span class="blank" data-answer="feature map">_____</span> showing where the filter's pattern is detected.</p>
+        <button onclick="checkFillBlank(this)">Check</button>
+        <div class="fill-feedback" style="display:none;"></div>
+      </div>
+
+      <!-- FB 3 -->
+      <div class="fill-blank-item">
+        <p><strong>3.</strong> ReLU(x) = max(0, x). For any negative input, ReLU outputs <span class="blank" data-answer="0">_____</span>.</p>
+        <button onclick="checkFillBlank(this)">Check</button>
+        <div class="fill-feedback" style="display:none;"></div>
+      </div>
+
+      <!-- FB 4 -->
+      <div class="fill-blank-item">
+        <p><strong>4.</strong> Weight sharing means the same <span class="blank" data-answer="filter">_____</span> (same weights) is applied at every spatial position.</p>
+        <button onclick="checkFillBlank(this)">Check</button>
+        <div class="fill-feedback" style="display:none;"></div>
+      </div>
+
+      <!-- FB 5 -->
+      <div class="fill-blank-item">
+        <p><strong>5.</strong> The three principles of CNNs are local connectivity, weight sharing, and translation <span class="blank" data-answer="equivariance">_____</span>.</p>
+        <button onclick="checkFillBlank(this)">Check</button>
+        <div class="fill-feedback" style="display:none;"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ SCENARIOS ============ -->
+  <section id="scenarios-section" data-progress-section>
+    <h2>Scenarios</h2>
+
+    <div class="scenario-item">
+      <h3>Scenario 1: Designing a CNN for Medical Imaging</h3>
+      <div class="analogy-box">
+        <strong>Scenario:</strong> You are building a CNN to classify 512×512 greyscale X-ray images as "healthy" or "pneumonia." You need to choose between:<br><br>
+        <strong>Option A:</strong> A fully-connected network with one hidden layer of 500 neurons.<br>
+        <strong>Option B:</strong> A CNN with 3 conv/pool blocks followed by a dense classifier.<br><br>
+        <strong>Questions:</strong><br>
+        1. How many input parameters does Option A need for the first layer?<br>
+        2. Why is Option B almost certainly better?<br>
+        3. What type of features would you expect the CNN to learn at each layer?
+      </div>
+      <div class="worked-example">
+        <strong>Solution:</strong><br><br>
+        1. Input: 512 × 512 × 1 = 262,144 pixels. First hidden layer: 262,144 × 500 = <strong>131,072,000 weights</strong> + 500 biases ≈ 131 million parameters. This is enormous and will severely overfit with typical medical image datasets (often only thousands of images).<br><br>
+        2. Option B is better because:<br>
+        • Conv filters share weights: a 3×3 filter = 10 params, reused across all positions.<br>
+        • Spatial structure is preserved — edges, textures, shapes are detected based on their pattern, not their absolute position.<br>
+        • Translation equivariance means pneumonia indicators are detected regardless of where they appear in the lung.<br>
+        • Far fewer parameters → less overfitting on small medical datasets.<br><br>
+        3. Expected features:<br>
+        • Block 1: Edges and gradients (bone boundaries, lung tissue edges)<br>
+        • Block 2: Textures (opacity patterns, consolidation regions)<br>
+        • Block 3: Disease-specific patterns (ground-glass opacities, nodules)<br>
+        • Dense layer: Combines these to classify healthy vs. pneumonia.
+      </div>
+    </div>
+
+    <div class="scenario-item">
+      <h3>Scenario 2: Debugging a Failing CNN</h3>
+      <div class="analogy-box">
+        <strong>Scenario:</strong> Your CNN trained on CIFAR-10 (32×32 colour images) is showing 90% training accuracy but only 45% test accuracy. You inspect the convolutional layers and find that 60% of ReLU outputs are exactly zero across all training samples.<br><br>
+        <strong>Questions:</strong><br>
+        1. What problem does this suggest?<br>
+        2. What are two things you could try to fix it?<br>
+        3. How would you verify the fix worked?
+      </div>
+      <div class="worked-example">
+        <strong>Solution:</strong><br><br>
+        1. <strong>Massive dead ReLU problem:</strong> 60% of neurons are permanently dead — they always output zero. This means 60% of the network's capacity is wasted. These neurons receive no gradient updates and never recover. This could be caused by too-high learning rate, bad initialization, or too-aggressive training.<br><br>
+        2. <strong>Fixes:</strong><br>
+        • Switch to <strong>Leaky ReLU</strong> (α=0.01): negatives get a small gradient, so dead neurons can recover.<br>
+        • <strong>Reduce the learning rate</strong> (e.g. from 0.01 to 0.001): prevents weights from overshooting into permanently-negative territory.<br>
+        • Apply <strong>He initialization</strong>: initialize weights from N(0, √(2/fan_in)) to keep initial activations centred around zero.<br><br>
+        3. <strong>Verification:</strong><br>
+        • Monitor the percentage of zero activations per layer during training — it should stay below 10-20%.<br>
+        • Check if test accuracy improves (gap between train and test should narrow).<br>
+        • After training, count ReLU zeros: if still high, further tune learning rate or initialization.
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

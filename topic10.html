@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Topic 10: Sequential Data Modeling (RNN &amp; LSTM)</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Top Navigation -->
+<nav class="top-nav" id="topNav">
+  <a href="index.html" class="nav-home">Lecture Notes</a>
+  <span class="nav-separator">|</span>
+  <span class="nav-topic">Topic 10: RNN &amp; LSTM</span>
+  <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">Dark</button>
+</nav>
+
+<!-- Progress Bar -->
+<div class="progress-bar-container" id="progressBarContainer">
+  <div class="progress-bar" id="progressBar" style="width: 0%;"></div>
+  <span class="progress-text" id="progressText">0%</span>
+</div>
+
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar">
+  <nav class="sidebar-nav">
+    <h3>Topic 10: RNN &amp; LSTM</h3>
+    <ul id="sidebarNav">
+      <li><a href="#section1" class="sidebar-link active" data-section="1">1. Why Sequences Matter</a></li>
+      <li><a href="#section2" class="sidebar-link" data-section="2">2. Why FFNs Fail</a></li>
+      <li><a href="#section3" class="sidebar-link" data-section="3">3. The Recurrent Cell</a></li>
+      <li><a href="#section4" class="sidebar-link" data-section="4">4. Sequence Task Shapes</a></li>
+      <li><a href="#section5" class="sidebar-link" data-section="5">5. RNN Forward Pass</a></li>
+      <li><a href="#section6" class="sidebar-link" data-section="6">6. RNN Worked Example</a></li>
+      <li><a href="#section7" class="sidebar-link" data-section="7">7. Vanishing Gradients</a></li>
+      <li><a href="#section8" class="sidebar-link" data-section="8">8. LSTM Overview</a></li>
+      <li><a href="#section9" class="sidebar-link" data-section="9">9. LSTM Gate Equations</a></li>
+      <li><a href="#section10" class="sidebar-link" data-section="10">10. LSTM Worked Example</a></li>
+      <li><a href="#section11" class="sidebar-link" data-section="11">11. RNN vs LSTM vs GRU</a></li>
+      <li><a href="#section12" class="sidebar-link" data-section="12">12. Flashcards</a></li>
+      <li><a href="#section13" class="sidebar-link" data-section="13">13. Quiz</a></li>
+      <li><a href="#section14" class="sidebar-link" data-section="14">14. Fill in the Blanks</a></li>
+    </ul>
+  </nav>
+</aside>
+
+<!-- Main Content -->
+<main class="main-content" id="mainContent">
+
+<!-- ==================== SECTION 1: WHY SEQUENCES MATTER ==================== -->
+<section class="content-section" id="section1" data-progress-section="1">
+  <h2>1. Why Sequences Matter</h2>
+
+  <div class="analogy-box">
+    <h4>Analogy: Word Order Changes Everything</h4>
+    <p>Consider these two sentences:</p>
+    <p style="font-size:1.2em; font-weight:bold; color:var(--accent);">"The dog bit the man."</p>
+    <p style="font-size:1.2em; font-weight:bold; color:var(--accent);">"The man bit the dog."</p>
+    <p>They contain <strong>exactly the same words</strong>, yet the meaning is <em>completely opposite</em>. What changed? Only the <strong>order</strong>. This proves that order carries meaning — and models must respect that.</p>
+  </div>
+
+  <p>A <strong>sequence</strong> is any ordered collection of elements where position matters. Unlike sets or bags-of-features, the same elements arranged differently yield different meaning.</p>
+
+  <p>Sequences appear everywhere:</p>
+  <ul>
+    <li><strong>Text:</strong> "I love this movie" vs "I don't love this movie" — a single word reversal flips sentiment</li>
+    <li><strong>Speech:</strong> Sound waves unfold in time; misplacing a phoneme changes the word</li>
+    <li><strong>Time series:</strong> Stock prices, sensor readings, ECG signals — yesterday's value contextualizes today's</li>
+    <li><strong>Video:</strong> Frames in order show motion; shuffled frames are meaningless noise</li>
+    <li><strong>DNA:</strong> A gene's function depends on surrounding nucleotides</li>
+  </ul>
+
+  <div class="takeaway-box">
+    <h4>Key Idea</h4>
+    <p>The meaning of an element depends on <strong>what came before it</strong>. Any model that processes sequences must maintain some notion of history. This is the fundamental motivation for Recurrent Neural Networks.</p>
+  </div>
+</section>
+
+<!-- ==================== SECTION 2: WHY FFNs FAIL ==================== -->
+<section class="content-section" id="section2" data-progress-section="2">
+  <h2>2. Why Feed-Forward Networks Fail on Sequences</h2>
+
+  <p>Standard feed-forward networks have two critical limitations when facing sequential data:</p>
+
+  <div class="warning-box">
+    <h4>Problem 1: Fixed Input Size</h4>
+    <p>A feed-forward network is built with a fixed number of input neurons. If you design it for 10 words, you cannot feed it 11 words. If you design it for 100 pixels, you cannot feed it 200. Sequences have <strong>variable lengths</strong> — a sentence can be 3 words or 30 words — and feed-forward nets simply cannot adapt.</p>
+  </div>
+
+  <div class="warning-box">
+    <h4>Problem 2: No Memory</h4>
+    <p>Even if you padded every input to a fixed length, the network processes all inputs in a single pass. It has <strong>no mechanism to remember</strong> what it saw at step 1 when it reaches step 5. Each input is treated independently within the forward pass.</p>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy: Reading a Sentence</h4>
+    <p>Imagine reading a novel where someone shows you one word at a time on flashcards — but after each flashcard, you <strong>forget everything</strong> you've read so far. By the time you reach the period at the end of a sentence, you have no idea what the sentence was about. That is what a feed-forward network does. A human reader, by contrast, holds a <strong>running understanding</strong> of the sentence, updating their interpretation with every new word.</p>
+  </div>
+
+  <div class="definition-box">
+    <h4>Definition: Recurrence</h4>
+    <p><strong>Recurrence</strong> is the architectural principle of feeding the network's own output (or hidden state) back into itself at the next time step. This creates a feedback loop that allows information to persist across steps — giving the network a form of memory.</p>
+  </div>
+</section>
+
+<!-- ==================== SECTION 3: THE RECURRENT CELL ==================== -->
+<section class="content-section" id="section3" data-progress-section="3">
+  <h2>3. The Recurrent Cell</h2>
+
+  <p>A <strong>recurrent neural network (RNN)</strong> is built from a single recurrent cell that processes one element at a time while maintaining a <strong>hidden state</strong> — a running summary of everything it has seen so far.</p>
+
+  <div class="definition-box">
+    <h4>Definition: Hidden State</h4>
+    <p>The <strong>hidden state</strong> (denoted <span class="formula">h<sub>t</sub></span>) is a vector that the RNN cell updates at each time step. It is the network's "memory" — a compressed representation of all previous inputs. At time step <em>t</em>, the cell reads input <span class="formula">x<sub>t</sub></span> and the previous hidden state <span class="formula">h<sub>t-1</sub></span>, then produces a new hidden state <span class="formula">h<sub>t</sub></span>.</p>
+  </div>
+
+  <p><strong>How it works:</strong></p>
+  <ol>
+    <li><strong>Read one element:</strong> The cell receives input <span class="formula">x<sub>t</sub></span> (e.g., one word's embedding at time step <em>t</em>).</li>
+    <li><strong>Combine with memory:</strong> It merges <span class="formula">x<sub>t</sub></span> with the previous hidden state <span class="formula">h<sub>t-1</sub></span> using learned weights.</li>
+    <li><strong>Produce new memory:</strong> The result is passed through a non-linearity (typically tanh) to produce <span class="formula">h<sub>t</sub></span>.</li>
+    <li><strong>Feed back:</strong> <span class="formula">h<sub>t</sub></span> is passed to the next time step as <span class="formula">h<sub>t-1</sub></span> for the next input.</li>
+  </ol>
+
+  <div class="analogy-box">
+    <h4>Analogy: The Note-Taker</h4>
+    <p>Imagine you are in a lecture and taking notes. At each moment, you read a new sentence from the speaker (<span class="formula">x<sub>t</sub></span>), look at your running notes so far (<span class="formula">h<sub>t-1</sub></span>), and then update your notes to include the new information (<span class="formula">h<sub>t</sub></span>). Your notes are a compressed summary that carries forward — and you use the same pen and paper (the same weights) every time.</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Key Insight: Weight Sharing</h4>
+    <p>The <strong>same weights</strong> are reused at every time step. Whether the sequence has 5 elements or 500, the cell uses identical parameters. This means the network learns a <em>general rule</em> for processing transitions, not a rule for each position. It also means the model size is independent of sequence length.</p>
+  </div>
+
+  <p><strong>Unrolling through time:</strong> Although we draw the RNN cell with a loop, it is often easier to reason about by "unrolling" the computation across time steps. This produces a chain of identical cells, each connected to the next through the hidden state vector.</p>
+
+  <div class="formula" style="text-align:center; padding:1em; font-size:1.1em;">
+    x₁ → [Cell] → h₁ → [Cell] → h₂ → [Cell] → h₃ → ... → hₜ
+  </div>
+  <p style="text-align:center; color:var(--text-muted); font-size:0.9em;">Each [Cell] box uses the exact same weight matrices W<sub>xh</sub> and W<sub>hh</sub>.</p>
+</section>
+
+<!-- ==================== SECTION 4: SEQUENCE TASK SHAPES ==================== -->
+<section class="content-section" id="section4" data-progress-section="4">
+  <h2>4. Sequence Task Shapes</h2>
+
+  <p>Not all sequence problems have the same input/output structure. We classify them by how inputs and outputs relate:</p>
+
+  <div class="definition-box">
+    <h4>Many-to-One</h4>
+    <p><strong>Input:</strong> A sequence of many elements. <strong>Output:</strong> A single value.</p>
+    <p><strong>Examples:</strong></p>
+    <ul>
+      <li><strong>Sentiment classification:</strong> Feed in a sequence of words → output a single sentiment score (positive/negative).</li>
+      <li><strong>Risk scoring:</strong> Feed in a patient's sequence of vital signs over 24 hours → output a single risk score.</li>
+    </ul>
+    <p>The final hidden state <span class="formula">h<sub>T</sub></span> serves as the summary and is fed to a classifier.</p>
+  </div>
+
+  <div class="definition-box">
+    <h4>One-to-Many</h4>
+    <p><strong>Input:</strong> A single value. <strong>Output:</strong> A sequence of many elements.</p>
+    <p><strong>Examples:</strong></p>
+    <ul>
+      <li><strong>Image captioning:</strong> Feed in a single image feature vector → output a sequence of words describing the image.</li>
+      <li><strong>Music generation:</strong> Feed in a starting note or genre tag → output a sequence of notes.</li>
+    </ul>
+  </div>
+
+  <div class="definition-box">
+    <h4>Many-to-Many (Equal Length)</h4>
+    <p><strong>Input:</strong> A sequence. <strong>Output:</strong> A sequence of the same length, where each output corresponds to one input.</p>
+    <p><strong>Examples:</strong></p>
+    <ul>
+      <li><strong>POS tagging:</strong> Each word in a sentence gets a part-of-speech tag.</li>
+      <li><strong>Named entity recognition:</strong> Each word is classified as person, location, organization, or other.</li>
+      <li><strong>Pixel-wise segmentation:</strong> Each pixel in an image gets a class label.</li>
+    </ul>
+    <p>The RNN outputs at every time step; each output depends on both past and (in bidirectional models) future context.</p>
+  </div>
+
+  <div class="definition-box">
+    <h4>Many-to-Many (Unequal Length) — Encoder-Decoder</h4>
+    <p><strong>Input:</strong> A sequence of length <em>M</em>. <strong>Output:</strong> A sequence of length <em>N</em>, where <em>M ≠ N</em>.</p>
+    <p><strong>Examples:</strong></p>
+    <ul>
+      <li><strong>Machine translation:</strong> Translate an English sentence (M words) into a French sentence (N words, usually different count).</li>
+      <li><strong>Dialogue systems:</strong> A question of varying length generates an answer of varying length.</li>
+    </ul>
+    <p>The <strong>encoder</strong> reads the input sequence and compresses it into a context vector. The <strong>decoder</strong> generates the output sequence one element at a time, conditioned on that context.</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Rule of Thumb</h4>
+    <p>When facing a new sequential task, first determine the <strong>shape</strong>: How many inputs? How many outputs? Are they the same length? The shape determines your architecture.</p>
+  </div>
+</section>
+
+<!-- ==================== SECTION 5: RNN FORWARD PASS ==================== -->
+<section class="content-section" id="section5" data-progress-section="5">
+  <h2>5. RNN Forward Pass — The Math</h2>
+
+  <p>A vanilla RNN cell performs two computations at each time step <em>t</em>:</p>
+
+  <div class="formula" style="font-size:1.15em; padding:1em;">
+    <strong>Hidden state update:</strong><br>
+    h<sub>t</sub> = tanh(W<sub>xh</sub> · x<sub>t</sub> + W<sub>hh</sub> · h<sub>t-1</sub> + b<sub>h</sub>)
+  </div>
+
+  <div class="formula" style="font-size:1.15em; padding:1em;">
+    <strong>Output (optional):</strong><br>
+    ŷ<sub>t</sub> = W<sub>hy</sub> · h<sub>t</sub> + b<sub>y</sub>
+  </div>
+
+  <p><strong>Where:</strong></p>
+  <ul>
+    <li><span class="formula">x<sub>t</sub></span> — input vector at time step <em>t</em></li>
+    <li><span class="formula">h<sub>t</sub></span> — hidden state (memory) at time step <em>t</em></li>
+    <li><span class="formula">h<sub>t-1</sub></span> — hidden state from the previous time step</li>
+    <li><span class="formula">W<sub>xh</sub></span> — weight matrix connecting input to hidden state</li>
+    <li><span class="formula">W<sub>hh</sub></span> — weight matrix connecting previous hidden state to current hidden state</li>
+    <li><span class="formula">b<sub>h</sub></span> — bias vector for the hidden state</li>
+    <li><span class="formula">W<sub>hy</sub></span> — weight matrix connecting hidden state to output</li>
+    <li><span class="formula">b<sub>y</sub></span> — bias vector for the output</li>
+    <li><span class="formula">tanh</span> — hyperbolic tangent, squashes values to (−1, +1)</li>
+  </ul>
+
+  <div class="formula" style="font-size:1.15em; padding:1em;">
+    <strong>Initial condition:</strong><br>
+    h<sub>0</sub> = <strong>0</strong> (zero vector)
+  </div>
+
+  <div class="analogy-box">
+    <h4>Intuition: A Blending Function</h4>
+    <p>The hidden state update is a <strong>blend</strong> of two things:</p>
+    <ol>
+      <li><strong>What I see now:</strong> W<sub>xh</sub> · x<sub>t</sub> — the current input, projected into hidden space.</li>
+      <li><strong>What I remembered:</strong> W<sub>hh</sub> · h<sub>t-1</sub> — the running summary from all past inputs.</li>
+    </ol>
+    <p>These are added together (with bias), then squashed through tanh to keep values bounded. The result is a new memory that fuses past and present. The tanh ensures values stay in (−1, +1), preventing the hidden state from growing unboundedly.</p>
+  </div>
+
+  <div class="recap-box">
+    <h4>Summary</h4>
+    <p>At every step, the RNN asks: <em>"Given what I see now and what I remember, what should I remember next?"</em> The answer is a new hidden state — a compressed, evolving summary of the entire sequence processed so far.</p>
+  </div>
+</section>
+
+<!-- ==================== SECTION 6: RNN WORKED EXAMPLE ==================== -->
+<section class="content-section" id="section6" data-progress-section="6">
+  <h2>6. RNN Worked Example (Hand Calculation)</h2>
+
+  <p>Let us compute the forward pass of a simple scalar RNN step by step.</p>
+
+  <div class="definition-box">
+    <h4>Given Parameters</h4>
+    <ul>
+      <li><span class="formula">W<sub>xh</sub> = 0.5</span></li>
+      <li><span class="formula">W<sub>hh</sub> = 0.8</span></li>
+      <li><span class="formula">b<sub>h</sub> = 0.0</span></li>
+      <li><span class="formula">W<sub>hy</sub> = 1.0</span></li>
+      <li><span class="formula">b<sub>y</sub> = 0.0</span></li>
+    </ul>
+    <p><strong>Inputs:</strong> x₁ = 1.0, x₂ = 0.5</p>
+    <p><strong>Initial hidden state:</strong> h₀ = 0.0</p>
+  </div>
+
+  <h3>Step 1: Time step t = 1</h3>
+  <div class="worked-example">
+    <p>Input: x₁ = 1.0, Previous hidden state: h₀ = 0.0</p>
+    <p><strong>Compute the linear combination:</strong></p>
+    <p style="text-align:center;">W<sub>xh</sub> · x₁ + W<sub>hh</sub> · h₀ + b<sub>h</sub></p>
+    <p style="text-align:center;">= 0.5 × 1.0 + 0.8 × 0.0 + 0.0</p>
+    <p style="text-align:center;">= 0.5 + 0.0 + 0.0</p>
+    <p style="text-align:center; font-weight:bold;">= 0.5</p>
+    <p><strong>Apply tanh:</strong></p>
+    <p style="text-align:center;">h₁ = tanh(0.5)</p>
+    <p style="text-align:center;">h₁ = <strong>0.4621</strong></p>
+    <p style="color:var(--text-muted); font-size:0.9em;">(Recall: tanh(0.5) = (e<sup>0.5</sup> − e<sup>−0.5</sup>) / (e<sup>0.5</sup> + e<sup>−0.5</sup>) = (1.6487 − 0.6065) / (1.6487 + 0.6065) = 1.0422 / 2.2552 = 0.4621)</p>
+  </div>
+
+  <h3>Step 2: Time step t = 2</h3>
+  <div class="worked-example">
+    <p>Input: x₂ = 0.5, Previous hidden state: h₁ = 0.4621</p>
+    <p><strong>Compute the linear combination:</strong></p>
+    <p style="text-align:center;">W<sub>xh</sub> · x₂ + W<sub>hh</sub> · h₁ + b<sub>h</sub></p>
+    <p style="text-align:center;">= 0.5 × 0.5 + 0.8 × 0.4621 + 0.0</p>
+    <p style="text-align:center;">= 0.25 + 0.3697</p>
+    <p style="text-align:center; font-weight:bold;">= 0.6197</p>
+    <p><strong>Apply tanh:</strong></p>
+    <p style="text-align:center;">h₂ = tanh(0.6197)</p>
+    <p style="text-align:center;">h₂ = <strong>0.5509</strong></p>
+  </div>
+
+  <h3>Step 3: Output at t = 2</h3>
+  <div class="worked-example">
+    <p><strong>Compute output:</strong></p>
+    <p style="text-align:center;">ŷ₂ = W<sub>hy</sub> · h₂ + b<sub>y</sub></p>
+    <p style="text-align:center;">= 1.0 × 0.5509 + 0.0</p>
+    <p style="text-align:center; font-weight:bold;">ŷ₂ = 0.5509</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Why This Matters</h4>
+    <p>Notice that <strong>h₂ depends on h₁</strong>, and <strong>h₁ depended on x₁</strong>. Even though the output is at time step 2, the information from x₁ = 1.0 is encoded inside h₂ and therefore influences the output. <strong>The memory is carried forward through the hidden state chain.</strong></p>
+  </div>
+
+  <div class="recap-box">
+    <h4>Complete Trace Table</h4>
+    <table style="width:100%; border-collapse:collapse; margin-top:0.5em;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border);">
+          <th style="text-align:left; padding:0.4em;">Step</th>
+          <th style="text-align:left; padding:0.4em;">Input x<sub>t</sub></th>
+          <th style="text-align:left; padding:0.4em;">h<sub>t-1</sub></th>
+          <th style="text-align:left; padding:0.4em;">Linear</th>
+          <th style="text-align:left; padding:0.4em;">h<sub>t</sub></th>
+          <th style="text-align:left; padding:0.4em;">Output</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4em;">t=0</td>
+          <td style="padding:0.4em;">—</td>
+          <td style="padding:0.4em;">0.0000</td>
+          <td style="padding:0.4em;">—</td>
+          <td style="padding:0.4em;">0.0000</td>
+          <td style="padding:0.4em;">—</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4em;">t=1</td>
+          <td style="padding:0.4em;">1.0</td>
+          <td style="padding:0.4em;">0.0000</td>
+          <td style="padding:0.4em;">0.5000</td>
+          <td style="padding:0.4em;">0.4621</td>
+          <td style="padding:0.4em;">—</td>
+        </tr>
+        <tr>
+          <td style="padding:0.4em;">t=2</td>
+          <td style="padding:0.4em;">0.5</td>
+          <td style="padding:0.4em;">0.4621</td>
+          <td style="padding:0.4em;">0.6197</td>
+          <td style="padding:0.4em;">0.5509</td>
+          <td style="padding:0.4em;">0.5509</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ==================== SECTION 7: VANISHING GRADIENTS ==================== -->
+<section class="content-section" id="section7" data-progress-section="7">
+  <h2>7. Vanishing Gradients in RNNs</h2>
+
+  <p>During training, RNNs are optimized using <strong>Backpropagation Through Time (BPTT)</strong> — an extension of standard backpropagation that unrolls the RNN across all time steps and applies the chain rule through the unrolled graph.</p>
+
+  <div class="definition-box">
+    <h4>Definition: Backpropagation Through Time (BPTT)</h4>
+    <p>BPTT is the algorithm used to compute gradients in recurrent networks. The RNN is "unrolled" into a deep feed-forward network (one layer per time step), and standard backpropagation is applied. Gradients flow backward through the hidden state chain from step <em>T</em> back to step 1.</p>
+  </div>
+
+  <p>The gradient of the loss at step <em>t</em> with respect to an earlier hidden state <span class="formula">h<sub>k</sub></span> (where k &lt; t) requires multiplying the Jacobians of each intermediate step:</p>
+
+  <div class="formula" style="padding:1em; text-align:center;">
+    ∂h<sub>t</sub>/∂h<sub>k</sub> = ∏<sub>j=k+1</sub><sup>t</sup> ∂h<sub>j</sub>/∂h<sub>j-1</sub> = ∏<sub>j=k+1</sub><sup>t</sup> diag(1 − h<sub>j</sub>²) · W<sub>hh</sub>
+  </div>
+
+  <div class="warning-box">
+    <h4>The Vanishing Gradient Problem</h4>
+    <p>Each Jacobian term <span class="formula">diag(1 − h<sub>j</sub>²) · W<sub>hh</sub></span> is a matrix. Its eigenvalues determine whether the product grows or shrinks as more terms are multiplied:</p>
+    <ul>
+      <li><strong>Most eigenvalues &lt; 1:</strong> Multiplying many such matrices causes the gradient to <strong>shrink exponentially</strong> toward zero. This is <em>vanishing</em>.</li>
+      <li><strong>Some eigenvalues &gt; 1:</strong> The gradient can <strong>grow exponentially</strong>. This is <em>exploding</em>.</li>
+    </ul>
+  </div>
+
+  <div class="worked-example">
+    <h4>Watch What Happens Over 20 Steps</h4>
+    <p>If the typical scaling factor is <span class="formula">λ</span>:</p>
+    <table style="width:100%; border-collapse:collapse; margin-top:0.5em;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border);">
+          <th style="text-align:left; padding:0.4em;">λ</th>
+          <th style="text-align:left; padding:0.4em;">λ<sup>10</sup></th>
+          <th style="text-align:left; padding:0.4em;">λ<sup>20</sup></th>
+          <th style="text-align:left; padding:0.4em;">Effect</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4em;">0.9</td>
+          <td style="padding:0.4em;">0.349</td>
+          <td style="padding:0.4em;">0.122</td>
+          <td style="padding:0.4em;">Gradient reduced to ~12%</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4em;">0.7</td>
+          <td style="padding:0.4em;">0.028</td>
+          <td style="padding:0.4em;">0.0008</td>
+          <td style="padding:0.4em;">Essentially zero</td>
+        </tr>
+        <tr>
+          <td style="padding:0.4em;">0.5</td>
+          <td style="padding:0.4em;">0.001</td>
+          <td style="padding:0.4em;">≈ 0</td>
+          <td style="padding:0.4em;">Completely vanished</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy: The Telephone Game</h4>
+    <p>Imagine a game of "telephone" where a message passes through 20 people. If each person retains 90% of the message, by the time it reaches person 20, only about 12% of the original meaning survives. If each person retains 50%, the message is completely garbled after a few steps. This is exactly what happens to gradients: the signal degrades exponentially as it travels backward through time.</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Practical Consequence</h4>
+    <p>A vanilla RNN can effectively remember only about <strong>5 to 10 time steps</strong>. Dependencies beyond this range are nearly impossible to learn because the gradient signal has vanished to near-zero. This is why we need LSTM (and GRU) architectures.</p>
+  </div>
+</section>
+
+<!-- ==================== SECTION 8: LSTM OVERVIEW ==================== -->
+<section class="content-section" id="section8" data-progress-section="8">
+  <h2>8. LSTM — The Protected Memory Lane</h2>
+
+  <p>The <strong>Long Short-Term Memory (LSTM)</strong> network was specifically designed to solve the vanishing gradient problem. Its core innovation is the <strong>cell state</strong> — a separate memory channel that runs through time with minimal interference.</p>
+
+  <div class="definition-box">
+    <h4>Definition: Cell State (C<sub>t</sub>)</h4>
+    <p>The <strong>cell state</strong> is an additional vector maintained by the LSTM alongside the hidden state. It acts as a <strong>conveyor belt</strong> that carries information across many time steps with almost no transformation. Information is added to or removed from the cell state through learned gates, but the belt itself allows gradients to flow nearly undiminished.</p>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy: The Conveyor Belt</h4>
+    <p>Imagine a factory conveyor belt running through a series of workstations. Items on the belt travel long distances without being altered — the belt itself is just transportation. Workstations can <strong>add</strong> new items to the belt, <strong>remove</strong> existing items, or <strong>peek</strong> at what's on the belt without modifying it. This is how the cell state works: it is a highway for information that bypasses the repeated nonlinear transformations that cause gradients to vanish in vanilla RNNs.</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Why LSTMs Work</h4>
+    <p>In a vanilla RNN, the hidden state is updated as: <span class="formula">h<sub>t</sub> = tanh(...)</span>. Every step applies a nonlinear squashing function, which repeatedly multiplies gradients by numbers less than 1. In an LSTM, the cell state is updated <strong>additively</strong>:</p>
+    <p style="text-align:center; font-size:1.1em; margin:0.5em 0;"><span class="formula">C<sub>t</sub> = f<sub>t</sub> ⊙ C<sub>t-1</sub> + i<sub>t</sub> ⊙ Ĉ<sub>t</sub></span></p>
+    <p>The gradient of C<sub>t</sub> with respect to C<sub>t-1</sub> is simply the forget gate f<sub>t</sub> — a vector of values between 0 and 1, but <strong>not</strong> further compressed by tanh. If the forget gate is close to 1, the gradient passes through almost perfectly. This is the key to learning long-range dependencies.</p>
+  </div>
+</section>
+
+<!-- ==================== SECTION 9: LSTM GATE EQUATIONS ==================== -->
+<section class="content-section" id="section9" data-progress-section="9">
+  <h2>9. LSTM Gate Equations (Full)</h2>
+
+  <p>An LSTM cell at time step <em>t</em> receives three inputs: the current input <span class="formula">x<sub>t</sub></span>, the previous hidden state <span class="formula">h<sub>t-1</sub></span>, and the previous cell state <span class="formula">C<sub>t-1</sub></span>. It computes four quantities using learned weight matrices and biases.</p>
+
+  <p>First, the previous hidden state and current input are concatenated: <span class="formula">[h<sub>t-1</sub>, x<sub>t</sub>]</span>. All four computations use this same concatenation as input.</p>
+
+  <div class="formula" style="padding:1.2em; font-size:1.1em; margin-bottom:0.8em;">
+    <strong>Forget Gate:</strong><br>
+    f<sub>t</sub> = σ(W<sub>f</sub> · [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>f</sub>)<br>
+    <span style="color:var(--text-muted); font-size:0.9em;">Decides how much of the old cell state C<sub>t-1</sub> to keep. Values near 1 = keep; near 0 = erase.</span>
+  </div>
+
+  <div class="formula" style="padding:1.2em; font-size:1.1em; margin-bottom:0.8em;">
+    <strong>Input Gate:</strong><br>
+    i<sub>t</sub> = σ(W<sub>i</sub> · [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>i</sub>)<br>
+    <span style="color:var(--text-muted); font-size:0.9em;">Decides how much new information to admit into the cell state.</span>
+  </div>
+
+  <div class="formula" style="padding:1.2em; font-size:1.1em; margin-bottom:0.8em;">
+    <strong>Candidate (Proposed New Content):</strong><br>
+    Ĉ<sub>t</sub> = tanh(W<sub>C</sub> · [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>C</sub>)<br>
+    <span style="color:var(--text-muted); font-size:0.9em;">Creates a vector of candidate values that could be added to the cell state.</span>
+  </div>
+
+  <div class="formula" style="padding:1.2em; font-size:1.1em; margin-bottom:0.8em;">
+    <strong>Cell State Update:</strong><br>
+    C<sub>t</sub> = f<sub>t</sub> ⊙ C<sub>t-1</sub> + i<sub>t</sub> ⊙ Ĉ<sub>t</sub><br>
+    <span style="color:var(--text-muted); font-size:0.9em;">Erases old memory (forget gate) and adds new content (input gate × candidate). The ⊙ denotes element-wise multiplication.</span>
+  </div>
+
+  <div class="formula" style="padding:1.2em; font-size:1.1em; margin-bottom:0.8em;">
+    <strong>Output Gate:</strong><br>
+    o<sub>t</sub> = σ(W<sub>o</sub> · [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>o</sub>)<br>
+    <span style="color:var(--text-muted); font-size:0.9em;">Decides how much of the cell state to expose as the hidden state output.</span>
+  </div>
+
+  <div class="formula" style="padding:1.2em; font-size:1.1em; margin-bottom:0.8em;">
+    <strong>Hidden State Output:</strong><br>
+    h<sub>t</sub> = o<sub>t</sub> ⊙ tanh(C<sub>t</sub>)<br>
+    <span style="color:var(--text-muted); font-size:0.9em;">The visible output. The cell state is squashed through tanh (bounded to −1,+1) and filtered by the output gate.</span>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy: Reading a Book with a Notepad</h4>
+    <ul>
+      <li><strong>Forget gate</strong> = Crossing out old notes that are no longer relevant ("I don't need the character list from chapter 1 anymore").</li>
+      <li><strong>Input gate</strong> = Deciding which new details are worth writing down ("This character's new motivation is important").</li>
+      <li><strong>Candidate</strong> = The actual new note you write ("Elara now wants to find the crystal").</li>
+      <li><strong>Cell state update</strong> = Updating your notepad — erase old stuff, write new stuff.</li>
+      <li><strong>Output gate</strong> = Deciding what to mention when someone asks "what happened so far?" — you don't recite every note, just the relevant parts.</li>
+    </ul>
+  </div>
+
+  <div class="warning-box">
+    <h4>Important: Four Weight Matrices</h4>
+    <p>An LSTM has <strong>four</strong> sets of weights and biases (W<sub>f</sub>, W<sub>i</sub>, W<sub>C</sub>, W<sub>o</sub> and their biases), compared to the vanilla RNN's two (W<sub>xh</sub>, W<sub>hh</sub>). This means an LSTM has roughly <strong>4× more parameters</strong> than a vanilla RNN of the same hidden size. The extra capacity is what enables it to learn complex gating behaviors.</p>
+  </div>
+</section>
+
+<!-- ==================== SECTION 10: LSTM WORKED EXAMPLE ==================== -->
+<section class="content-section" id="section10" data-progress-section="10">
+  <h2>10. LSTM Worked Example (Hand Calculation)</h2>
+
+  <p>Let us walk through a single LSTM time step with concrete numbers.</p>
+
+  <div class="definition-box">
+    <h4>Given Values</h4>
+    <ul>
+      <li><span class="formula">C<sub>t-1</sub> = 0.60</span> (previous cell state)</li>
+      <li><span class="formula">h<sub>t-1</sub> = 0.10</span> (previous hidden state)</li>
+      <li><span class="formula">x<sub>t</sub> = 0.50</span> (current input)</li>
+    </ul>
+    <p><strong>Pre-activations</strong> (values after linear transformation, before activation):</p>
+    <ul>
+      <li><span class="formula">z<sub>f</sub> = 1.0</span> (for forget gate)</li>
+      <li><span class="formula">z<sub>i</sub> = 0.5</span> (for input gate)</li>
+      <li><span class="formula">z<sub>C</sub> = 0.8</span> (for candidate)</li>
+      <li><span class="formula">z<sub>o</sub> = 0.2</span> (for output gate)</li>
+    </ul>
+  </div>
+
+  <h3>Step 1: Compute All Gates</h3>
+  <div class="worked-example">
+    <p><strong>Forget gate:</strong></p>
+    <p style="text-align:center;">f<sub>t</sub> = σ(1.0) = 1 / (1 + e<sup>−1.0</sup>) = 1 / (1 + 0.3679) = 1 / 1.3679 = <strong>0.731</strong></p>
+    <p style="color:var(--text-muted); font-size:0.9em;">→ Keep 73.1% of old cell state</p>
+
+    <p style="margin-top:0.8em;"><strong>Input gate:</strong></p>
+    <p style="text-align:center;">i<sub>t</sub> = σ(0.5) = 1 / (1 + e<sup>−0.5</sup>) = 1 / (1 + 0.6065) = 1 / 1.6065 = <strong>0.622</strong></p>
+    <p style="color:var(--text-muted); font-size:0.9em;">→ Admit 62.2% of new candidate content</p>
+
+    <p style="margin-top:0.8em;"><strong>Candidate:</strong></p>
+    <p style="text-align:center;">Ĉ<sub>t</sub> = tanh(0.8) = <strong>0.664</strong></p>
+    <p style="color:var(--text-muted); font-size:0.9em;">→ Proposed new content is 0.664</p>
+
+    <p style="margin-top:0.8em;"><strong>Output gate:</strong></p>
+    <p style="text-align:center;">o<sub>t</sub> = σ(0.2) = 1 / (1 + e<sup>−0.2</sup>) = 1 / (1 + 0.8187) = 1 / 1.8187 = <strong>0.550</strong></p>
+    <p style="color:var(--text-muted); font-size:0.9em;">→ Expose 55.0% of the cell state</p>
+  </div>
+
+  <h3>Step 2: Update Cell State</h3>
+  <div class="worked-example">
+    <p style="text-align:center; font-size:1.1em;">C<sub>t</sub> = f<sub>t</sub> ⊙ C<sub>t-1</sub> + i<sub>t</sub> ⊙ Ĉ<sub>t</sub></p>
+    <p style="text-align:center;">= 0.731 × 0.60 + 0.622 × 0.664</p>
+    <p style="text-align:center;">= 0.4386 + 0.4130</p>
+    <p style="text-align:center; font-weight:bold;">C<sub>t</sub> = 0.8516</p>
+    <p style="color:var(--text-muted); font-size:0.9em;">Old memory (0.4386 retained) + New content (0.4130 added) = Updated memory (0.8516)</p>
+  </div>
+
+  <h3>Step 3: Compute Hidden State Output</h3>
+  <div class="worked-example">
+    <p style="text-align:center; font-size:1.1em;">h<sub>t</sub> = o<sub>t</sub> ⊙ tanh(C<sub>t</sub>)</p>
+    <p style="text-align:center;">= 0.550 × tanh(0.8516)</p>
+    <p style="text-align:center;">= 0.550 × 0.6917</p>
+    <p style="text-align:center; font-weight:bold;">h<sub>t</sub> = 0.3804</p>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Read-Out: What Happened</h4>
+    <p>The belt <strong>kept 73% of the old memory</strong> (0.4386 out of 0.60) and <strong>added new content</strong> worth 0.4130. The cell state grew from 0.60 to 0.8516. The output gate then <strong>exposed only 55%</strong> of the squashed cell state to the visible hidden output. Notice that the cell state (0.8516) is larger than the old cell state (0.60) — the LSTM learned to accumulate information here.</p>
+  </div>
+
+  <div class="recap-box">
+    <h4>Complete LSTM Trace Table</h4>
+    <table style="width:100%; border-collapse:collapse; margin-top:0.5em;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border);">
+          <th style="text-align:left; padding:0.4em;">Quantity</th>
+          <th style="text-align:left; padding:0.4em;">Value</th>
+          <th style="text-align:left; padding:0.4em;">Interpretation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4em;">f<sub>t</sub> (forget gate)</td>
+          <td style="padding:0.4em;">0.731</td>
+          <td style="padding:0.4em;">Keep 73.1% of old memory</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4em;">i<sub>t</sub> (input gate)</td>
+          <td style="padding:0.4em;">0.622</td>
+          <td style="padding:0.4em;">Admit 62.2% of new info</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4em;">Ĉ<sub>t</sub> (candidate)</td>
+          <td style="padding:0.4em;">0.664</td>
+          <td style="padding:0.4em;">Proposed new content</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4em;">C<sub>t</sub> (new cell state)</td>
+          <td style="padding:0.4em;">0.8516</td>
+          <td style="padding:0.4em;">Updated memory (was 0.60)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.4em;">o<sub>t</sub> (output gate)</td>
+          <td style="padding:0.4em;">0.550</td>
+          <td style="padding:0.4em;">Expose 55.0% of cell</td>
+        </tr>
+        <tr>
+          <td style="padding:0.4em;">h<sub>t</sub> (hidden output)</td>
+          <td style="padding:0.4em;">0.3804</td>
+          <td style="padding:0.4em;">Visible output</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ==================== SECTION 11: COMPARISON TABLE ==================== -->
+<section class="content-section" id="section11" data-progress-section="11">
+  <h2>11. RNN vs LSTM vs GRU — Comparison</h2>
+
+  <p>There are three main recurrent architectures. Here is how they compare:</p>
+
+  <div class="recap-box">
+    <table style="width:100%; border-collapse:collapse;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border);">
+          <th style="text-align:left; padding:0.5em;">Feature</th>
+          <th style="text-align:left; padding:0.5em;">Vanilla RNN</th>
+          <th style="text-align:left; padding:0.5em;">LSTM</th>
+          <th style="text-align:left; padding:0.5em;">GRU</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.5em;"><strong>Gates</strong></td>
+          <td style="padding:0.5em;">None</td>
+          <td style="padding:0.5em;">3 (forget, input, output)</td>
+          <td style="padding:0.5em;">2 (reset, update)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.5em;"><strong>Memory states</strong></td>
+          <td style="padding:0.5em;">1 (h<sub>t</sub>)</td>
+          <td style="padding:0.5em;">2 (h<sub>t</sub>, C<sub>t</sub>)</td>
+          <td style="padding:0.5em;">1 (h<sub>t</sub>)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.5em;"><strong>Long-range dependencies</strong></td>
+          <td style="padding:0.5em;">Weak (~5-10 steps)</td>
+          <td style="padding:0.5em;">Strong (100+ steps)</td>
+          <td style="padding:0.5em;">Strong (100+ steps)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.5em;"><strong>Number of parameters</strong></td>
+          <td style="padding:0.5em;">Lowest</td>
+          <td style="padding:0.5em;">Highest (~4× vanilla)</td>
+          <td style="padding:0.5em;">Medium (~3× vanilla)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.5em;"><strong>Training cost</strong></td>
+          <td style="padding:0.5em;">Lowest</td>
+          <td style="padding:0.5em;">Highest</td>
+          <td style="padding:0.5em;">Medium</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.5em;"><strong>Inference speed</strong></td>
+          <td style="padding:0.5em;">Fastest</td>
+          <td style="padding:0.5em;">Slowest</td>
+          <td style="padding:0.5em;">Medium</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.5em;"><strong>Vanishing gradients?</strong></td>
+          <td style="padding:0.5em;">Yes (severe)</td>
+          <td style="padding:0.5em;">Mitigated</td>
+          <td style="padding:0.5em;">Mitigated</td>
+        </tr>
+        <tr>
+          <td style="padding:0.5em;"><strong>Introduced</strong></td>
+          <td style="padding:0.5em;">~1990</td>
+          <td style="padding:0.5em;">1997 (Hochreiter &amp; Schmidhuber)</td>
+          <td style="padding:0.5em;">2014 (Cho et al.)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="analogy-box">
+    <h4>Analogy: Note-Taking Strategies</h4>
+    <ul>
+      <li><strong>Vanilla RNN:</strong> Like writing a single running paragraph. As it gets longer, early details fade and get overwritten. Good for short notes.</li>
+      <li><strong>LSTM:</strong> Like having a detailed notebook with separate pages. You can earmark pages to keep, tear out pages you don't need, and add new pages. Nothing gets overwritten accidentally. Best for long, complex projects.</li>
+      <li><strong>GRU:</strong> Like a simplified notebook — fewer pages, but still organized. Faster to write in, easier to manage, and almost as effective as the full notebook for most tasks.</li>
+    </ul>
+  </div>
+
+  <div class="takeaway-box">
+    <h4>Rule of Thumb</h4>
+    <p>Start with <strong>GRU or LSTM</strong> for any task involving long-range dependencies. Use GRU first (simpler, fewer parameters) and only switch to LSTM if you need the extra expressiveness. Use vanilla RNNs only for very short sequences or as a pedagogical starting point.</p>
+  </div>
+
+  <div class="warning-box">
+    <h4>Modern Note</h4>
+    <p>In practice today, <strong>Transformers</strong> have largely replaced RNNs and LSTMs for most NLP tasks, as they handle long-range dependencies even more effectively through self-attention. However, RNNs and LSTMs remain important for streaming/real-time applications, edge devices with limited memory, and understanding the foundations of sequence modeling.</p>
+  </div>
+</section>
+
+<!-- ==================== SECTION 12: FLASHCARDS ==================== -->
+<section class="content-section" id="section12" data-progress-section="12">
+  <h2>12. Flashcards</h2>
+
+  <div class="flashcard-container" id="flashcardContainer12">
+
+    <div class="flashcard" data-flashcard>
+      <div class="flashcard-front">
+        <h4>RNN</h4>
+        <p>What is a Recurrent Neural Network?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>A neural network with <strong>feedback loops</strong> that allow it to maintain a hidden state across time steps. It processes sequences one element at a time, updating its memory at each step using shared weights.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" data-flashcard>
+      <div class="flashcard-front">
+        <h4>LSTM</h4>
+        <p>What is a Long Short-Term Memory network?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>A gated recurrent architecture with a dedicated <strong>cell state</strong> (conveyor belt) that allows gradients to flow across many time steps without vanishing. Uses forget, input, and output gates to control information flow.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" data-flashcard>
+      <div class="flashcard-front">
+        <h4>Hidden State</h4>
+        <p>What is the hidden state in an RNN?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>The running summary vector <span class="formula">h<sub>t</sub></span> that encodes all information the network has processed so far. It is updated at each time step and passed to the next step as the network's memory.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" data-flashcard>
+      <div class="flashcard-front">
+        <h4>Vanishing Gradient</h4>
+        <p>What is the vanishing gradient problem in RNNs?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>During backpropagation through time, gradients are multiplied by matrices with eigenvalues &lt; 1 at each step, causing them to <strong>shrink exponentially</strong>. This makes it impossible for vanilla RNNs to learn long-range dependencies.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" data-flashcard>
+      <div class="flashcard-front">
+        <h4>BPTT</h4>
+        <p>What is Backpropagation Through Time?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>An extension of backpropagation for recurrent networks. The RNN is <strong>unrolled</strong> into a deep feed-forward network (one layer per time step), and the chain rule is applied through the entire unrolled graph to compute gradients.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" data-flashcard>
+      <div class="flashcard-front">
+        <h4>Forget Gate</h4>
+        <p>What does the forget gate do in an LSTM?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>It decides <strong>how much of the old cell state to keep</strong>. Computed as f<sub>t</sub> = σ(W<sub>f</sub> · [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>f</sub>). Values near 1 retain old memory; values near 0 erase it.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" data-flashcard>
+      <div class="flashcard-front">
+        <h4>Input Gate</h4>
+        <p>What does the input gate do in an LSTM?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>It decides <strong>how much new information to write into the cell state</strong>. Computed as i<sub>t</sub> = σ(W<sub>i</sub> · [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>i</sub>). Works with the candidate vector Ĉ<sub>t</sub> to determine what gets added.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" data-flashcard>
+      <div class="flashcard-front">
+        <h4>Output Gate</h4>
+        <p>What does the output gate do in an LSTM?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>It decides <strong>how much of the cell state to expose</strong> as the hidden state output. Computed as o<sub>t</sub> = σ(W<sub>o</sub> · [h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>o</sub>). The cell state is first squashed through tanh, then filtered by the output gate.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" data-flashcard>
+      <div class="flashcard-front">
+        <h4>Cell State</h4>
+        <p>What is the cell state in an LSTM?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>A separate memory vector C<sub>t</sub> that runs through time like a <strong>conveyor belt</strong>. Updated additively (not through repeated tanh), which allows gradients to flow across many steps with minimal decay.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" data-flashcard>
+      <div class="flashcard-front">
+        <h4>Sequence Task</h4>
+        <p>What are the four main shapes of sequence tasks?</p>
+      </div>
+      <div class="flashcard-back">
+        <p><strong>Many-to-one</strong> (sentiment analysis), <strong>One-to-many</strong> (image captioning), <strong>Many-to-many equal</strong> (POS tagging), <strong>Many-to-many unequal</strong> (machine translation via encoder-decoder).</p>
+      </div>
+    </div>
+
+    <div class="flashcard" data-flashcard>
+      <div class="flashcard-front">
+        <h4>GRU</h4>
+        <p>What is a Gated Recurrent Unit?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>A simplified recurrent architecture with only <strong>two gates</strong> (reset and update) and a single state (h<sub>t</sub>). Fewer parameters than LSTM but comparably effective for many tasks. Introduced by Cho et al. in 2014.</p>
+      </div>
+    </div>
+
+    <div class="flashcard" data-flashcard>
+      <div class="flashcard-front">
+        <h4>tanh</h4>
+        <p>Why is tanh used in RNNs and LSTMs?</p>
+      </div>
+      <div class="flashcard-back">
+        <p>tanh squashes values to the range <strong>(−1, +1)</strong>, keeping hidden states and cell states bounded. Unlike sigmoid (0 to 1), tanh is centered at zero, which helps with learning dynamics. It introduces non-linearity needed for the network to learn complex patterns.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ==================== SECTION 13: QUIZ ==================== -->
+<section class="content-section" id="section13" data-progress-section="13">
+  <h2>13. Quiz</h2>
+
+  <div class="quiz-container" id="quizContainer13">
+
+    <div class="quiz-question" data-quiz-question="1">
+      <h4>Q1. Why can't a standard feed-forward network handle variable-length sequences?</h4>
+      <div class="quiz-options">
+        <button class="quiz-option" data-quiz-option="a">A) It uses ReLU activation</button>
+        <button class="quiz-option" data-quiz-option="b">B) It requires a fixed number of input neurons</button>
+        <button class="quiz-option" data-quiz-option="c">C) It cannot use dropout</button>
+        <button class="quiz-option" data-quiz-option="d">D) It is too shallow</button>
+      </div>
+      <div class="quiz-feedback" data-quiz-feedback="1" style="display:none;">
+        <p><strong>Correct: B)</strong> Feed-forward networks have a fixed architecture with a predetermined number of input neurons. Sequences vary in length (e.g., sentences of 3 vs. 30 words), and there is no way to change the input layer size dynamically.</p>
+      </div>
+    </div>
+
+    <div class="quiz-question" data-quiz-question="2">
+      <h4>Q2. In an RNN, what role does the hidden state h<sub>t</sub> play?</h4>
+      <div class="quiz-options">
+        <button class="quiz-option" data-quiz-option="a">A) It stores the learning rate</button>
+        <button class="quiz-option" data-quiz-option="b">B) It is a running summary of all past inputs</button>
+        <button class="quiz-option" data-quiz-option="c">C) It holds the gradient values</button>
+        <button class="quiz-option" data-quiz-option="d">D) It determines the batch size</button>
+      </div>
+      <div class="quiz-feedback" data-quiz-feedback="2" style="display:none;">
+        <p><strong>Correct: B)</strong> The hidden state h<sub>t</sub> is the network's memory — a compressed representation of all inputs seen up to time step <em>t</em>. It is updated at each step and passed forward to the next time step.</p>
+      </div>
+    </div>
+
+    <div class="quiz-question" data-quiz-question="3">
+      <h4>Q3. What is the primary advantage of LSTM over vanilla RNN?</h4>
+      <div class="quiz-options">
+        <button class="quiz-option" data-quiz-option="a">A) It has fewer parameters</button>
+        <button class="quiz-option" data-quiz-option="b">B) It runs faster on CPU</button>
+        <button class="quiz-option" data-quiz-option="c">C) The cell state allows gradients to flow across many steps without vanishing</button>
+        <button class="quiz-option" data-quiz-option="d">D) It doesn't need training</button>
+      </div>
+      <div class="quiz-feedback" data-quiz-feedback="3" style="display:none;">
+        <p><strong>Correct: C)</strong> The LSTM's cell state is updated additively (C<sub>t</sub> = f·C<sub>t-1</sub> + i·Ĉ), allowing gradients to flow through the forget gate with minimal degradation. This enables learning dependencies spanning hundreds of time steps.</p>
+      </div>
+    </div>
+
+    <div class="quiz-question" data-quiz-question="4">
+      <h4>Q4. What does the forget gate in an LSTM control?</h4>
+      <div class="quiz-options">
+        <button class="quiz-option" data-quiz-option="a">A) How much of the old cell state to keep</button>
+        <button class="quiz-option" data-quiz-option="b">B) The learning rate schedule</button>
+        <button class="quiz-option" data-quiz-option="c">C) How many layers the network has</button>
+        <button class="quiz-option" data-quiz-option="d">D) The batch normalization parameters</button>
+      </div>
+      <div class="quiz-feedback" data-quiz-feedback="4" style="display:none;">
+        <p><strong>Correct: A)</strong> The forget gate f<sub>t</sub> = σ(W<sub>f</sub>·[h<sub>t-1</sub>, x<sub>t</sub>] + b<sub>f</sub>) produces values between 0 and 1 that determine how much of the previous cell state C<sub>t-1</sub> to retain. Values near 1 keep old memory; near 0 erase it.</p>
+      </div>
+    </div>
+
+    <div class="quiz-question" data-quiz-question="5">
+      <h4>Q5. Which architecture is used for machine translation (English → French of different length)?</h4>
+      <div class="quiz-options">
+        <button class="quiz-option" data-quiz-option="a">A) Many-to-one RNN</button>
+        <button class="quiz-option" data-quiz-option="b">B) One-to-many RNN</button>
+        <button class="quiz-option" data-quiz-option="c">C) Many-to-many (equal length) RNN</button>
+        <button class="quiz-option" data-quiz-option="d">D) Encoder-decoder (many-to-many unequal) RNN</button>
+      </div>
+      <div class="quiz-feedback" data-quiz-feedback="5" style="display:none;">
+        <p><strong>Correct: D)</strong> Machine translation requires an <strong>encoder-decoder</strong> architecture because the input and output sequences typically have different lengths. The encoder reads the source sentence, and the decoder generates the target sentence word by word.</p>
+      </div>
+    </div>
+
+    <div class="quiz-question" data-quiz-question="6">
+      <h4>Q6. In the vanilla RNN equation h<sub>t</sub> = tanh(W<sub>xh</sub>·x<sub>t</sub> + W<sub>hh</sub>·h<sub>t-1</sub> + b<sub>h</sub>), what does W<sub>hh</sub> control?</h4>
+      <div class="quiz-options">
+        <button class="quiz-option" data-quiz-option="a">A) How the current input affects the hidden state</button>
+        <button class="quiz-option" data-quiz-option="b">B) How the previous hidden state influences the new hidden state</button>
+        <button class="quiz-option" data-quiz-option="c">C) How the hidden state maps to the output</button>
+        <button class="quiz-option" data-quiz-option="d">D) The bias term</button>
+      </div>
+      <div class="quiz-feedback" data-quiz-feedback="6" style="display:none;">
+        <p><strong>Correct: B)</strong> W<sub>hh</sub> is the weight matrix that connects the previous hidden state h<sub>t-1</sub> to the current hidden state h<sub>t</sub>. It controls how the network's memory from the previous step influences its new memory. The eigenvalues of W<sub>hh</sub> are central to the vanishing/exploding gradient problem.</p>
+      </div>
+    </div>
+
+    <div class="quiz-question" data-quiz-question="7">
+      <h4>Q7. Why does the gradient vanish in vanilla RNNs but not (as easily) in LSTMs?</h4>
+      <div class="quiz-options">
+        <button class="quiz-option" data-quiz-option="a">A) LSTMs use a larger learning rate</button>
+        <button class="quiz-option" data-quiz-option="b">B) LSTMs use dropout instead of backpropagation</button>
+        <button class="quiz-option" data-quiz-option="c">C) The LSTM cell state is updated additively, so gradients flow through the forget gate without repeated tanh squashing</button>
+        <button class="quiz-option" data-quiz-option="d">D) LSTMs don't use gradients at all</button>
+      </div>
+      <div class="quiz-feedback" data-quiz-feedback="7" style="display:none;">
+        <p><strong>Correct: C)</strong> In vanilla RNNs, gradients pass through tanh derivatives (values < 1) at every step, causing exponential shrinkage. In LSTMs, the cell state gradient is ∂C<sub>t</sub>/∂C<sub>t-1</sub> = f<sub>t</sub> (the forget gate), which can be close to 1, allowing gradients to flow long distances.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ==================== SECTION 14: FILL IN THE BLANKS ==================== -->
+<section class="content-section" id="section14" data-progress-section="14">
+  <h2>14. Fill in the Blanks</h2>
+
+  <div class="fill-blank-container" id="fillBlankContainer14">
+
+    <div class="fill-blank-question" data-fill-question="1">
+      <p><strong>1.</strong> In an RNN, the hidden state <span class="formula">h<sub>t</sub></span> is computed using the current input <span class="formula">x<sub>t</sub></span> and the previous ________.</p>
+      <div class="fill-blank-input">
+        <input type="text" class="fill-blank-field" data-fill-answer="hidden state" placeholder="Type your answer..." data-fill-correct="false">
+        <button class="fill-blank-check" data-fill-check="1">Check</button>
+      </div>
+      <div class="fill-blank-feedback" data-fill-feedback="1" style="display:none;">
+        <p><strong>Correct answer: hidden state</strong> (h<sub>t-1</sub>). The hidden state is the network's memory, carrying information from all previous time steps forward to the current step.</p>
+      </div>
+    </div>
+
+    <div class="fill-blank-question" data-fill-question="2">
+      <p><strong>2.</strong> The vanishing gradient problem occurs because gradients are multiplied by matrices with eigenvalues less than ________ at each backward step through time.</p>
+      <div class="fill-blank-input">
+        <input type="text" class="fill-blank-field" data-fill-answer="1" placeholder="Type your answer..." data-fill-correct="false">
+        <button class="fill-blank-check" data-fill-check="2">Check</button>
+      </div>
+      <div class="fill-blank-feedback" data-fill-feedback="2" style="display:none;">
+        <p><strong>Correct answer: 1</strong>. When eigenvalues are less than 1, repeated multiplication causes the gradient to shrink exponentially toward zero. For example, 0.9²⁰ ≈ 0.12.</p>
+      </div>
+    </div>
+
+    <div class="fill-blank-question" data-fill-question="3">
+      <p><strong>3.</strong> An LSTM has three gates: the forget gate, the input gate, and the ________ gate.</p>
+      <div class="fill-blank-input">
+        <input type="text" class="fill-blank-field" data-fill-answer="output" placeholder="Type your answer..." data-fill-correct="false">
+        <button class="fill-blank-check" data-fill-check="3">Check</button>
+      </div>
+      <div class="fill-blank-feedback" data-fill-feedback="3" style="display:none;">
+        <p><strong>Correct answer: output</strong>. The output gate controls how much of the cell state is exposed as the hidden state output: h<sub>t</sub> = o<sub>t</sub> ⊙ tanh(C<sub>t</sub>).</p>
+      </div>
+    </div>
+
+    <div class="fill-blank-question" data-fill-question="4">
+      <p><strong>4.</strong> The LSTM cell state is updated using ________ operations (addition), not repeated squashing through tanh, which is why gradients can flow across many time steps.</p>
+      <div class="fill-blank-input">
+        <input type="text" class="fill-blank-field" data-fill-answer="additive" placeholder="Type your answer..." data-fill-correct="false">
+        <button class="fill-blank-check" data-fill-check="4">Check</button>
+      </div>
+      <div class="fill-blank-feedback" data-fill-feedback="4" style="display:none;">
+        <p><strong>Correct answer: additive</strong>. The cell state update C<sub>t</sub> = f<sub>t</sub>⊙C<sub>t-1</sub> + i<sub>t</sub>⊙Ĉ<sub>t</sub> is additive, meaning the gradient ∂C<sub>t</sub>/∂C<sub>t-1</sub> is simply the forget gate — not a product of repeated tanh derivatives.</p>
+      </div>
+    </div>
+
+    <div class="fill-blank-question" data-fill-question="5">
+      <p><strong>5.</strong> A task where a model reads a sequence of words and outputs a single sentiment score is an example of a ________-to-one architecture.</p>
+      <div class="fill-blank-input">
+        <input type="text" class="fill-blank-field" data-fill-answer="many" placeholder="Type your answer..." data-fill-correct="false">
+        <button class="fill-blank-check" data-fill-check="5">Check</button>
+      </div>
+      <div class="fill-blank-feedback" data-fill-feedback="5" style="display:none;">
+        <p><strong>Correct answer: many</strong>. Many-to-one: multiple input elements (words in a sentence) produce a single output (sentiment score). The final hidden state h<sub>T</sub> is used as the summary.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="recap-box" style="margin-top:2em;">
+    <h4>Scenario Question</h4>
+    <p><strong>You are building a model to predict tomorrow's stock price based on the last 30 days of daily closing prices. What type of sequence task shape is this, and which architecture would you choose?</strong></p>
+    <details class="collapsible">
+      <summary>Click to reveal answer</summary>
+      <div style="padding-top:0.5em;">
+        <p><strong>Task shape:</strong> Many-to-one. You have 30 input values (many) and produce 1 output (single price).</p>
+        <p><strong>Architecture choice:</strong> Start with a <strong>GRU or LSTM</strong>. A vanilla RNN would struggle because stock prices from 25+ days ago may still be relevant (e.g., trend information), and the vanishing gradient would prevent the model from learning those long-range patterns. An LSTM's cell state can preserve trend information across all 30 days. A GRU would also work well with fewer parameters and faster training.</p>
+        <p><strong>Why not a Transformer?</strong> For a 30-step sequence with limited training data, an LSTM/GRU is more data-efficient and less likely to overfit than a Transformer, which needs more data to learn attention patterns effectively.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+</main>
+
+<script src="script.js"></script>
+<script>
+// Collapsible sections
+document.querySelectorAll('.collapsible summary').forEach(function(summary) {
+  summary.addEventListener('click', function() {
+    this.parentElement.classList.toggle('open');
+  });
+});
+
+// Flashcard flipping
+document.querySelectorAll('[data-flashcard]').forEach(function(card) {
+  card.addEventListener('click', function() {
+    this.classList.toggle('flipped');
+  });
+});
+
+// Quiz logic
+document.querySelectorAll('.quiz-option').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var question = this.closest('[data-quiz-question]');
+    var qNum = question.getAttribute('data-quiz-question');
+    var options = question.querySelectorAll('.quiz-option');
+    var feedback = question.querySelector('[data-quiz-feedback]');
+
+    // Determine correct answer (index 1 = option b for Q1, index 1 = b for Q2, etc.)
+    var correctMap = {1:'b', 2:'b', 3:'c', 4:'a', 5:'d', 6:'b', 7:'c'};
+    var correctAnswer = correctMap[qNum];
+    var selected = this.getAttribute('data-quiz-option');
+
+    options.forEach(function(o) { o.disabled = true; });
+
+    if (selected === correctAnswer) {
+      this.classList.add('correct');
+    } else {
+      this.classList.add('incorrect');
+      // highlight the correct one
+      options.forEach(function(o) {
+        if (o.getAttribute('data-quiz-option') === correctAnswer) {
+          o.classList.add('correct');
+        }
+      });
+    }
+    feedback.style.display = 'block';
+  });
+});
+
+// Fill in the blanks
+document.querySelectorAll('.fill-blank-check').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var q = this.closest('[data-fill-question]');
+    var qNum = q.getAttribute('data-fill-question');
+    var input = q.querySelector('.fill-blank-field');
+    var feedback = q.querySelector('[data-fill-feedback]');
+    var answer = input.getAttribute('data-fill-answer').toLowerCase().trim();
+    var userAnswer = input.value.toLowerCase().trim();
+
+    if (userAnswer === answer) {
+      input.classList.add('correct');
+      input.classList.remove('incorrect');
+      feedback.innerHTML = '<p style="color:var(--success);"><strong>Correct!</strong> ' + feedback.innerHTML.replace(/<[^>]*>/g, '').substring(0) + '</p>';
+    } else {
+      input.classList.add('incorrect');
+      input.classList.remove('correct');
+    }
+    feedback.style.display = 'block';
+  });
+});
+
+// Progress tracking
+(function() {
+  var sections = document.querySelectorAll('[data-progress-section]');
+  var progressBar = document.getElementById('progressBar');
+  var progressText = document.getElementById('progressText');
+  var sidebarLinks = document.querySelectorAll('.sidebar-link');
+  var totalSections = sections.length;
+
+  function updateProgress() {
+    var scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    var windowHeight = window.innerHeight;
+    var docHeight = document.documentElement.scrollHeight;
+    var scrolled = scrollTop / (docHeight - windowHeight);
+    var pct = Math.min(100, Math.round(scrolled * 100));
+    progressBar.style.width = pct + '%';
+    progressText.textContent = pct + '%';
+
+    // Determine active section
+    var activeIndex = 0;
+    sections.forEach(function(sec, i) {
+      var rect = sec.getBoundingClientRect();
+      if (rect.top <= windowHeight * 0.4) {
+        activeIndex = i;
+      }
+    });
+
+    sidebarLinks.forEach(function(link) {
+      link.classList.remove('active');
+    });
+    if (sidebarLinks[activeIndex]) {
+      sidebarLinks[activeIndex].classList.add('active');
+    }
+  }
+
+  window.addEventListener('scroll', updateProgress);
+  updateProgress();
+})();
+
+// Theme toggle
+(function() {
+  var toggle = document.getElementById('themeToggle');
+  var body = document.body;
+  toggle.addEventListener('click', function() {
+    if (body.getAttribute('data-theme') === 'dark') {
+      body.removeAttribute('data-theme');
+      toggle.textContent = 'Dark';
+    } else {
+      body.setAttribute('data-theme', 'dark');
+      toggle.textContent = 'Light';
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
