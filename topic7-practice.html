@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Topic 7 Exam Prep — Subjective Questions</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="practice-page">
+
+  <div class="top-nav">
+    <a href="index.html" class="logo">&#8592; TTTC2453 ML Hub</a>
+    <div class="nav-links">
+      <a href="index.html">All Topics</a>
+      <a href="topic7.html">Topic 7 Notes</a>
+    </div>
+  </div>
+
+  <button class="theme-toggle" id="themeToggle">
+    <span class="icon">&#9728;</span>
+    <span class="label-text">Toggle Theme</span>
+  </button>
+
+  <div class="practice-header">
+    <h1>Topic 7 — Subjective Practice</h1>
+    <p class="subtitle">12 worked questions covering Neural Networks, Forward Pass, Backpropagation, Weight Updates, and the Complete Training Loop. Full step-by-step solutions.</p>
+  </div>
+
+  <div class="practice-container">
+
+    <!-- ============================================================ -->
+    <!-- EASY QUESTIONS Q1–Q3                                         -->
+    <!-- ============================================================ -->
+
+    <!-- Q1 -->
+    <div class="subjective-question">
+      <div class="q-number">Question 1</div>
+      <div class="q-difficulty easy">Easy</div>
+      <div class="q-text">Explain why a linear model cannot solve the XOR problem. Give a concrete example.</div>
+      <div class="q-formula">Linear model: ŷ = w₁x₁ + w₂x₂ + b &nbsp;→&nbsp; Decision boundary is a straight line</div>
+      <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+      <div class="solution-content">
+        <div class="solution-steps">
+
+          <h4>Step 1: Write the XOR truth table</h4>
+          <div class="solution-step">
+            <div class="step-label">Define XOR inputs and outputs</div>
+            <span class="step-math">
+              | x₁ | x₂ | y (XOR) |
+              |----|----|---------|
+              |  0 |  0 |    0    |
+              |  0 |  1 |    1    |
+              |  1 |  0 |    1    |
+              |  1 |  1 |    0    |
+            </span>
+            <div class="step-explain">XOR outputs 1 when inputs differ, and 0 when inputs are the same.</div>
+          </div>
+
+          <h4>Step 2: What a linear model tries to do</h4>
+          <div class="solution-step">
+            <div class="step-label">Decision boundary</div>
+            <span class="step-math">ŷ = w₁x₁ + w₂x₂ + b</span>
+            <div class="step-explain">A linear classifier draws a single straight line in the (x₁, x₂) plane. Points on one side are classified as 0, points on the other side as 1. The decision boundary is the line w₁x₁ + w₂x₂ + b = 0.</div>
+          </div>
+
+          <h4>Step 3: Attempt to separate the classes</h4>
+          <div class="solution-step">
+            <div class="step-label">Classification requirements</div>
+            <span class="step-math">
+              Class 0: (0,0) and (1,1) — same side of the line<br>
+              Class 1: (0,1) and (1,0) — opposite side of the line
+            </span>
+            <div class="step-explain">We need a line such that (0,0) and (1,1) fall on one side, while (0,1) and (1,0) fall on the other side.</div>
+          </div>
+
+          <h4>Step 4: Prove no such line exists</h4>
+          <div class="solution-step">
+            <div class="step-label">Algebraic proof</div>
+            <span class="step-math">
+              For correct classification we need:<br>
+              (i) &nbsp;w₁(0) + w₂(1) + b > 0 &nbsp;⟹&nbsp; w₂ + b > 0 &nbsp;&nbsp;[classify (0,1) as 1]<br>
+              (ii) w₁(1) + w₂(0) + b > 0 &nbsp;⟹&nbsp; w₁ + b > 0 &nbsp;&nbsp;[classify (1,0) as 1]<br>
+              (iii) w₁(0) + w₂(0) + b ≤ 0 &nbsp;⟹&nbsp; b ≤ 0 &nbsp;&nbsp;[classify (0,0) as 0]<br>
+              (iv) w₁(1) + w₂(1) + b ≤ 0 &nbsp;⟹&nbsp; w₁ + w₂ + b ≤ 0 &nbsp;&nbsp;[classify (1,1) as 0]<br><br>
+              From (i): b > −w₂. &nbsp; From (ii): b > −w₁.<br>
+              From (iii): b ≤ 0.<br>
+              Adding (i) and (ii): w₁ + w₂ + 2b > 0 &nbsp;⟹&nbsp; w₁ + w₂ + b > −b ≥ 0 (since b ≤ 0, −b ≥ 0)<br>
+              But (iv) requires w₁ + w₂ + b ≤ 0.<br>
+              CONTRADICTION! w₁ + w₂ + b > 0 AND w₁ + w₂ + b ≤ 0 cannot both hold.
+            </span>
+            <div class="step-explain">No assignment of w₁, w₂, b can satisfy all four inequalities simultaneously. The four XOR points are not linearly separable.</div>
+          </div>
+
+          <h4>Step 5: Geometric intuition</h4>
+          <div class="solution-step">
+            <div class="step-label">Visual reasoning</div>
+            <span class="step-math">
+              Plot all 4 points on a 2D plane:<br>
+              (0,0) = class 0, (0,1) = class 1, (1,0) = class 1, (1,1) = class 0<br><br>
+              These points form a square with diagonal pairs in the same class.<br>
+              No straight line can separate the diagonals.
+            </span>
+            <div class="step-explain">The two class-0 points are at diagonally opposite corners, and so are the two class-1 points. A straight line can only separate points that are on opposite sides of a line — but here the same-class points are on opposite sides of any candidate line.</div>
+          </div>
+
+          <div class="solution-final">&#10003; A linear model produces a straight-line decision boundary. XOR requires a non-linear boundary (e.g., a network with a hidden layer). Therefore, no linear model can solve XOR.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="subjective-question">
+      <div class="q-number">Question 2</div>
+      <div class="q-difficulty easy">Easy</div>
+      <div class="q-text">Describe the architecture of an MLP with 3 input features, 2 hidden layers (4 neurons each), and 1 output. Calculate the total number of weights and biases.</div>
+      <div class="q-formula">Params between layers = (n_prev × n_curr) weights + n_curr biases</div>
+      <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+      <div class="solution-content">
+        <div class="solution-steps">
+
+          <h4>Step 1: Draw the architecture</h4>
+          <div class="solution-step">
+            <div class="step-label">Network diagram</div>
+            <span class="step-math">
+              Input Layer (3 neurons: x₁, x₂, x₃)<br>
+                    ↓<br>
+              Hidden Layer 1 (4 neurons: h₁⁽¹⁾, h₂⁽¹⁾, h₃⁽¹⁾, h₄⁽¹⁾)<br>
+                    ↓<br>
+              Hidden Layer 2 (4 neurons: h₁⁽²⁾, h₂⁽²⁾, h₃⁽²⁾, h₄⁽²⁾)<br>
+                    ↓<br>
+              Output Layer (1 neuron: ŷ)
+            </span>
+            <div class="step-explain">Each arrow represents a weight. Each neuron in a layer receives a weighted sum from every neuron in the previous layer, plus a bias.</div>
+          </div>
+
+          <h4>Step 2: Layer 1 — Input → Hidden 1</h4>
+          <div class="solution-step">
+            <div class="step-label">Count parameters</div>
+            <span class="step-math">
+              W⁽¹⁾ is a 4 × 3 matrix (4 neurons × 3 inputs)<br>
+              Weights: 4 × 3 = 12<br>
+              Biases: 4 (one per hidden neuron)<br>
+              Subtotal: 12 + 4 = 16
+            </span>
+            <div class="step-explain">Each of the 4 hidden neurons has a weight for each of the 3 inputs, plus its own bias term.</div>
+          </div>
+
+          <h4>Step 3: Layer 2 — Hidden 1 → Hidden 2</h4>
+          <div class="solution-step">
+            <div class="step-label">Count parameters</div>
+            <span class="step-math">
+              W⁽²⁾ is a 4 × 4 matrix (4 neurons × 4 inputs from previous layer)<br>
+              Weights: 4 × 4 = 16<br>
+              Biases: 4 (one per hidden neuron)<br>
+              Subtotal: 16 + 4 = 20
+            </span>
+            <div class="step-explain">Each of the 4 neurons in Hidden Layer 2 connects to all 4 neurons in Hidden Layer 1, plus has a bias.</div>
+          </div>
+
+          <h4>Step 4: Layer 3 — Hidden 2 → Output</h4>
+          <div class="solution-step">
+            <div class="step-label">Count parameters</div>
+            <span class="step-math">
+              W⁽³⁾ is a 1 × 4 matrix (1 neuron × 4 inputs from previous layer)<br>
+              Weights: 1 × 4 = 4<br>
+              Biases: 1 (one for the output neuron)<br>
+              Subtotal: 4 + 1 = 5
+            </span>
+            <div class="step-explain">The single output neuron connects to all 4 neurons in Hidden Layer 2, plus has one bias.</div>
+          </div>
+
+          <h4>Step 5: Compute grand total</h4>
+          <div class="solution-step">
+            <div class="step-label">Sum all layers</div>
+            <span class="step-math">
+              Total weights = 12 + 16 + 4 = 32<br>
+              Total biases &nbsp;= 4 + 4 + 1 = 9<br>
+              ─────────────────────────────<br>
+              Total parameters = 32 + 9 = 41
+            </span>
+            <div class="step-explain">The network has 41 learnable parameters in total.</div>
+          </div>
+
+          <div class="solution-final">&#10003; Total weights = 32, total biases = 9, total parameters = 41.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="subjective-question">
+      <div class="q-number">Question 3</div>
+      <div class="q-difficulty easy">Easy</div>
+      <div class="q-text">State the sigmoid function and its derivative. Why is the derivative formula useful for backpropagation?</div>
+      <div class="q-formula">σ(z) = 1/(1 + e<sup>−z</sup>) &nbsp;&nbsp;&nbsp; σ'(z) = σ(z) × (1 − σ(z))</div>
+      <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+      <div class="solution-content">
+        <div class="solution-steps">
+
+          <h4>Step 1: State the sigmoid function</h4>
+          <div class="solution-step">
+            <div class="step-label">Definition</div>
+            <span class="step-math">σ(z) = 1 / (1 + e<sup>−z</sup>)</span>
+            <div class="step-explain">The sigmoid function maps any real number z to a value between 0 and 1, making it useful as an activation function for binary classification.</div>
+          </div>
+
+          <h4>Step 2: Derive the derivative</h4>
+          <div class="solution-step">
+            <div class="step-label">Calculus derivation</div>
+            <span class="step-math">
+              Let σ = 1/(1 + e<sup>−z</sup>)<br><br>
+              dσ/dz = d/dz [ (1 + e<sup>−z</sup>)<sup>−1</sup> ]<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= −1 × (1 + e<sup>−z</sup>)<sup>−2</sup> × (−e<sup>−z</sup>)<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= e<sup>−z</sup> / (1 + e<sup>−z</sup>)²<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= [1/(1 + e<sup>−z</sup>)] × [e<sup>−z</sup>/(1 + e<sup>−z</sup>)]<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= σ(z) × [e<sup>−z</sup>/(1 + e<sup>−z</sup>)]<br><br>
+              Note: e<sup>−z</sup>/(1 + e<sup>−z</sup>) = 1 − 1/(1 + e<sup>−z</sup>) = 1 − σ(z)<br><br>
+              ∴ σ'(z) = σ(z) × (1 − σ(z))
+            </span>
+            <div class="step-explain">The derivative of the sigmoid is beautifully simple: it equals the output times (1 minus the output).</div>
+          </div>
+
+          <h4>Step 3: Show the derivative graph property</h4>
+          <div class="solution-step">
+            <div class="step-label">Maximum value</div>
+            <span class="step-math">
+              σ'(z) = σ(z)(1 − σ(z))<br>
+              Maximum when σ(z) = 0.5 (i.e., z = 0):<br>
+              σ'(0) = 0.5 × 0.5 = 0.25 (maximum value)<br><br>
+              As |z| → ∞: σ(z) → 1 or 0, so σ'(z) → 0
+            </span>
+            <div class="step-explain">The sigmoid derivative is largest at z = 0 and approaches 0 for large |z|. This maximum of 0.25 is important for understanding vanishing gradients.</div>
+          </div>
+
+          <h4>Step 4: Why it is useful for backpropagation</h4>
+          <div class="solution-step">
+            <div class="step-label">Computational efficiency</div>
+            <span class="step-math">
+              During forward pass: we compute a = σ(z) and store it.<br>
+              During backward pass: we need σ'(z).<br>
+              Instead of recomputing e<sup>−z</sup> etc., we simply compute:<br>
+              σ'(z) = a × (1 − a) &nbsp;&nbsp;using the already-stored a.
+            </span>
+            <div class="step-explain">The formula σ'(z) = σ(z)(1 − σ(z)) means we reuse the forward pass output. No need to recompute exponentials — just one multiplication and one subtraction. This makes backpropagation through sigmoid layers very efficient.</div>
+          </div>
+
+          <div class="solution-final">&#10003; σ(z) = 1/(1+e<sup>−z</sup>), σ'(z) = σ(z)(1−σ(z)). The derivative reuses the forward-pass output a, avoiding expensive recomputation.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MEDIUM QUESTIONS Q4–Q8                                       -->
+    <!-- ============================================================ -->
+
+    <!-- Q4 -->
+    <div class="subjective-question">
+      <div class="q-number">Question 4</div>
+      <div class="q-difficulty medium">Medium</div>
+      <div class="q-text">Perform a complete forward pass for a network with: x₁=0.6, x₂=0.4; hidden weights w₁₁=0.2, w₁₂=0.3, w₂₁=0.4, w₂₂=0.1; hidden biases b₁=0.15, b₂=0.10; output weights w₁=0.6, w₂=0.4; output bias b₃=0.25. Use sigmoid activation. Target y=1. Compute the loss using L=½(ŷ−y)².</div>
+      <div class="q-formula">
+        z = Σwᵢxᵢ + b &nbsp;&nbsp;&nbsp; σ(z) = 1/(1+e<sup>−z</sup>) &nbsp;&nbsp;&nbsp; L = ½(ŷ − y)²
+      </div>
+      <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+      <div class="solution-content">
+        <div class="solution-steps">
+
+          <h4>Step 1: Compute hidden neuron 1 pre-activation z₁</h4>
+          <div class="solution-step">
+            <div class="step-label">Weighted sum + bias</div>
+            <span class="step-math">
+              z₁ = w₁₁·x₁ + w₁₂·x₂ + b₁<br>
+              z₁ = (0.2)(0.6) + (0.3)(0.4) + 0.15<br>
+              z₁ = 0.12 + 0.12 + 0.15<br>
+              z₁ = 0.39
+            </span>
+            <div class="step-explain">Multiply each input by its corresponding weight and add the bias.</div>
+          </div>
+
+          <h4>Step 2: Compute hidden neuron 1 activation h₁</h4>
+          <div class="solution-step">
+            <div class="step-label">Apply sigmoid</div>
+            <span class="step-math">
+              h₁ = σ(z₁) = σ(0.39) = 1/(1 + e<sup>−0.39</sup>)<br>
+              e<sup>−0.39</sup> = 0.6771<br>
+              h₁ = 1/(1 + 0.6771) = 1/1.6771<br>
+              h₁ = 0.5963
+            </span>
+            <div class="step-explain">Apply the sigmoid activation function to the pre-activation value.</div>
+          </div>
+
+          <h4>Step 3: Compute hidden neuron 2 pre-activation z₂</h4>
+          <div class="solution-step">
+            <div class="step-label">Weighted sum + bias</div>
+            <span class="step-math">
+              z₂ = w₂₁·x₁ + w₂₂·x₂ + b₂<br>
+              z₂ = (0.4)(0.6) + (0.1)(0.4) + 0.10<br>
+              z₂ = 0.24 + 0.04 + 0.10<br>
+              z₂ = 0.38
+            </span>
+            <div class="step-explain">Same process for the second hidden neuron with its own weights and bias.</div>
+          </div>
+
+          <h4>Step 4: Compute hidden neuron 2 activation h₂</h4>
+          <div class="solution-step">
+            <div class="step-label">Apply sigmoid</div>
+            <span class="step-math">
+              h₂ = σ(z₂) = σ(0.38) = 1/(1 + e<sup>−0.38</sup>)<br>
+              e<sup>−0.38</sup> = 0.6839<br>
+              h₂ = 1/(1 + 0.6839) = 1/1.6839<br>
+              h₂ = 0.5939
+            </span>
+            <div class="step-explain">Apply sigmoid to get the activation of the second hidden neuron.</div>
+          </div>
+
+          <h4>Step 5: Compute output neuron pre-activation z₃</h4>
+          <div class="solution-step">
+            <div class="step-label">Weighted sum + bias</div>
+            <span class="step-math">
+              z₃ = w₁·h₁ + w₂·h₂ + b₃<br>
+              z₃ = (0.6)(0.5963) + (0.4)(0.5939) + 0.25<br>
+              z₃ = 0.3578 + 0.2376 + 0.25<br>
+              z₃ = 0.8454
+            </span>
+            <div class="step-explain">The output neuron receives weighted hidden activations plus its bias.</div>
+          </div>
+
+          <h4>Step 6: Compute output activation ŷ</h4>
+          <div class="solution-step">
+            <div class="step-label">Apply sigmoid</div>
+            <span class="step-math">
+              ŷ = σ(z₃) = σ(0.8454) = 1/(1 + e<sup>−0.8454</sup>)<br>
+              e<sup>−0.8454</sup> = 0.4293<br>
+              ŷ = 1/(1 + 0.4293) = 1/1.4293<br>
+              ŷ = 0.6996
+            </span>
+            <div class="step-explain">The network predicts ŷ = 0.6996. Since the target is y = 1, the model is underestimating.</div>
+          </div>
+
+          <h4>Step 7: Compute the loss</h4>
+          <div class="solution-step">
+            <div class="step-label">MSE loss for single sample</div>
+            <span class="step-math">
+              L = ½(ŷ − y)²<br>
+              L = ½(0.6996 − 1)²<br>
+              L = ½(−0.3004)²<br>
+              L = ½ × 0.09024<br>
+              L = 0.04512
+            </span>
+            <div class="step-explain">The loss measures how far the prediction is from the target. L = 0.04512 will be reduced by backpropagation.</div>
+          </div>
+
+          <div class="solution-final">&#10003; Forward pass complete: h₁=0.5963, h₂=0.5939, ŷ=0.6996, Loss L=0.04512</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="subjective-question">
+      <div class="q-number">Question 5</div>
+      <div class="q-difficulty medium">Medium</div>
+      <div class="q-text">Using the forward pass from Q4, compute the output layer error δ_out and all output layer weight gradients.</div>
+      <div class="q-formula">
+        δ_out = (ŷ − y) × σ'(z₃) = (ŷ − y) × ŷ × (1 − ŷ)<br>
+        ∂L/∂w = δ_out × a_prev &nbsp;&nbsp;&nbsp; ∂L/∂b = δ_out
+      </div>
+      <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+      <div class="solution-content">
+        <div class="solution-steps">
+
+          <h4>Step 1: Recall values from Q4</h4>
+          <div class="solution-step">
+            <div class="step-label">Key values</div>
+            <span class="step-math">
+              ŷ = 0.6996, &nbsp; y = 1, &nbsp; z₃ = 0.8454<br>
+              h₁ = 0.5963, &nbsp; h₂ = 0.5939<br>
+              w₁ = 0.6, &nbsp; w₂ = 0.4, &nbsp; b₃ = 0.25
+            </span>
+            <div class="step-explain">We will use these stored values for all gradient computations.</div>
+          </div>
+
+          <h4>Step 2: Compute σ'(z₃)</h4>
+          <div class="solution-step">
+            <div class="step-label">Sigmoid derivative at output</div>
+            <span class="step-math">
+              σ'(z₃) = ŷ × (1 − ŷ)<br>
+              σ'(z₃) = 0.6996 × (1 − 0.6996)<br>
+              σ'(z₃) = 0.6996 × 0.3004<br>
+              σ'(z₃) = 0.2102
+            </span>
+            <div class="step-explain">Using the efficient formula: derivative = output × (1 − output).</div>
+          </div>
+
+          <h4>Step 3: Compute output error δ_out</h4>
+          <div class="solution-step">
+            <div class="step-label">Error signal at output</div>
+            <span class="step-math">
+              δ_out = (ŷ − y) × σ'(z₃)<br>
+              δ_out = (0.6996 − 1) × 0.2102<br>
+              δ_out = (−0.3004) × 0.2102<br>
+              δ_out = −0.06314
+            </span>
+            <div class="step-explain">The negative δ indicates we need to increase the output (pull toward y=1).</div>
+          </div>
+
+          <h4>Step 4: Compute ∂L/∂w₁ (gradient for output weight w₁)</h4>
+          <div class="solution-step">
+            <div class="step-label">Chain rule application</div>
+            <span class="step-math">
+              ∂L/∂w₁ = δ_out × h₁<br>
+              ∂L/∂w₁ = (−0.06314) × 0.5963<br>
+              ∂L/∂w₁ = −0.03765
+            </span>
+            <div class="step-explain">The gradient of the loss w.r.t. output weight w₁ is the error signal times the hidden activation that feeds into it.</div>
+          </div>
+
+          <h4>Step 5: Compute ∂L/∂w₂ (gradient for output weight w₂)</h4>
+          <div class="solution-step">
+            <div class="step-label">Chain rule application</div>
+            <span class="step-math">
+              ∂L/∂w₂ = δ_out × h₂<br>
+              ∂L/∂w₂ = (−0.06314) × 0.5939<br>
+              ∂L/∂w₂ = −0.03750
+            </span>
+            <div class="step-explain">Same formula, using h₂ instead of h₁.</div>
+          </div>
+
+          <h4>Step 6: Compute ∂L/∂b₃ (gradient for output bias)</h4>
+          <div class="solution-step">
+            <div class="step-label">Bias gradient</div>
+            <span class="step-math">
+              ∂L/∂b₃ = δ_out<br>
+              ∂L/∂b₃ = −0.06314
+            </span>
+            <div class="step-explain">The bias gradient equals the error signal directly, since ∂z₃/∂b₃ = 1.</div>
+          </div>
+
+          <div class="solution-final">&#10003; δ_out = −0.06314; ∂L/∂w₁ = −0.03765; ∂L/∂w₂ = −0.03750; ∂L/∂b₃ = −0.06314</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="subjective-question">
+      <div class="q-number">Question 6</div>
+      <div class="q-difficulty medium">Medium</div>
+      <div class="q-text">Using Q4–Q5 values, compute hidden layer error signals and all hidden layer weight gradients.</div>
+      <div class="q-formula">
+        δ_h = w_output × δ_out × σ'(z_hidden)<br>
+        ∂L/∂w_input = δ_h × x_input &nbsp;&nbsp;&nbsp; ∂L/∂b = δ_h
+      </div>
+      <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+      <div class="solution-content">
+        <div class="solution-steps">
+
+          <h4>Step 1: Compute σ'(z₁) for hidden neuron 1</h4>
+          <div class="solution-step">
+            <div class="step-label">Sigmoid derivative at hidden neuron 1</div>
+            <span class="step-math">
+              σ'(z₁) = h₁ × (1 − h₁)<br>
+              σ'(z₁) = 0.5963 × (1 − 0.5963)<br>
+              σ'(z₁) = 0.5963 × 0.4037<br>
+              σ'(z₁) = 0.2407
+            </span>
+            <div class="step-explain">Compute the derivative of the sigmoid at hidden neuron 1's pre-activation.</div>
+          </div>
+
+          <h4>Step 2: Compute σ'(z₂) for hidden neuron 2</h4>
+          <div class="solution-step">
+            <div class="step-label">Sigmoid derivative at hidden neuron 2</div>
+            <span class="step-math">
+              σ'(z₂) = h₂ × (1 − h₂)<br>
+              σ'(z₂) = 0.5939 × (1 − 0.5939)<br>
+              σ'(z₂) = 0.5939 × 0.4061<br>
+              σ'(z₂) = 0.2412
+            </span>
+            <div class="step-explain">Same computation for the second hidden neuron.</div>
+          </div>
+
+          <h4>Step 3: Compute δ_h₁ (error signal for hidden neuron 1)</h4>
+          <div class="solution-step">
+            <div class="step-label">Backpropagate error through w₁</div>
+            <span class="step-math">
+              δ_h₁ = w₁ × δ_out × σ'(z₁)<br>
+              δ_h₁ = 0.6 × (−0.06314) × 0.2407<br>
+              δ_h₁ = (−0.03788) × 0.2407<br>
+              δ_h₁ = −0.009114
+            </span>
+            <div class="step-explain">The error at hidden neuron 1 is the output error scaled by the connecting weight and the local derivative.</div>
+          </div>
+
+          <h4>Step 4: Compute δ_h₂ (error signal for hidden neuron 2)</h4>
+          <div class="solution-step">
+            <div class="step-label">Backpropagate error through w₂</div>
+            <span class="step-math">
+              δ_h₂ = w₂ × δ_out × σ'(z₂)<br>
+              δ_h₂ = 0.4 × (−0.06314) × 0.2412<br>
+              δ_h₂ = (−0.02526) × 0.2412<br>
+              δ_h₂ = −0.006095
+            </span>
+            <div class="step-explain">Same formula, using w₂ and σ'(z₂).</div>
+          </div>
+
+          <h4>Step 5: Compute ∂L/∂w₁₁ (input→hidden1, neuron 1)</h4>
+          <div class="solution-step">
+            <div class="step-label">Input weight gradient</div>
+            <span class="step-math">
+              ∂L/∂w₁₁ = δ_h₁ × x₁<br>
+              ∂L/∂w₁₁ = (−0.009114) × 0.6<br>
+              ∂L/∂w₁₁ = −0.005468
+            </span>
+            <div class="step-explain">Gradient for the weight connecting input x₁ to hidden neuron 1.</div>
+          </div>
+
+          <h4>Step 6: Compute ∂L/∂w₁₂ (input→hidden1, neuron 2 input)</h4>
+          <div class="solution-step">
+            <div class="step-label">Input weight gradient</div>
+            <span class="step-math">
+              ∂L/∂w₁₂ = δ_h₁ × x₂<br>
+              ∂L/∂w₁₂ = (−0.009114) × 0.4<br>
+              ∂L/∂w₁₂ = −0.003646
+            </span>
+            <div class="step-explain">Gradient for the weight connecting input x₂ to hidden neuron 1.</div>
+          </div>
+
+          <h4>Step 7: Compute ∂L/∂w₂₁ (input→hidden2, neuron 1 input)</h4>
+          <div class="solution-step">
+            <div class="step-label">Input weight gradient</div>
+            <span class="step-math">
+              ∂L/∂w₂₁ = δ_h₂ × x₁<br>
+              ∂L/∂w₂₁ = (−0.006095) × 0.6<br>
+              ∂L/∂w₂₁ = −0.003657
+            </span>
+            <div class="step-explain">Gradient for the weight connecting input x₁ to hidden neuron 2.</div>
+          </div>
+
+          <h4>Step 8: Compute ∂L/∂w₂₂ (input→hidden2, neuron 2 input)</h4>
+          <div class="solution-step">
+            <div class="step-label">Input weight gradient</div>
+            <span class="step-math">
+              ∂L/∂w₂₂ = δ_h₂ × x₂<br>
+              ∂L/∂w₂₂ = (−0.006095) × 0.4<br>
+              ∂L/∂w₂₂ = −0.002438
+            </span>
+            <div class="step-explain">Gradient for the weight connecting input x₂ to hidden neuron 2.</div>
+          </div>
+
+          <h4>Step 9: Compute bias gradients ∂L/∂b₁ and ∂L/∂b₂</h4>
+          <div class="solution-step">
+            <div class="step-label">Bias gradients equal error signals</div>
+            <span class="step-math">
+              ∂L/∂b₁ = δ_h₁ = −0.009114<br>
+              ∂L/∂b₂ = δ_h₂ = −0.006095
+            </span>
+            <div class="step-explain">Bias gradients equal the error signal at their respective neurons.</div>
+          </div>
+
+          <div class="solution-final">&#10003; δ_h₁ = −0.009114, δ_h₂ = −0.006095; all 6 weight gradients + 2 bias gradients computed above.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="subjective-question">
+      <div class="q-number">Question 7</div>
+      <div class="q-difficulty medium">Medium</div>
+      <div class="q-text">Apply one gradient descent step with η=0.5 to all parameters from Q4–Q6. Verify by re-running the forward pass and confirming loss decreased.</div>
+      <div class="q-formula">w_new = w_old − η × ∂L/∂w &nbsp;&nbsp;&nbsp; b_new = b_old − η × ∂L/∂b</div>
+      <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+      <div class="solution-content">
+        <div class="solution-steps">
+
+          <h4>Step 1: Update hidden layer weights</h4>
+          <div class="solution-step">
+            <div class="step-label">Gradient descent on input→hidden weights</div>
+            <span class="step-math">
+              w₁₁_new = 0.2 − 0.5 × (−0.005468) = 0.2 + 0.002734 = 0.20273<br>
+              w₁₂_new = 0.3 − 0.5 × (−0.003646) = 0.3 + 0.001823 = 0.30182<br>
+              w₂₁_new = 0.4 − 0.5 × (−0.003657) = 0.4 + 0.001829 = 0.40183<br>
+              w₂₂_new = 0.1 − 0.5 × (−0.002438) = 0.1 + 0.001219 = 0.10122
+            </span>
+            <div class="step-explain">All gradients are negative, so all weights increase (moving in the direction that reduces loss).</div>
+          </div>
+
+          <h4>Step 2: Update hidden layer biases</h4>
+          <div class="solution-step">
+            <div class="step-label">Gradient descent on hidden biases</div>
+            <span class="step-math">
+              b₁_new = 0.15 − 0.5 × (−0.009114) = 0.15 + 0.004557 = 0.15456<br>
+              b₂_new = 0.10 − 0.5 × (−0.006095) = 0.10 + 0.003048 = 0.10305
+            </span>
+            <div class="step-explain">Both biases increase slightly to reduce the loss.</div>
+          </div>
+
+          <h4>Step 3: Update output layer weights</h4>
+          <div class="solution-step">
+            <div class="step-label">Gradient descent on hidden→output weights</div>
+            <span class="step-math">
+              w₁_new = 0.6 − 0.5 × (−0.03765) = 0.6 + 0.018825 = 0.61883<br>
+              w₂_new = 0.4 − 0.5 × (−0.03750) = 0.4 + 0.018750 = 0.41875
+            </span>
+            <div class="step-explain">Output weights get larger adjustments because the gradients are bigger at the output layer.</div>
+          </div>
+
+          <h4>Step 4: Update output bias</h4>
+          <div class="solution-step">
+            <div class="step-label">Gradient descent on output bias</div>
+            <span class="step-math">
+              b₃_new = 0.25 − 0.5 × (−0.06314) = 0.25 + 0.03157 = 0.28157
+            </span>
+            <div class="step-explain">The output bias increases the most because it has the largest gradient.</div>
+          </div>
+
+          <h4>Step 5: Summary of all updated parameters</h4>
+          <div class="solution-step">
+            <div class="step-label">Before → After</div>
+            <span class="step-math">
+              w₁₁: 0.20000 → 0.20273 &nbsp;&nbsp; w₁₂: 0.30000 → 0.30182<br>
+              w₂₁: 0.40000 → 0.40183 &nbsp;&nbsp; w₂₂: 0.10000 → 0.10122<br>
+              b₁: &nbsp;0.15000 → 0.15456 &nbsp;&nbsp; b₂: &nbsp;0.10000 → 0.10305<br>
+              w₁: &nbsp;0.60000 → 0.61883 &nbsp;&nbsp; w₂: &nbsp;0.40000 → 0.41875<br>
+              b₃: &nbsp;0.25000 → 0.28157
+            </span>
+            <div class="step-explain">All parameters updated. Changes are small because η=0.5 and gradients are small.</div>
+          </div>
+
+          <h4>Step 6: Re-run forward pass with new weights</h4>
+          <div class="solution-step">
+            <div class="step-label">Verification forward pass</div>
+            <span class="step-math">
+              z₁_new = 0.20273×0.6 + 0.30182×0.4 + 0.15456<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 0.12164 + 0.12073 + 0.15456 = 0.39693<br>
+              h₁_new = σ(0.39693) = 1/(1+e<sup>−0.39693</sup>) = 1/(1+0.6723) = 1/1.6723 = 0.5980<br><br>
+
+              z₂_new = 0.40183×0.6 + 0.10122×0.4 + 0.10305<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 0.24110 + 0.04049 + 0.10305 = 0.38464<br>
+              h₂_new = σ(0.38464) = 1/(1+e<sup>−0.38464</sup>) = 1/(1+0.6807) = 1/1.6807 = 0.5950<br><br>
+
+              z₃_new = 0.61883×0.5980 + 0.41875×0.5950 + 0.28157<br>
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;= 0.37006 + 0.24916 + 0.28157 = 0.90079<br>
+              ŷ_new = σ(0.90079) = 1/(1+e<sup>−0.90079</sup>) = 1/(1+0.4063) = 1/1.4063 = 0.7111<br><br>
+
+              L_new = ½(0.7111 − 1)² = ½(−0.2889)² = ½ × 0.08347 = 0.04173
+            </span>
+            <div class="step-explain">The new prediction is ŷ = 0.7111 (closer to target y = 1) and loss decreased from 0.04512 to 0.04173.</div>
+          </div>
+
+          <h4>Step 7: Confirm loss decreased</h4>
+          <div class="solution-step">
+            <div class="step-label">Loss comparison</div>
+            <span class="step-math">
+              Before update: L = 0.04512<br>
+              After update: &nbsp;L = 0.04173<br>
+              Reduction: &nbsp;&nbsp;&nbsp;0.04512 − 0.04173 = 0.00339<br>
+              Percentage decrease: (0.00339/0.04512) × 100% = 7.51%
+            </span>
+            <div class="step-explain">The loss decreased by 7.51% in one update step, confirming the gradient descent worked correctly.</div>
+          </div>
+
+          <div class="solution-final">&#10003; After one gradient descent step: loss decreased from 0.04512 to 0.04173 (−7.51%). Update verified.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="subjective-question">
+      <div class="q-number">Question 8</div>
+      <div class="q-difficulty medium">Medium</div>
+      <div class="q-text">Explain the vanishing gradient problem. Why does it happen with sigmoid activations? How does ReLU help?</div>
+      <div class="q-formula">
+        σ'(z) ≤ 0.25 (max at z=0) &nbsp;&nbsp;&nbsp; After L layers: gradient × (0.25)<sup>L</sup><br>
+        ReLU: f(z) = max(0,z), f'(z) = 1 for z &gt; 0
+      </div>
+      <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+      <div class="solution-content">
+        <div class="solution-steps">
+
+          <h4>Step 1: What is the vanishing gradient problem?</h4>
+          <div class="solution-step">
+            <div class="step-label">Definition</div>
+            <span class="step-math">
+              In deep networks, gradients are computed by multiplying many local derivatives<br>
+              during backpropagation (chain rule). If these local derivatives are small (&lt;1),<br>
+              the gradient shrinks exponentially as it propagates to earlier layers.
+            </span>
+            <div class="step-explain">The gradient signal that tells early layers how to update their weights becomes negligibly small, so those layers barely learn.</div>
+          </div>
+
+          <h4>Step 2: Why sigmoid causes vanishing gradients</h4>
+          <div class="solution-step">
+            <div class="step-label">Sigmoid derivative bound</div>
+            <span class="step-math">
+              σ'(z) = σ(z)(1 − σ(z))<br>
+              Maximum value: σ'(0) = 0.5 × 0.5 = 0.25<br><br>
+              So at every layer: |gradient| is multiplied by at most 0.25<br><br>
+              After L layers back to the input:<br>
+              |gradient at layer 1| ≤ |gradient at output| × (0.25)<sup>L</sup>
+            </span>
+            <div class="step-explain">The sigmoid derivative never exceeds 0.25, so each layer reduces the gradient by at least a factor of 4.</div>
+          </div>
+
+          <h4>Step 3: Numerical examples</h4>
+          <div class="solution-step">
+            <div class="step-label">Exponential decay</div>
+            <span class="step-math">
+              L = 2 layers: &nbsp;(0.25)² = 0.0625 &nbsp;&nbsp;&nbsp;(6.25% of original)<br>
+              L = 5 layers: &nbsp;(0.25)⁵ = 0.000977 &nbsp;(0.1% of original)<br>
+              L = 10 layers: (0.25)¹⁰ = 0.000000954 &nbsp;(0.0001% of original)<br>
+              L = 20 layers: (0.25)²⁰ ≈ 9.1 × 10⁻¹³ &nbsp;(essentially zero)
+            </span>
+            <div class="step-explain">After just 10 layers of sigmoid, the gradient is less than one millionth of its original value. Early layers effectively receive no learning signal.</div>
+          </div>
+
+          <h4>Step 4: Consequences of vanishing gradients</h4>
+          <div class="solution-step">
+            <div class="step-label">Practical impact</div>
+            <span class="step-math">
+              1. Early (closer to input) layers learn extremely slowly or not at all<br>
+              2. Training time becomes impractically long<br>
+              3. Deep sigmoid networks often perform no better than shallow ones<br>
+              4. Network effectively ignores the depth advantage
+            </span>
+            <div class="step-explain">Even though we add more layers, the network can't use them because early layers can't learn meaningful features.</div>
+          </div>
+
+          <h4>Step 5: How ReLU helps</h4>
+          <div class="solution-step">
+            <div class="step-label">ReLU activation</div>
+            <span class="step-math">
+              ReLU: f(z) = max(0, z)<br>
+              f'(z) = 1 for z &gt; 0 (active neuron)<br>
+              f'(z) = 0 for z ≤ 0 (inactive neuron)<br><br>
+              For active neurons: gradient × 1 = gradient (no shrinking!)<br><br>
+              Through L active layers: gradient × 1<sup>L</sup> = gradient (unchanged)
+            </span>
+            <div class="step-explain">ReLU has a derivative of exactly 1 for positive inputs — no multiplicative shrinking occurs for active neurons. The gradient can flow unchanged through arbitrarily deep networks.</div>
+          </div>
+
+          <h4>Step 6: ReLU caveat — dead neurons</h4>
+          <div class="solution-step">
+            <div class="step-label">Dead ReLU problem</div>
+            <span class="step-math">
+              If z ≤ 0 for a neuron, f'(z) = 0 → gradient = 0<br>
+              This neuron can never recover (no gradient to update its weights)<br>
+              It becomes permanently "dead"<br><br>
+              Mitigation: Leaky ReLU: f(z) = max(0.01z, z), f'(z) = 0.01 for z ≤ 0
+            </span>
+            <div class="step-explain">While ReLU solves vanishing gradients, it can cause dead neurons. Leaky ReLU or careful initialization helps prevent this.</div>
+          </div>
+
+          <div class="solution-final">&#10003; Vanishing gradients: sigmoid's σ'(z) ≤ 0.25 causes exponential gradient decay through layers. ReLU fixes this with f'(z) = 1 for active neurons, preventing gradient shrinkage.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- HARD QUESTIONS Q9–Q12                                       -->
+    <!-- ============================================================ -->
+
+    <!-- Q9 -->
+    <div class="subjective-question">
+      <div class="q-number">Question 9</div>
+      <div class="q-difficulty hard">Hard</div>
+      <div class="q-text">Write out the complete 6-step backpropagation recipe. For each step, state the formula and explain what it computes.</div>
+      <div class="q-formula">
+        δ⁽ᴸ⁾ = ∂L/∂a⁽ᴸ⁾ · φ'(z⁽ᴸ⁾) &nbsp;&nbsp;&nbsp; δ⁽ˡ⁾ = (W⁽ˡ⁺¹⁾)ᵀ · δ⁽ˡ⁺¹⁾ ⊙ φ'(z⁽ˡ⁾)
+      </div>
+      <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+      <div class="solution-content">
+        <div class="solution-steps">
+
+          <h4>Step 1: Forward Pass</h4>
+          <div class="solution-step">
+            <div class="step-label">Compute activations layer by layer</div>
+            <span class="step-math">
+              For each layer l = 1, 2, ..., L:<br>
+              z⁽ˡ⁾ = W⁽ˡ⁾ · a⁽ˡ⁻¹⁾ + b⁽ˡ⁾<br>
+              a⁽ˡ⁾ = φ(z⁽ˡ⁾)<br><br>
+              Where a⁽⁰⁾ = x (the input) and a⁽ᴸ⁾ = ŷ (the prediction)<br>
+              Store all z⁽ˡ⁾ and a⁽ˡ⁾ — needed for backward pass.
+            </span>
+            <div class="step-explain">This feeds the input forward through the network to get a prediction. We must store every intermediate value because backprop needs them.</div>
+          </div>
+
+          <h4>Step 2: Compute Loss</h4>
+          <div class="solution-step">
+            <div class="step-label">Measure prediction error</div>
+            <span class="step-math">
+              L = loss(a⁽ᴸ⁾, y)<br><br>
+              Common losses:<br>
+              MSE: L = ½(a⁽ᴸ⁾ − y)²<br>
+              Cross-entropy: L = −[y·ln(a⁽ᴸ⁾) + (1−y)·ln(1−a⁽ᴸ⁾)]
+            </span>
+            <div class="step-explain">The loss quantifies how wrong the network's prediction is compared to the true target y.</div>
+          </div>
+
+          <h4>Step 3: Compute Output Error Signal δ⁽ᴸ⁾</h4>
+          <div class="solution-step">
+            <div class="step-label">Initialize backpropagation at the output</div>
+            <span class="step-math">
+              δ⁽ᴸ⁾ = ∂L/∂a⁽ᴸ⁾ × φ'(z⁽ᴸ⁾)<br><br>
+              For MSE + sigmoid:<br>
+              ∂L/∂a = (a⁽ᴸ⁾ − y) = (ŷ − y)<br>
+              φ'(z⁽ᴸ⁾) = ŷ(1 − ŷ)<br>
+              δ⁽ᴸ⁾ = (ŷ − y) · ŷ · (1 − ŷ)<br><br>
+              For cross-entropy + sigmoid:<br>
+              δ⁽ᴸ⁾ = a⁽ᴸ⁾ − y = ŷ − y (simpler!)
+            </span>
+            <div class="step-explain">δ⁽ᴸ⁾ measures how much the loss changes with respect to the pre-activation at the output. It is the "error signal" that drives learning.</div>
+          </div>
+
+          <h4>Step 4: Backpropagate Error (Compute Hidden δ's)</h4>
+          <div class="solution-step">
+            <div class="step-label">Propagate error backward through each layer</div>
+            <span class="step-math">
+              For l = L−1, L−2, ..., 1:<br><br>
+              δ⁽ˡ⁾ = (W⁽ˡ⁺¹⁾)ᵀ · δ⁽ˡ⁺¹⁾ ⊙ φ'(z⁽ˡ⁾)<br><br>
+              Breaking this down:<br>
+              (a) (W⁽ˡ⁺¹⁾)ᵀ · δ⁽ˡ⁺¹⁾ = distribute error from layer l+1 back to layer l<br>
+              (b) ⊙ φ'(z⁽ˡ⁾) = multiply by local derivative to get the error at layer l<br><br>
+              For sigmoid: φ'(z⁽ˡ⁾) = a⁽ˡ⁾ ⊙ (1 − a⁽ˡ⁾)
+            </span>
+            <div class="step-explain">This is the heart of backpropagation. The error signal from each layer is "pushed back" to the previous layer through the transpose weight matrix, then scaled by the local activation derivative.</div>
+          </div>
+
+          <h4>Step 5: Compute Gradients</h4>
+          <div class="solution-step">
+            <div class="step-label">Derivatives of loss w.r.t. each parameter</div>
+            <span class="step-math">
+              For each layer l = 1, 2, ..., L:<br><br>
+              ∂L/∂W⁽ˡ⁾ = δ⁽ˡ⁾ · (a⁽ˡ⁻¹⁾)ᵀ<br>
+              ∂L/∂b⁽ˡ⁾ = δ⁽ˡ⁾<br><br>
+              In matrix form (batch of m samples):<br>
+              ∂L/∂W⁽ˡ⁾ = (1/m) · δ⁽ˡ⁾ · (A⁽ˡ⁻¹⁾)ᵀ
+            </span>
+            <div class="step-explain">These gradients tell us how to change each weight and bias to reduce the loss. Weight gradients use the outer product of the error signal and the previous layer's activations.</div>
+          </div>
+
+          <h4>Step 6: Update Parameters</h4>
+          <div class="solution-step">
+            <div class="step-label">Gradient descent update rule</div>
+            <span class="step-math">
+              For each layer l = 1, 2, ..., L:<br><br>
+              W⁽ˡ⁾ ← W⁽ˡ⁾ − η × ∂L/∂W⁽ˡ⁾<br>
+              b⁽ˡ⁾ ← b⁽ˡ⁾ − η × ∂L/∂b⁽ˡ⁾<br><br>
+              Where η = learning rate
+            </span>
+            <div class="step-explain">Adjust all parameters in the direction that decreases the loss. A larger η makes bigger steps but risks overshooting; a smaller η is safer but slower.</div>
+          </div>
+
+          <div class="solution-final">&#10003; The 6-step recipe: (1) Forward pass, (2) Compute loss, (3) Output δ, (4) Backpropagate δ, (5) Compute gradients, (6) Update parameters.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="subjective-question">
+      <div class="q-number">Question 10</div>
+      <div class="q-difficulty hard">Hard</div>
+      <div class="q-text">A network has input x=[0.5, 0.3], hidden layer with 2 neurons (w₁₁=0.15, w₁₂=0.20, w₂₁=0.25, w₂₂=0.30, b₁=0.10, b₂=0.10), output layer (w₁=0.40, w₂=0.50, b₃=0.20). Target y=1. Sigmoid on both layers. L=½(ŷ−y)². Perform the COMPLETE forward pass AND one complete backpropagation step with η=0.5. Show every calculation.</div>
+      <div class="q-formula">
+        σ(z)=1/(1+e<sup>−z</sup>) &nbsp;&nbsp; L=½(ŷ−y)² &nbsp;&nbsp; δ=(ŷ−y)·ŷ·(1−ŷ) &nbsp;&nbsp; w←w−η·∂L/∂w
+      </div>
+      <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+      <div class="solution-content">
+        <div class="solution-steps">
+
+          <h4>Step 1: Forward Pass — Hidden Neuron 1</h4>
+          <div class="solution-step">
+            <div class="step-label">Pre-activation and activation</div>
+            <span class="step-math">
+              z₁ = w₁₁·x₁ + w₁₂·x₂ + b₁<br>
+              z₁ = (0.15)(0.5) + (0.20)(0.3) + 0.10<br>
+              z₁ = 0.075 + 0.06 + 0.10<br>
+              z₁ = 0.235<br><br>
+              h₁ = σ(0.235) = 1/(1 + e<sup>−0.235</sup>)<br>
+              e<sup>−0.235</sup> = 0.7906<br>
+              h₁ = 1/(1 + 0.7906) = 1/1.7906<br>
+              h₁ = 0.5585
+            </span>
+            <div class="step-explain">Compute the first hidden neuron's weighted sum and apply sigmoid.</div>
+          </div>
+
+          <h4>Step 2: Forward Pass — Hidden Neuron 2</h4>
+          <div class="solution-step">
+            <div class="step-label">Pre-activation and activation</div>
+            <span class="step-math">
+              z₂ = w₂₁·x₁ + w₂₂·x₂ + b₂<br>
+              z₂ = (0.25)(0.5) + (0.30)(0.3) + 0.10<br>
+              z₂ = 0.125 + 0.09 + 0.10<br>
+              z₂ = 0.315<br><br>
+              h₂ = σ(0.315) = 1/(1 + e<sup>−0.315</sup>)<br>
+              e<sup>−0.315</sup> = 0.7296<br>
+              h₂ = 1/(1 + 0.7296) = 1/1.7296<br>
+              h₂ = 0.5782
+            </span>
+            <div class="step-explain">Compute the second hidden neuron's weighted sum and apply sigmoid.</div>
+          </div>
+
+          <h4>Step 3: Forward Pass — Output Neuron</h4>
+          <div class="solution-step">
+            <div class="step-label">Pre-activation and activation</div>
+            <span class="step-math">
+              z₃ = w₁·h₁ + w₂·h₂ + b₃<br>
+              z₃ = (0.40)(0.5585) + (0.50)(0.5782) + 0.20<br>
+              z₃ = 0.2234 + 0.2891 + 0.20<br>
+              z₃ = 0.7125<br><br>
+              ŷ = σ(0.7125) = 1/(1 + e<sup>−0.7125</sup>)<br>
+              e<sup>−0.7125</sup> = 0.4903<br>
+              ŷ = 1/(1 + 0.4903) = 1/1.4903<br>
+              ŷ = 0.6710
+            </span>
+            <div class="step-explain">The output neuron computes its weighted sum from hidden activations and applies sigmoid.</div>
+          </div>
+
+          <h4>Step 4: Compute Loss</h4>
+          <div class="solution-step">
+            <div class="step-label">MSE loss</div>
+            <span class="step-math">
+              L = ½(ŷ − y)²<br>
+              L = ½(0.6710 − 1)²<br>
+              L = ½(−0.3290)²<br>
+              L = ½ × 0.1082<br>
+              L = 0.05411
+            </span>
+            <div class="step-explain">The prediction ŷ = 0.6710 is far from target y = 1, giving a loss of 0.05411.</div>
+          </div>
+
+          <h4>Step 5: Backprop — Output Error δ_out</h4>
+          <div class="solution-step">
+            <div class="step-label">Output error signal</div>
+            <span class="step-math">
+              δ_out = (ŷ − y) × ŷ × (1 − ŷ)<br>
+              δ_out = (0.6710 − 1) × 0.6710 × (1 − 0.6710)<br>
+              δ_out = (−0.3290) × 0.6710 × 0.3290<br>
+              δ_out = (−0.3290) × 0.2208<br>
+              δ_out = −0.07264
+            </span>
+            <div class="step-explain">The error signal at the output layer, combining prediction error and sigmoid derivative.</div>
+          </div>
+
+          <h4>Step 6: Backprop — Output Weight Gradients</h4>
+          <div class="solution-step">
+            <div class="step-label">∂L/∂w₁, ∂L/∂w₂, ∂L/∂b₃</div>
+            <span class="step-math">
+              ∂L/∂w₁ = δ_out × h₁ = (−0.07264) × 0.5585 = −0.04058<br>
+              ∂L/∂w₂ = δ_out × h₂ = (−0.07264) × 0.5782 = −0.04200<br>
+              ∂L/∂b₃ = δ_out = −0.07264
+            </span>
+            <div class="step-explain">Output weight gradients are error signal × corresponding hidden activation.</div>
+          </div>
+
+          <h4>Step 7: Backprop — Hidden Error Signals</h4>
+          <div class="solution-step">
+            <div class="step-label">δ_h₁ and δ_h₂</div>
+            <span class="step-math">
+              σ'(z₁) = h₁ × (1 − h₁) = 0.5585 × 0.4415 = 0.2466<br>
+              σ'(z₂) = h₂ × (1 − h₂) = 0.5782 × 0.4218 = 0.2439<br><br>
+
+              δ_h₁ = w₁ × δ_out × σ'(z₁)<br>
+              δ_h₁ = 0.40 × (−0.07264) × 0.2466<br>
+              δ_h₁ = (−0.02906) × 0.2466<br>
+              δ_h₁ = −0.007164<br><br>
+
+              δ_h₂ = w₂ × δ_out × σ'(z₂)<br>
+              δ_h₂ = 0.50 × (−0.07264) × 0.2439<br>
+              δ_h₂ = (−0.03632) × 0.2439<br>
+              δ_h₂ = −0.008858
+            </span>
+            <div class="step-explain">Error signals at hidden neurons, propagated back from the output through the weights.</div>
+          </div>
+
+          <h4>Step 8: Backprop — Hidden Weight Gradients</h4>
+          <div class="solution-step">
+            <div class="step-label">All input→hidden gradients</div>
+            <span class="step-math">
+              ∂L/∂w₁₁ = δ_h₁ × x₁ = (−0.007164) × 0.5 = −0.003582<br>
+              ∂L/∂w₁₂ = δ_h₁ × x₂ = (−0.007164) × 0.3 = −0.002149<br>
+              ∂L/∂w₂₁ = δ_h₂ × x₁ = (−0.008858) × 0.5 = −0.004429<br>
+              ∂L/∂w₂₂ = δ_h₂ × x₂ = (−0.008858) × 0.3 = −0.002657<br>
+              ∂L/∂b₁ = δ_h₁ = −0.007164<br>
+              ∂L/∂b₂ = δ_h₂ = −0.008858
+            </span>
+            <div class="step-explain">Hidden weight gradients are hidden error signal × corresponding input.</div>
+          </div>
+
+          <h4>Step 9: Weight Updates (η=0.5)</h4>
+          <div class="solution-step">
+            <div class="step-label">Gradient descent on all 9 parameters</div>
+            <span class="step-math">
+              w₁₁_new = 0.15 − 0.5×(−0.003582) = 0.15 + 0.001791 = 0.15179<br>
+              w₁₂_new = 0.20 − 0.5×(−0.002149) = 0.20 + 0.001075 = 0.20108<br>
+              w₂₁_new = 0.25 − 0.5×(−0.004429) = 0.25 + 0.002215 = 0.25221<br>
+              w₂₂_new = 0.30 − 0.5×(−0.002657) = 0.30 + 0.001329 = 0.30133<br>
+              b₁_new &nbsp;= 0.10 − 0.5×(−0.007164) = 0.10 + 0.003582 = 0.10358<br>
+              b₂_new &nbsp;= 0.10 − 0.5×(−0.008858) = 0.10 + 0.004429 = 0.10443<br>
+              w₁_new &nbsp;= 0.40 − 0.5×(−0.04058) = 0.40 + 0.02029 = 0.42029<br>
+              w₂_new &nbsp;= 0.50 − 0.5×(−0.04200) = 0.50 + 0.02100 = 0.52100<br>
+              b₃_new &nbsp;= 0.20 − 0.5×(−0.07264) = 0.20 + 0.03632 = 0.23632
+            </span>
+            <div class="step-explain">All weights and biases updated. Output layer parameters get the largest updates due to larger gradients.</div>
+          </div>
+
+          <div class="solution-final">&#10003; Complete forward+backward pass done. Before: L=0.05411, ŷ=0.6710. All 9 parameters updated. Next iteration will have smaller loss.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q11 -->
+    <div class="subjective-question">
+      <div class="q-number">Question 11</div>
+      <div class="q-difficulty hard">Hard</div>
+      <div class="q-text">Explain the symmetry problem in weight initialization. What happens if all weights are initialized to 0? Prove that all neurons in a hidden layer will always have identical gradients.</div>
+      <div class="q-formula">
+        If w_ij⁽¹⁾ = c for all j: &nbsp; z_j⁽¹⁾ = c·Σxᵢ + b = same ∀j &nbsp;→&nbsp; a_j⁽¹⁾ = same ∀j &nbsp;→&nbsp; identical gradients
+      </div>
+      <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+      <div class="solution-content">
+        <div class="solution-steps">
+
+          <h4>Step 1: What is the symmetry problem?</h4>
+          <div class="solution-step">
+            <div class="step-label">Setup</div>
+            <span class="step-math">
+              Consider a hidden layer with n neurons, each receiving the same input x.<br>
+              If all weights are initialized to the same value c (including 0),<br>
+              every neuron computes the exact same function of the input.
+            </span>
+            <div class="step-explain">Symmetry means all neurons in a layer are interchangeable — they compute the same thing and receive the same gradients.</div>
+          </div>
+
+          <h4>Step 2: Prove identical pre-activations</h4>
+          <div class="solution-step">
+            <div class="step-label">Same weights → same z</div>
+            <span class="step-math">
+              For neuron j in hidden layer 1:<br>
+              z_j⁽¹⁾ = Σᵢ w_ji⁽¹⁾ · xᵢ + b⁽¹⁾<br><br>
+              If all w_ji⁽¹⁾ = c (same constant for all j):<br>
+              z_j⁽¹⁾ = c · Σᵢ xᵢ + b = same value for ALL j<br><br>
+              Example with 2 inputs, 3 hidden neurons, c = 0:<br>
+              z₁⁽¹⁾ = 0·x₁ + 0·x₂ + 0 = 0<br>
+              z₂⁽¹⁾ = 0·x₁ + 0·x₂ + 0 = 0<br>
+              z₃⁽¹⁾ = 0·x₁ + 0·x₂ + 0 = 0<br>
+              All identical!
+            </span>
+            <div class="step-explain">When weights are equal, the weighted sum is the same for every neuron regardless of input.</div>
+          </div>
+
+          <h4>Step 3: Prove identical activations</h4>
+          <div class="solution-step">
+            <div class="step-label">Same z → same a</div>
+            <span class="step-math">
+              a_j⁽¹⁾ = φ(z_j⁽¹⁾)<br><br>
+              Since z_j⁽¹⁾ is the same for all j:<br>
+              a_j⁽¹⁾ = φ(same value) = same activation for all j<br><br>
+              With sigmoid and z = 0: a_j = σ(0) = 0.5 for all j
+            </span>
+            <div class="step-explain">The activation function is deterministic, so identical pre-activations produce identical activations.</div>
+          </div>
+
+          <h4>Step 4: Prove identical gradients during backprop</h4>
+          <div class="solution-step">
+            <div class="step-label">Same a → same δ → same gradients</div>
+            <span class="step-math">
+              Backprop from output: δ_j⁽¹⁾ = w_j^(out) × δ_out × σ'(z_j⁽¹⁾)<br><br>
+              If output weights are also equal (w_j^(out) = d for all j):<br>
+              δ_j⁽¹⁾ = d × δ_out × σ'(same z) = same value for all j<br><br>
+              Gradient for weight w_ji⁽¹⁾:<br>
+              ∂L/∂w_ji⁽¹⁾ = δ_j⁽¹⁾ × xᵢ<br><br>
+              Since δ_j⁽¹⁾ is same for all j:<br>
+              ∂L/∂w_ji⁽¹⁾ = (same δ) × xᵢ = same gradient for ALL j
+            </span>
+            <div class="step-explain">Every neuron receives the exact same gradient for its weights, because they all have the same error signal and the same input.</div>
+          </div>
+
+          <h4>Step 5: Prove symmetry persists after update</h4>
+          <div class="solution-step">
+            <div class="step-label">Update preserves symmetry</div>
+            <span class="step-math">
+              w_ji_new = w_ji_old − η × ∂L/∂w_ji<br><br>
+              Since w_ji_old = same for all j, and ∂L/∂w_ji = same for all j:<br>
+              w_ji_new = same for all j<br><br>
+              ∴ After the update, ALL weights remain equal!<br>
+              Symmetry is NEVER broken — permanently stuck.
+            </span>
+            <div class="step-explain">The update rule applies the same change to all neurons' weights, so they stay identical forever. The network effectively has only 1 neuron per hidden layer.</div>
+          </div>
+
+          <h4>Step 6: Why this is a problem</h4>
+          <div class="solution-step">
+            <div class="step-label">Wasted capacity</div>
+            <span class="step-math">
+              If a hidden layer has 100 neurons but symmetry is not broken:<br>
+              → All 100 neurons compute the same function<br>
+              → Equivalent to a network with 1 neuron per layer<br>
+              → Network capacity is wasted<br>
+              → Cannot learn complex features that require diverse representations
+            </span>
+            <div class="step-explain">The whole point of multiple neurons is to learn different features. Symmetry prevents this.</div>
+          </div>
+
+          <h4>Step 7: Solutions</h4>
+          <div class="solution-step">
+            <div class="step-label">Random initialization breaks symmetry</div>
+            <span class="step-math">
+              Xavier/Glorot initialization: W ~ N(0, 2/(n_in + n_out))<br>
+              He initialization: W ~ N(0, 2/n_in)<br><br>
+              Random values → different w_ji for each j → different z_j → different a_j<br>
+              → different δ_j → different gradients → weights diverge → symmetry broken!
+            </span>
+            <div class="step-explain">Random initialization ensures each neuron starts with different weights, so they learn different features from the very first update.</div>
+          </div>
+
+          <div class="solution-final">&#10003; Zero/equal initialization causes all neurons to compute identical functions, receive identical gradients, and remain identical forever. Fix: random initialization (Xavier/He).</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="subjective-question">
+      <div class="q-number">Question 12</div>
+      <div class="q-difficulty hard">Hard</div>
+      <div class="q-text">You have 2000 training samples, batch size 500. Explain: (a) How many weight updates per epoch? (b) After 10 epochs, how many total updates? (c) If training loss = 0.002 and validation loss = 0.15 after 50 epochs, diagnose the problem and propose 3 solutions.</div>
+      <div class="q-formula">
+        Batches per epoch = N / batch_size &nbsp;&nbsp;&nbsp; Total updates = epochs × batches_per_epoch
+      </div>
+      <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+      <div class="solution-content">
+        <div class="solution-steps">
+
+          <h4>Step 1: Part (a) — Weight updates per epoch</h4>
+          <div class="solution-step">
+            <div class="step-label">Compute batches per epoch</div>
+            <span class="step-math">
+              Number of training samples: N = 2000<br>
+              Batch size: B = 500<br><br>
+              Batches per epoch = N / B = 2000 / 500 = 4<br><br>
+              Each batch produces one gradient computation and one weight update.<br>
+              ∴ 4 weight updates per epoch
+            </span>
+            <div class="step-explain">In mini-batch gradient descent, we process the data in chunks (batches). Each batch triggers one parameter update.</div>
+          </div>
+
+          <h4>Step 2: Part (b) — Total updates after 10 epochs</h4>
+          <div class="solution-step">
+            <div class="step-label">Multiply epochs by updates per epoch</div>
+            <span class="step-math">
+              Updates per epoch = 4<br>
+              Number of epochs = 10<br><br>
+              Total updates = 10 × 4 = 40<br><br>
+              Detailed breakdown:<br>
+              Epoch 1: batches 1, 2, 3, 4 → updates 1, 2, 3, 4<br>
+              Epoch 2: batches 5, 6, 7, 8 → updates 5, 6, 7, 8<br>
+              ...<br>
+              Epoch 10: batches 37, 38, 39, 40 → updates 37, 38, 39, 40
+            </span>
+            <div class="step-explain">Each epoch processes all 2000 samples once (in 4 batches), giving 4 updates. Over 10 epochs: 40 total updates.</div>
+          </div>
+
+          <h4>Step 3: Part (c) — Diagnose the problem</h4>
+          <div class="solution-step">
+            <div class="step-label">Training vs. validation loss</div>
+            <span class="step-math">
+              Training loss = 0.002 &nbsp;(very low — model fits training data extremely well)<br>
+              Validation loss = 0.15 &nbsp;(75× higher than training loss)<br><br>
+              Diagnosis: OVERFITTING<br><br>
+              The model has memorized the training data patterns (including noise)<br>
+              but cannot generalize to unseen data (validation set).
+            </span>
+            <div class="step-explain">A large gap between training and validation loss is the hallmark of overfitting. The model is too complex relative to the amount of training data.</div>
+          </div>
+
+          <h4>Step 4: Solution 1 — Early Stopping</h4>
+          <div class="solution-step">
+            <div class="step-label">Stop training at the right time</div>
+            <span class="step-math">
+              Monitor validation loss during training:<br><br>
+              Epoch 1:  val_loss = 0.30<br>
+              Epoch 10: val_loss = 0.12 &nbsp;(improving)<br>
+              Epoch 20: val_loss = 0.08 &nbsp;(best — STOP HERE)<br>
+              Epoch 30: val_loss = 0.11 &nbsp;(starting to worsen)<br>
+              Epoch 50: val_loss = 0.15 &nbsp;(overfitting)<br><br>
+              Early stopping at epoch 20 gives val_loss = 0.08<br>
+              Instead of continuing to epoch 50 with val_loss = 0.15
+            </span>
+            <div class="step-explain">Stop training when validation loss stops improving (or starts increasing). This prevents the model from overfitting further.</div>
+          </div>
+
+          <h4>Step 5: Solution 2 — Regularization</h4>
+          <div class="solution-step">
+            <div class="step-label">Add penalty for complexity</div>
+            <span class="step-math">
+              L2 Regularization (Weight Decay):<br>
+              L_total = L_data + λ × Σ w²<br>
+              λ = regularization strength (e.g., 0.01)<br><br>
+              Effect: penalizes large weights → simpler model → better generalization<br><br>
+              Dropout (during training):<br>
+              Randomly set p% of neurons to 0 at each forward pass<br>
+              e.g., dropout rate = 0.5 → 50% of neurons randomly disabled<br>
+              Forces network to learn redundant representations → less overfitting
+            </span>
+            <div class="step-explain">Regularization adds constraints that prevent the model from becoming too complex, improving generalization.</div>
+          </div>
+
+          <h4>Step 6: Solution 3 — More training data</h4>
+          <div class="solution-step">
+            <div class="step-label">Data augmentation or collection</div>
+            <span class="step-math">
+              Current: 2000 samples, model has 41+ parameters<br>
+              Ratio: 2000/41 ≈ 49 samples per parameter (low!)<br><br>
+              Options:<br>
+              1. Collect more real data (best but costly)<br>
+              2. Data augmentation:<br>
+              &nbsp;&nbsp;• Images: flip, rotate, crop, adjust brightness<br>
+              &nbsp;&nbsp;• Text: synonym replacement, back-translation<br>
+              &nbsp;&nbsp;• General: add noise, mixup, cutout<br><br>
+              More data → harder to memorize → must learn general patterns → less overfitting
+            </span>
+            <div class="step-explain">Increasing the effective training set size makes it harder for the model to memorize, forcing it to learn generalizable features.</div>
+          </div>
+
+          <h4>Step 7: Bonus — Solution 4: Reduce model capacity</h4>
+          <div class="solution-step">
+            <div class="step-label">Simpler architecture</div>
+            <span class="step-math">
+              Current model: 3 layers with 41 parameters<br><br>
+              Reduce to:<br>
+              • Fewer hidden layers (e.g., 1 instead of 2)<br>
+              • Fewer neurons per layer (e.g., 2 instead of 4)<br><br>
+              Simpler model → fewer parameters → less capacity to overfit<br><br>
+              Also consider: removing dropout, early stopping, or using batch normalization
+            </span>
+            <div class="step-explain">A simpler model has less capacity to memorize noise, naturally reducing overfitting.</div>
+          </div>
+
+          <div class="solution-final">&#10003; (a) 4 updates/epoch, (b) 40 total updates in 10 epochs, (c) Overfitting — fix with early stopping, regularization (L2/dropout), more data, or reduced model capacity.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /practice-container -->
+
+  <script src="script.js"></script>
+  <script src="practice.js"></script>
+</body>
+</html>
