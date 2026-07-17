@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Week 10 Tutorial — Core Calculation Workshop</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="top-nav">
+    <a href="index.html" class="logo">&#8592; TTTC2453 ML Hub</a>
+    <div class="nav-links">
+      <a href="index.html">All Topics</a>
+    </div>
+  </div>
+
+  <button class="theme-toggle" id="themeToggle">
+    <span class="icon">&#9728;</span>
+    <span class="label-text">Toggle Theme</span>
+  </button>
+
+  <main class="main-content" id="main-content">
+
+  <div class="practice-header">
+    <h1>Week 10 Tutorial — Core Calculation Workshop</h1>
+    <p class="subtitle">Metrics, Loss, Gradient Descent, Trees &amp; Activations | 15 Questions with full worked solutions</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q1: Accuracy from Confusion Matrix
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 1</div>
+    <div class="q-difficulty easy">Confusion Matrix &rarr; Accuracy &nbsp;|&nbsp; 4 marks &nbsp;|&nbsp; CLO3</div>
+    <div class="q-text">A spam-email filter (class 1 = spam). Confusion matrix: TP = 80, FN = 20, FP = 40, TN = 60.</div>
+    <div class="q-formula">Accuracy = (TP + TN) / (TP + TN + FP + FN)</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from question)</h4>
+        <div class="solution-step">
+          <div class="step-label">All four values are given directly in the confusion matrix</div>
+          <span class="step-math">TP = 80 &nbsp; (correctly predicted spam)
+FN = 20 &nbsp; (spam predicted as not-spam — missed)
+FP = 40 &nbsp; (not-spam predicted as spam — false alarm)
+TN = 60 &nbsp; (correctly predicted not-spam)</span>
+        </div>
+
+        <h4>(a) Formula (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: State the accuracy formula</div>
+          <span class="step-math">Accuracy = (TP + TN) / (TP + TN + FP + FN)</span>
+          <div class="step-explain">Accuracy = fraction of ALL predictions that are correct (both classes).</div>
+        </div>
+
+        <h4>(b) Compute Accuracy (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2: Substitute given values</div>
+          <span class="step-math">Numerator (correct):&emsp; TP + TN = 80 + 60 = 140
+Denominator (total): TP + TN + FP + FN = 80 + 60 + 40 + 20 = 200
+
+Accuracy = 140 / 200 = 0.7000</span>
+        </div>
+
+        <h4>(c) Why accuracy can be misleading (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Answer</div>
+          <span class="step-math">When one class is much rarer (imbalanced), a model can achieve high
+accuracy by always predicting the majority class, despite having no
+real ability to identify the minority (rare) class.</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q2: RMSE
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 2</div>
+    <div class="q-difficulty medium">Regression Error &rarr; RMSE &nbsp;|&nbsp; 4 marks &nbsp;|&nbsp; CLO3</div>
+    <div class="q-text">House prices ($1,000s): y = [10, 14, 8, 12, 6], predicted y&#770; = [12, 11, 9, 15, 5]</div>
+    <div class="q-formula">RMSE = &radic;[(1/n) &Sigma; (y&#770;&#8321; &minus; y&#8321;)&sup2;]</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from question table)</h4>
+        <div class="solution-step">
+          <div class="step-label">Five data pairs from the table</div>
+          <span class="step-math">n = 5 (number of properties)
+
+Property:    1     2     3     4     5
+Actual y:   10    14     8    12     6    ← given
+Predicted:  12    11     9    15     5    ← given</span>
+        </div>
+
+        <h4>(a) Residuals (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: Compute each residual = y&#770;&#8321; &minus; y&#8321;</div>
+          <span class="step-math">Property 1:  12 − 10 =  2
+Property 2:  11 − 14 = −3
+Property 3:   9 − 8  =  1
+Property 4:  15 − 12 =  3
+Property 5:   5 − 6  = −1</span>
+          <div class="step-explain">Each residual = predicted minus actual. Positive = overpredicted, negative = underpredicted.</div>
+        </div>
+
+        <h4>(b) MSE (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2: Square each residual, sum, divide by n</div>
+          <span class="step-math">Squared residuals: 2² = 4,  (-3)² = 9,  1² = 1,  3² = 9,  (-1)² = 1
+
+Sum of squares = 4 + 9 + 1 + 9 + 1 = 24
+
+MSE = 24 / 5 = 4.8000</span>
+        </div>
+
+        <h4>(c) RMSE (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 3: Take square root of MSE</div>
+          <span class="step-math">RMSE = &radic;MSE = &radic;4.8 = 2.1909</span>
+          <div class="step-explain">RMSE is in the same units as y (thousands of dollars). On average, predictions are off by about $2,191.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q3: MAE
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 3</div>
+    <div class="q-difficulty easy">Regression Error &rarr; MAE &nbsp;|&nbsp; 3 marks &nbsp;|&nbsp; CLO3</div>
+    <div class="q-text">Same data as Q2: y = [10, 14, 8, 12, 6], y&#770; = [12, 11, 9, 15, 5]</div>
+    <div class="q-formula">MAE = (1/n) &Sigma; |y&#770;&#8321; &minus; y&#8321;|</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from Q2 — same data)</h4>
+        <div class="solution-step">
+          <div class="step-label">Residuals already computed in Q2</div>
+          <span class="step-math">Residuals (y&#770; − y):  [+2, −3, +1, +3, −1]
+n = 5</span>
+        </div>
+
+        <h4>(a) Absolute Errors (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: Take absolute value of each residual</div>
+          <span class="step-math">|+2| = 2
+|−3| = 3
+|+1| = 1
+|+3| = 3
+|−1| = 1</span>
+        </div>
+
+        <h4>(b) MAE (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2: Average the absolute errors</div>
+          <span class="step-math">Sum = 2 + 3 + 1 + 3 + 1 = 10
+
+MAE = 10 / 5 = 2.0000</span>
+        </div>
+
+        <h4>(c) Why MAE is less sensitive (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Answer</div>
+          <span class="step-math">MAE treats all errors linearly (absolute value), whereas RMSE
+squares errors first, which disproportionately amplifies the
+contribution of large errors (outliers).</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q4: Sigmoid Activation
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 4</div>
+    <div class="q-difficulty easy">Logistic Regression &rarr; Sigmoid &nbsp;|&nbsp; 3 marks &nbsp;|&nbsp; CLO2</div>
+    <div class="q-text">Logit z = 1.0986. Hint: e&#8315;&#179;&#185;&#185;&#185;&#185; &asymp; 0.3333</div>
+    <div class="q-formula">&sigma;(z) = 1 / (1 + e&#8315;&#8319;)</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from question + hint)</h4>
+        <div class="solution-step">
+          <div class="step-label">z is given; the hint provides e&#8315;&#8319;</div>
+          <span class="step-math">z = 1.0986 &emsp; (given — the logit / linear combination output)
+e&#8315;&#8319; = e&#8315;&#179;&#185;&#185;&#185;&#185; &asymp; 0.3333 &emsp; (given in hint)</span>
+        </div>
+
+        <h4>(a) Sigmoid function (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: State the sigmoid formula</div>
+          <span class="step-math">&sigma;(z) = 1 / (1 + e&#8315;&#8319;)</span>
+        </div>
+
+        <h4>(b) Compute predicted probability (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2: Substitute z = 1.0986 and the hint</div>
+          <span class="step-math">&sigma;(1.0986) = 1 / (1 + e&#8315;&#179;&#185;&#185;&#185;&#185;)
+            = 1 / (1 + 0.3333)
+            = 1 / 1.3333
+            = 0.7500</span>
+        </div>
+
+        <h4>(c) Predicted class (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 3: Compare to threshold 0.5</div>
+          <span class="step-math">p&#770; = 0.7500 > 0.5 (threshold)
+
+Therefore predict Class 1 (positive class),
+because the predicted probability exceeds the decision boundary.</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q5: Binary Cross-Entropy Loss
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 5</div>
+    <div class="q-difficulty medium">Classification Loss &rarr; Binary Cross-Entropy &nbsp;|&nbsp; 5 marks &nbsp;|&nbsp; CLO2</div>
+    <div class="q-text">4 samples. p&#770; = [0.9, 0.2, 0.6, 0.4], y = [1, 0, 1, 0]. Hints: ln(0.9) &asymp; &minus;0.1054, ln(0.8) &asymp; &minus;0.2231, ln(0.6) &asymp; &minus;0.5108</div>
+    <div class="q-formula">BCE = &minus;[y&middot;ln(p&#770;) + (1&minus;y)&middot;ln(1&minus;p&#770;)]</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from question table + hints)</h4>
+        <div class="solution-step">
+          <div class="step-label">Four predicted probabilities and four true labels</div>
+          <span class="step-math">Sample:       1      2      3      4
+Predicted p&#770;:  0.9    0.2    0.6    0.4    ← given
+True label y:  1      0      1      0      ← given
+
+Given log values from hints:
+  ln(0.9) = −0.1054
+  ln(0.8) = −0.2231     (this is ln(1 − 0.2), needed for sample 2)
+  ln(0.6) = −0.5108
+  ln(0.4) = −0.9163     (derived: ln(1 − 0.6), needed for sample 3)
+  ln(0.1) = −2.3026     (derived: ln(1 − 0.9), needed for sample 1)
+
+Note: We need ln(1−p&#770;) for each sample too. These are computed as:
+  Sample 1: 1−0.9 = 0.1, so ln(0.1) = −2.3026
+  Sample 2: 1−0.2 = 0.8, so ln(0.8) = −0.2231 (given in hint)
+  Sample 3: 1−0.6 = 0.4, so ln(0.4) = −0.9163
+  Sample 4: 1−0.4 = 0.6, so ln(0.6) = −0.5108 (given in hint)</span>
+        </div>
+
+        <h4>(a) Per-sample BCE formula (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: State the per-sample loss term</div>
+          <span class="step-math">L&#8321; = &minus;[ y&#8321; &middot; ln(p&#770;&#8321;) + (1 &minus; y&#8321;) &middot; ln(1 &minus; p&#770;&#8321;) ]</span>
+          <div class="step-explain">When y=1 the first term is active; when y=0 the second term is active.</div>
+        </div>
+
+        <h4>(b) Loss for each sample (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2: Apply formula to each sample</div>
+          <span class="step-math">Sample 1 (y=1, p&#770;=0.9):
+  L₁ = −[ 1 × ln(0.9) + 0 × ln(0.1) ]
+     = −[ 1 × (−0.1054) + 0 ]
+     = −(−0.1054) = 0.1054
+
+Sample 2 (y=0, p&#770;=0.2):
+  L₂ = −[ 0 × ln(0.2) + 1 × ln(0.8) ]
+     = −[ 0 + 1 × (−0.2231) ]
+     = −(−0.2231) = 0.2231
+
+Sample 3 (y=1, p&#770;=0.6):
+  L₃ = −[ 1 × ln(0.6) + 0 × ln(0.4) ]
+     = −[ 1 × (−0.5108) + 0 ]
+     = −(−0.5108) = 0.5108
+
+Sample 4 (y=0, p&#770;=0.4):
+  L₄ = −[ 0 × ln(0.4) + 1 × ln(0.6) ]
+     = −[ 0 + 1 × (−0.5108) ]
+     = −(−0.5108) = 0.5108</span>
+        </div>
+
+        <h4>(c) Mean BCE (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 3: Average the four loss values</div>
+          <span class="step-math">Sum = 0.1054 + 0.2231 + 0.5108 + 0.5108 = 1.3501
+
+Mean BCE = 1.3501 / 4 = 0.3375</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q6: Gini Impurity
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 6</div>
+    <div class="q-difficulty easy">Decision Tree &rarr; Gini Impurity &nbsp;|&nbsp; 3 marks &nbsp;|&nbsp; CLO2</div>
+    <div class="q-text">Node has 10 samples: 7 class A, 3 class B.</div>
+    <div class="q-formula">Gini = 1 &minus; &Sigma; p&#8321;&sup2;</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from question)</h4>
+        <div class="solution-step">
+          <div class="step-label">Counts given directly</div>
+          <span class="step-math">Total samples = 10
+Class A count = 7    ← given
+Class B count = 3    ← given</span>
+        </div>
+
+        <h4>(a) Class proportions (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: Divide each count by total</div>
+          <span class="step-math">p&#8342; = 7 / 10 = 0.7
+p&#8345; = 3 / 10 = 0.3</span>
+        </div>
+
+        <h4>(b) Gini impurity (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2: Apply the Gini formula</div>
+          <span class="step-math">Gini = 1 − (p&#8342;&sup2; + p&#8345;&sup2;)
+     = 1 − (0.7² + 0.3²)
+     = 1 − (0.49 + 0.09)
+     = 1 − 0.58
+     = 0.4200</span>
+          <div class="step-explain">Gini = 0 means pure node (all one class). Gini = 0.5 means maximum impurity for 2 classes (50/50 split).</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q7: Entropy
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 7</div>
+    <div class="q-difficulty medium">Decision Tree &rarr; Entropy &nbsp;|&nbsp; 4 marks &nbsp;|&nbsp; CLO2</div>
+    <div class="q-text">Binary node: 10 samples, 2 positive, 8 negative. Hints: log&#8322;(0.2) &asymp; &minus;2.3219, log&#8322;(0.8) &asymp; &minus;0.3219</div>
+    <div class="q-formula">H = &minus; &Sigma; p&#8321; &middot; log&#8322;(p&#8321;)</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from question + hints)</h4>
+        <div class="solution-step">
+          <div class="step-label">Counts and log values given</div>
+          <span class="step-math">Total samples = 10
+Positive count = 2    ← given
+Negative count = 8    ← given
+log₂(0.2) = −2.3219  ← given in hint
+log₂(0.8) = −0.3219  ← given in hint</span>
+        </div>
+
+        <h4>(a) Class proportions (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: Compute proportions</div>
+          <span class="step-math">p&#8329; = 2/10 = 0.2
+p&#8330; = 8/10 = 0.8</span>
+        </div>
+
+        <h4>(b) Entropy (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2: Apply entropy formula using hint values</div>
+          <span class="step-math">H = −[ p&#8329; &middot; log₂(p&#8329;) + p&#8330; &middot; log₂(p&#8330;) ]
+  = −[ 0.2 × (−2.3219) + 0.8 × (−0.3219) ]
+  = −[ −0.4644 + (−0.2575) ]
+  = −[ −0.7219 ]
+  = 0.7219 bits</span>
+        </div>
+
+        <h4>(c) Maximum entropy (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Answer</div>
+          <span class="step-math">Maximum entropy for a binary node = 1.0 bit,
+achieved when the split is perfectly balanced: 50% positive, 50% negative.</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q8: F1-Score
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 8</div>
+    <div class="q-difficulty medium">Confusion Matrix &rarr; F1-Score &nbsp;|&nbsp; 5 marks &nbsp;|&nbsp; CLO3</div>
+    <div class="q-text">Medical screening (class 1 = disease). TP = 40, FN = 10, FP = 30, TN = 20.</div>
+    <div class="q-formula">Precision = TP/(TP+FP) &nbsp;|&nbsp; Recall = TP/(TP+FN) &nbsp;|&nbsp; F1 = 2PR/(P+R)</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from confusion matrix)</h4>
+        <div class="solution-step">
+          <div class="step-label">All values from the matrix</div>
+          <span class="step-math">TP = 40    ← given
+FN = 10    ← given
+FP = 30    ← given
+TN = 20    ← given</span>
+        </div>
+
+        <h4>(a) Precision (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: Precision = TP / (TP + FP)</div>
+          <span class="step-math">Precision = 40 / (40 + 30)
+          = 40 / 70
+          = 0.5714</span>
+          <div class="step-explain">Of all predicted positives, 57.14% are truly positive.</div>
+        </div>
+
+        <h4>(b) Recall (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2: Recall = TP / (TP + FN)</div>
+          <span class="step-math">Recall = 40 / (40 + 10)
+       = 40 / 50
+       = 0.8000</span>
+          <div class="step-explain">Of all actual positives, 80% are correctly identified.</div>
+        </div>
+
+        <h4>(c) F1-score (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 3: F1 = 2 &middot; Precision &middot; Recall / (Precision + Recall)</div>
+          <span class="step-math">F1 = 2 × (0.5714 × 0.8000) / (0.5714 + 0.8000)
+   = 2 × 0.4571 / 1.3714
+   = 0.9143 / 1.3714
+   = 0.6667</span>
+        </div>
+
+        <h4>(d) Why harmonic mean? (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Answer</div>
+          <span class="step-math">The harmonic mean is always closer to the smaller of the two
+values, so F1 penalises models where either precision or recall
+is very low — the arithmetic mean could mask a poor score on one metric.</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q9: Single-Feature Gradient Descent
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 9</div>
+    <div class="q-difficulty hard">Gradient Descent &rarr; Single Feature &nbsp;|&nbsp; 6 marks &nbsp;|&nbsp; CLO2</div>
+    <div class="q-text">y&#770; = w&#8320; + w&#8321;x, w&#8320; = 0, w&#8321; = 0, &alpha; = 0.1. Data: x = [1, 2, 4], y = [2, 5, 9]</div>
+    <div class="q-formula">&part;J/&part;w&#8321; = (2/n) &Sigma; (y&#770;&#8321; &minus; y&#8321;) &middot; x&#8321; &nbsp;|&nbsp; w&#8321; &larr; w&#8321; &minus; &alpha; &middot; &part;J/&part;w&#8321;</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from question)</h4>
+        <div class="solution-step">
+          <div class="step-label">Weights, learning rate, and training data all given</div>
+          <span class="step-math">w₀ = 0       ← given (initial weight)
+w₁ = 0       ← given (initial weight)
+α = 0.1      ← given (learning rate)
+n = 3         ← given (3 data points)
+
+Data (given):
+  x: [1, 2, 4]
+  y: [2, 5, 9]</span>
+        </div>
+
+        <h4>(a) Initial predictions (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: y&#770;&#8321; = w&#8320; + w&#8321; &middot; x&#8321; with w&#8320;=0, w&#8321;=0</div>
+          <span class="step-math">Point 1:  ŷ₁ = 0 + 0 × 1 = 0
+Point 2:  ŷ₂ = 0 + 0 × 2 = 0
+Point 3:  ŷ₃ = 0 + 0 × 4 = 0
+
+All predictions are 0 (initial weights are zero).</span>
+        </div>
+
+        <h4>(b) Residuals (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2: Residual = y&#770;&#8321; &minus; y&#8321;</div>
+          <span class="step-math">Point 1:  0 − 2 = −2
+Point 2:  0 − 5 = −5
+Point 3:  0 − 9 = −9</span>
+        </div>
+
+        <h4>(c) Gradient (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 3: Compute &part;J/&part;w&#8321; = (2/n) &Sigma; (y&#770;&#8321; &minus; y&#8321;) &middot; x&#8321;</div>
+          <span class="step-math">Multiply each residual by its x value:
+  (−2) × 1 = −2
+  (−5) × 2 = −10
+  (−9) × 4 = −36
+
+Sum = (−2) + (−10) + (−36) = −48
+
+∂J/∂w₁ = (2/3) × (−48) = 2 × (−16) = −32.0000</span>
+        </div>
+
+        <h4>(d) Weight update (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 4: Apply update rule</div>
+          <span class="step-math">w₁ ← w₁ − α × ∂J/∂w₁
+   = 0 − 0.1 × (−32.0000)
+   = 0 + 3.2000
+   = 3.2000</span>
+          <div class="step-explain">The negative gradient times negative learning rate = positive update, meaning w₁ increases to reduce the underpredictions.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q10: Two-Feature Gradient Descent
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 10</div>
+    <div class="q-difficulty hard">Gradient Descent &rarr; Two Features &nbsp;|&nbsp; 6 marks &nbsp;|&nbsp; CLO2</div>
+    <div class="q-text">w&#8320;=0.2, w&#8321;=0.5, w&#8322;=0.1. Sample: x&#8321;=3, x&#8322;=2, y=5.0, &alpha;=0.1. Per-sample gradient: &part;J/&part;w&#8335; = 2(y&#770; &minus; y) &middot; x&#8335;</div>
+    <div class="q-formula">y&#770; = w&#8320; + w&#8321;x&#8321; + w&#8322;x&#8322;</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from question)</h4>
+        <div class="solution-step">
+          <div class="step-label">Weights, sample, and learning rate all given</div>
+          <span class="step-math">w₀ = 0.2     ← given
+w₁ = 0.5     ← given
+w₂ = 0.1     ← given
+x₁ = 3       ← given
+x₂ = 2       ← given
+y = 5.0       ← given
+α = 0.1      ← given</span>
+        </div>
+
+        <h4>(a) Prediction (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: y&#770; = w&#8320; + w&#8321;x&#8321; + w&#8322;x&#8322;</div>
+          <span class="step-math">ŷ = 0.2 + 0.5 × 3 + 0.1 × 2
+  = 0.2 + 1.5 + 0.2
+  = 1.9000</span>
+        </div>
+
+        <h4>(b) Error (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2: Error = y&#770; &minus; y</div>
+          <span class="step-math">Error = 1.9 − 5.0 = −3.1000</span>
+          <div class="step-explain">Negative error means underprediction.</div>
+        </div>
+
+        <h4>(c) Gradient &part;J/&part;w&#8322; (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 3: Use per-sample gradient formula with x&#8322;</div>
+          <span class="step-math">∂J/∂w₂ = 2 × (ŷ − y) × x₂
+        = 2 × (−3.1) × 2
+        = 2 × (−6.2)
+        = −12.4000</span>
+        </div>
+
+        <h4>(d) Update w&#8322; (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 4: Apply update rule</div>
+          <span class="step-math">w₂ ← w₂ − α × ∂J/∂w₂
+   = 0.1 − 0.1 × (−12.4000)
+   = 0.1 + 1.2400
+   = 1.3400</span>
+          <div class="step-explain">w&#8322; increases substantially because the model underpredicts and x&#8322; contributes to the error.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q11: Precision & Recall (Imbalanced)
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 11</div>
+    <div class="q-difficulty medium">Confusion Matrix &rarr; Precision &amp; Recall &nbsp;|&nbsp; 4 marks &nbsp;|&nbsp; CLO3</div>
+    <div class="q-text">Fraud detection (class 1 = fraud). TP = 60, FN = 40, FP = 15, TN = 85.</div>
+    <div class="q-formula">Precision = TP/(TP+FP) &nbsp;|&nbsp; Recall = TP/(TP+FN)</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from confusion matrix)</h4>
+        <div class="solution-step">
+          <div class="step-label">All values from the matrix</div>
+          <span class="step-math">TP = 60    ← given
+FN = 40    ← given
+FP = 15    ← given
+TN = 85    ← given</span>
+        </div>
+
+        <h4>(a) Precision (1.5 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: Precision = TP / (TP + FP)</div>
+          <span class="step-math">Precision = 60 / (60 + 15)
+          = 60 / 75
+          = 0.8000</span>
+          <div class="step-explain">Of all transactions flagged as fraud, 80% actually are fraud.</div>
+        </div>
+
+        <h4>(b) Recall (1.5 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2: Recall = TP / (TP + FN)</div>
+          <span class="step-math">Recall = 60 / (60 + 40)
+       = 60 / 100
+       = 0.6000</span>
+          <div class="step-explain">The model catches 60% of all actual fraud cases.</div>
+        </div>
+
+        <h4>(c) Which metric to prioritise? (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Answer</div>
+          <span class="step-math">The bank should focus on RECALL, because missing a fraud case
+(FN) costs more than a false alarm (FP) — catching as many fraud
+cases as possible is the priority.</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q12: R-squared
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 12</div>
+    <div class="q-difficulty hard">Regression &rarr; R&sup2; &nbsp;|&nbsp; 6 marks &nbsp;|&nbsp; CLO3</div>
+    <div class="q-text">5 samples. y = [3, 5, 7, 9, 11], y&#770; = [4, 5, 6, 10, 10]</div>
+    <div class="q-formula">R&sup2; = 1 &minus; (SS&#8338; / SS&#7522;&#8339;) &nbsp;|&nbsp; SS&#8338; = &Sigma;(y&#8321;&minus;y&#770;&#8321;)&sup2; &nbsp;|&nbsp; SS&#7522;&#8339; = &Sigma;(y&#8321;&minus;ȳ)&sup2;</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from question table)</h4>
+        <div class="solution-step">
+          <div class="step-label">Five actual/predicted pairs from the table</div>
+          <span class="step-math">Sample:  1    2    3    4    5
+y:       3    5    7    9    11    ← given
+ŷ:       4    5    6   10    10    ← given
+n = 5</span>
+        </div>
+
+        <h4>(a) Mean ȳ (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: Average of actual values</div>
+          <span class="step-math">ȳ = (3 + 5 + 7 + 9 + 11) / 5
+  = 35 / 5
+  = 7.0000</span>
+        </div>
+
+        <h4>(b) SS&#8338; (Residual Sum of Squares) (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2: Compute (y&#8321; &minus; y&#770;&#8321;)&sup2; for each sample</div>
+          <span class="step-math">Sample 1: (3 − 4)² = (−1)² =  1
+Sample 2: (5 − 5)² = ( 0)² =  0
+Sample 3: (7 − 6)² = ( 1)² =  1
+Sample 4: (9 − 10)² = (−1)² = 1
+Sample 5: (11 − 10)² = ( 1)² = 1
+
+SS_res = 1 + 0 + 1 + 1 + 1 = 4</span>
+        </div>
+
+        <h4>(c) SS&#7522;&#8339; (Total Sum of Squares) (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 3: Compute (y&#8321; &minus; ȳ)&sup2; for each sample</div>
+          <span class="step-math">Sample 1: (3 − 7)² = (−4)² = 16
+Sample 2: (5 − 7)² = (−2)² =  4
+Sample 3: (7 − 7)² = ( 0)² =  0
+Sample 4: (9 − 7)² = ( 2)² =  4
+Sample 5: (11 − 7)² = ( 4)² = 16
+
+SS_tot = 16 + 4 + 0 + 4 + 16 = 40</span>
+        </div>
+
+        <h4>(d) R&sup2; (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 4: Apply R&sup2; formula</div>
+          <span class="step-math">R² = 1 − (SS_res / SS_tot)
+   = 1 − (4 / 40)
+   = 1 − 0.1000
+   = 0.9000</span>
+          <div class="step-explain">R&sup2; = 0.9000 means the model explains 90% of the variance in the actual values.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q13: Softmax
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 13</div>
+    <div class="q-difficulty medium">Neural Network &rarr; Softmax &nbsp;|&nbsp; 5 marks &nbsp;|&nbsp; CLO2</div>
+    <div class="q-text">3-class network. Logit vector z = [2.0, 1.0, 0.0]. Hints: e&sup2; &asymp; 7.3891, e&sup1; &asymp; 2.7183, e&sup0; = 1.0000</div>
+    <div class="q-formula">softmax(z&#8321;) = e&#8319;&#8321; / &Sigma; e&#8319;&#8334;</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from question + hints)</h4>
+        <div class="solution-step">
+          <div class="step-label">Logit vector and exponential values all given</div>
+          <span class="step-math">z₁ = 2.0    ← given
+z₂ = 1.0    ← given
+z₃ = 0.0    ← given
+
+e² = 7.3891  ← given in hint
+e¹ = 2.7183  ← given in hint
+e⁰ = 1.0000  ← given in hint</span>
+        </div>
+
+        <h4>(a) Softmax formula (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: State the general formula</div>
+          <span class="step-math">softmax(zᵢ) = e^zᵢ / (e^z₁ + e^z₂ + e^z₃)</span>
+        </div>
+
+        <h4>(b) Exponentials and sum (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2: Compute each e&#8319;&#8321; using the hints</div>
+          <span class="step-math">e^z₁ = e^2.0 = 7.3891    (from hint)
+e^z₂ = e^1.0 = 2.7183    (from hint)
+e^z₃ = e^0.0 = 1.0000    (from hint)
+
+Sum = 7.3891 + 2.7183 + 1.0000 = 11.1074</span>
+        </div>
+
+        <h4>(c) Softmax probabilities (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 3: Divide each exponential by the sum</div>
+          <span class="step-math">Class 1:  7.3891 / 11.1074 = 0.6653
+Class 2:  2.7183 / 11.1074 = 0.2448
+Class 3:  1.0000 / 11.1074 = 0.0900
+
+Verification: 0.6653 + 0.2448 + 0.0900 = 0.9999 ≈ 1.0000 ✓
+(minor rounding; mathematically exact sum = 1.0)</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q14: FPR & FNR
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 14</div>
+    <div class="q-difficulty medium">Confusion Matrix &rarr; FPR &amp; FNR &nbsp;|&nbsp; 4 marks &nbsp;|&nbsp; CLO3</div>
+    <div class="q-text">Diagnostic classifier (class 1 = condition present). TP = 45, FN = 5, FP = 20, TN = 30.</div>
+    <div class="q-formula">FPR = FP/(FP+TN) &nbsp;|&nbsp; FNR = FN/(FN+TP)</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from confusion matrix)</h4>
+        <div class="solution-step">
+          <div class="step-label">All values from the matrix</div>
+          <span class="step-math">TP = 45    ← given
+FN = 5     ← given
+FP = 20    ← given
+TN = 30    ← given</span>
+        </div>
+
+        <h4>(a) False Positive Rate (1.5 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: FPR = FP / (FP + TN)</div>
+          <span class="step-math">FPR = 20 / (20 + 30)
+    = 20 / 50
+    = 0.4000</span>
+          <div class="step-explain">40% of healthy patients are incorrectly flagged as positive.</div>
+        </div>
+
+        <h4>(b) False Negative Rate (1.5 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2: FNR = FN / (FN + TP)</div>
+          <span class="step-math">FNR = 5 / (5 + 45)
+    = 5 / 50
+    = 0.1000</span>
+          <div class="step-explain">Only 10% of sick patients are missed — the model is good at detecting the disease.</div>
+        </div>
+
+        <h4>(c) Which rate to keep low? (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Answer</div>
+          <span class="step-math">FNR is more important to keep low, because missing a sick
+patient (false negative) has life-threatening consequences,
+whereas a false positive simply triggers further testing.</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q15: Information Gain
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Question 15</div>
+    <div class="q-difficulty hard">Decision Tree &rarr; Information Gain &nbsp;|&nbsp; 8 marks &nbsp;|&nbsp; CLO2</div>
+    <div class="q-text">Parent: 10 samples (4 positive, 6 negative). Split into Left (5: 1 pos, 4 neg) and Right (5: 3 pos, 2 neg). Hints: log&#8322;(0.2)&asymp;&minus;2.3219, log&#8322;(0.8)&asymp;&minus;0.3219, log&#8322;(0.4)&asymp;&minus;1.3219, log&#8322;(0.6)&asymp;&minus;0.7370</div>
+    <div class="q-formula">IG = H(parent) &minus; &Sigma; (|child|/|parent|) &middot; H(child)</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Given Values (from question table + hints)</h4>
+        <div class="solution-step">
+          <div class="step-label">All sample counts from the table; log values from hints</div>
+          <span class="step-math">Parent: 10 samples total — 4 positive, 6 negative  ← given
+
+Left child:  5 samples — 1 positive, 4 negative  ← given
+Right child: 5 samples — 3 positive, 2 negative  ← given
+
+Given log values:
+  log₂(0.2) = −2.3219   ← hint (needed for: 1/5=0.2, 4/5=0.8 on left)
+  log₂(0.8) = −0.3219   ← hint
+  log₂(0.4) = −1.3219   ← hint (needed for: 2/5=0.4, 3/5=0.6 on right)
+  log₂(0.6) = −0.7370   ← hint</span>
+        </div>
+
+        <h4>(a) Parent entropy H(parent) (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 1: Compute parent class proportions then entropy</div>
+          <span class="step-math">Parent proportions:
+  p_pos = 4/10 = 0.4
+  p_neg = 6/10 = 0.6
+
+H(parent) = −[ 0.4 × log₂(0.4) + 0.6 × log₂(0.6) ]
+           = −[ 0.4 × (−1.3219) + 0.6 × (−0.7370) ]
+           = −[ −0.5288 + (−0.4422) ]
+           = −[ −0.9710 ]
+           = 0.9710 bits</span>
+        </div>
+
+        <h4>(b) Child entropies H(left) and H(right) (3 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 2a: Left child — 1 positive, 4 negative out of 5</div>
+          <span class="step-math">Left proportions:
+  p_pos = 1/5 = 0.2
+  p_neg = 4/5 = 0.8
+
+H(left) = −[ 0.2 × log₂(0.2) + 0.8 × log₂(0.8) ]
+        = −[ 0.2 × (−2.3219) + 0.8 × (−0.3219) ]
+        = −[ −0.4644 + (−0.2575) ]
+        = −[ −0.7219 ]
+        = 0.7219 bits</span>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Step 2b: Right child — 3 positive, 2 negative out of 5</div>
+          <span class="step-math">Right proportions:
+  p_pos = 3/5 = 0.6
+  p_neg = 2/5 = 0.4
+
+H(right) = −[ 0.6 × log₂(0.6) + 0.4 × log₂(0.4) ]
+         = −[ 0.6 × (−0.7370) + 0.4 × (−1.3219) ]
+         = −[ −0.4422 + (−0.5288) ]
+         = −[ −0.9710 ]
+         = 0.9710 bits</span>
+        </div>
+
+        <h4>(c) Weighted average entropy (1 mark)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 3: Weight each child by its proportion of parent samples</div>
+          <span class="step-math">Weight of left  = |left|  / |parent| = 5/10 = 0.5
+Weight of right = |right| / |parent| = 5/10 = 0.5
+
+Weighted H = 0.5 × H(left) + 0.5 × H(right)
+           = 0.5 × 0.7219 + 0.5 × 0.9710
+           = 0.3610 + 0.4855
+           = 0.8465 bits</span>
+        </div>
+
+        <h4>(d) Information Gain (2 marks)</h4>
+        <div class="solution-step">
+          <div class="step-label">Step 4: IG = H(parent) − weighted average H(children)</div>
+          <span class="step-math">IG = H(parent) − Weighted H(children)
+   = 0.9710 − 0.8465
+   = 0.1245 bits</span>
+          <div class="step-explain">The split reduces entropy by 0.1245 bits. A higher IG means a better split — this is the value used to choose the best feature at each node.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  </main>
+
+  <script src="script.js"></script>
+  <script src="practice.js"></script>
+</body>
+</html>
