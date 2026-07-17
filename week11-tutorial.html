@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Week 11 Tutorial — CNN · RNN · LSTM Full Solutions</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="top-nav">
+    <a href="index.html" class="logo">&#8592; TTTC2453 ML Hub</a>
+    <div class="nav-links">
+      <a href="index.html">All Topics</a>
+    </div>
+  </div>
+
+  <button class="theme-toggle" id="themeToggle">
+    <span class="icon">&#9728;</span>
+    <span class="label-text">Toggle Theme</span>
+  </button>
+
+  <main class="main-content" id="main-content">
+
+  <div class="practice-header">
+    <h1>Week 11 Tutorial — Full Worked Solutions</h1>
+    <p class="subtitle">CNN · RNN · LSTM | 6 Subjective Calculation Questions with step-by-step workings</p>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q1: CNN Conv → ReLU → Pooling
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Part A — Question 1</div>
+    <div class="q-difficulty medium">CNN · Conv → ReLU → Pooling</div>
+    <div class="q-text">Hand-trace a Convolution → ReLU → Pooling block on a 5×5 greyscale input with a 3×3 vertical-edge filter, bias +1, stride 1, no padding, followed by 2×2 max-pool (stride 1).</div>
+    <div class="q-formula">O = ⌊(W − F + 2P) / S⌋ + 1 &nbsp;|&nbsp; ReLU(z) = max(0, z)</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Part (a): Compute the 3×3 Feature Map Z</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 1: Confirm output size</div>
+          <span class="step-math">O = ⌊(5 − 3 + 2×0) / 1⌋ + 1 = ⌊2⌋ + 1 = 3</span>
+          <div class="step-explain">Input is 5×5, filter is 3×3, stride 1, no padding. Output is 3×3.</div>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Step 2: Position (0,0) — top-left</div>
+          <span class="step-math">Extract top-left 3×3 patch of I:
+┌           ┐     ┌           ┐
+│  1  0  2  │     │  1  0  -1 │
+│  2  1  0  │  K: │  1  0  -1 │
+│  3  2  1  │     │  1  0  -1 │
+└           ┘     └           ┘
+
+Sum of element-wise products:
+Row 1: (1×1) + (0×0) + (2×-1) = 1 + 0 - 2 = -1
+Row 2: (2×1) + (1×0) + (0×-1) = 2 + 0 + 0 =  2
+Row 3: (3×1) + (2×0) + (1×-1) = 3 + 0 - 1 =  2
+─────────────────────────────────────────────
+Convolution sum = -1 + 2 + 2 = 3
+
+Add bias: Z(0,0) = 3 + 1 = 4</span>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Step 3: Position (0,1)</div>
+          <span class="step-math">Patch:
+│  0  2  3  │     Products:
+│  1  0  1  │  →  (0×1)+(2×0)+(3×-1) = -3
+│  2  1  0  │     (1×1)+(0×0)+(1×-1) =  0
+                 (2×1)+(1×0)+(0×-1) =  2
+
+Sum = -3 + 0 + 2 = -1
+Z(0,1) = -1 + 1 = 0</span>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Step 4: Position (0,2)</div>
+          <span class="step-math">Patch:
+│  2  3  1  │     Products:
+│  0  1  2  │  →  (2×1)+(3×0)+(1×-1) =  1
+│  1  0  1  │     (0×1)+(1×0)+(2×-1) = -2
+                 (1×1)+(0×0)+(1×-1) =  0
+
+Sum = 1 - 2 + 0 = -1
+Z(0,2) = -1 + 1 = 0</span>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Step 5: Remaining positions (same method)</div>
+          <span class="step-math">Position (1,0): Sum = 2+2-2 = 2,  Z = 2+1 = 3
+Position (1,1): Sum = 0+2-2 = 0,  Z = 0+1 = 1
+Position (1,2): Sum = -2+0+2 = 0, Z = 0+1 = 1
+Position (2,0): Sum = 2-2+0 = 0,  Z = 0+1 = 1
+Position (2,1): Sum = 2-2+2 = 2,  Z = 2+1 = 3
+Position (2,2): Sum = 0+2-1 = 1,  Z = 1+1 = 2</span>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Result: Full 3×3 Feature Map Z</div>
+          <span class="step-math">Z = ┌         ┐
+    │ 4  0  0 │
+    │ 3  1  1 │
+    │ 1  3  2 │
+    └         ┘</span>
+        </div>
+
+        <h4>Part (b): Apply ReLU to get Activation Map A</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 6: ReLU(z) = max(0, z) applied element-wise</div>
+          <span class="step-math">Z = ┌         ┐       A = ReLU(Z) = ┌         ┐
+    │ 4  0  0 │       max(0,z)  →    │ 4  0  0 │
+    │ 3  1  1 │                      │ 3  1  1 │
+    │ 1  3  2 │                      │ 1  3  2 │
+    └         ┘                      └         ┘
+
+All values in Z are ≥ 0, so A = Z (no change).
+Cells equal to zero: Z(0,1) = 0 and Z(0,2) = 0
+→ 2 cells are zero (they remain zero after ReLU).</span>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-explain">Note: ReLU did NOT change any values here because all convolution outputs were ≥ 0. But ReLU is still essential — in a deeper network, later layers will produce negative values that must be zeroed out.</div>
+        </div>
+
+        <h4>Part (c): Apply 2×2 Max-Pool (stride 1)</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 7: Confirm pooled output size</div>
+          <span class="step-math">O = ⌊(3 − 2 + 2×0) / 1⌋ + 1 = ⌊1⌋ + 1 = 2
+Pooled map is 2×2.</span>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Step 8: Max-pool computation</div>
+          <span class="step-math">A = ┌         ┐
+    │ 4  0  0 │
+    │ 3  1  1 │
+    │ 1  3  2 │
+    └         ┘
+
+Position (0,0): max(4, 0, 3, 1) = 4
+Position (0,1): max(0, 0, 1, 1) = 1
+Position (1,0): max(3, 1, 1, 3) = 3
+Position (1,1): max(1, 1, 3, 2) = 3
+
+P = ┌       ┐
+    │ 4  1  │
+    │ 3  3  │
+    └       ┘</span>
+        </div>
+
+        <h4>Part (d): Why Removing ReLU Is a Bad Idea</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Subjective Reasoning</div>
+          <span class="step-math">In this specific block, ReLU had no visible effect because all
+convolution outputs happened to be ≥ 0. But consider what happens
+without ReLU in a multi-layer network:
+
+1. WITHOUT ReLU: Every layer computes a linear transformation
+   (weighted sum + bias). Stacking linear layers = one big linear
+   layer. The network CANNOT learn curved/non-linear boundaries.
+
+2. WITH ReLU: Negative values are zeroed out, breaking linearity.
+   Each layer can now learn to "switch on" or "switch off" different
+   features, enabling complex decision boundaries.
+
+3. Concrete distortion: If Z(0,1) = -5 in a deeper layer (instead of
+   0), without ReLU that -5 propagates forward, distorting all
+   downstream calculations. ReLU clips it to 0 — a clean "no signal"
+   rather than a misleading negative.
+
+4. Information is NOT lost by ReLU — the positive activations (which
+   carry the useful signal) pass through unchanged. Only the noise
+   (negative values) is discarded.</span>
+          <div class="solution-final">&#10003; Z = [[4,0,0],[3,1,1],[1,3,2]] → A = same (2 zeros) → P = [[4,1],[3,3]] (2×2)</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q2: CNN Tensor Shapes & Parameter Budget
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Part A — Question 2</div>
+    <div class="q-difficulty medium">CNN · Tensor Shapes &amp; Parameters</div>
+    <div class="q-text">A small CNN processes 64×64×3 input through CONV-1 (16 filters, 5×5, P=2, S=1) → POOL-1 (2×2, S=2) → CONV-2 (32 filters, 3×3, P=1, S=1) → POOL-2 (2×2, S=2). Compute output shapes, parameter counts, and justify conv vs fully-connected.</div>
+    <div class="q-formula">O = ⌊(W − F + 2P) / S⌋ + 1 &nbsp;|&nbsp; Params = (F × F × C_in + 1) × C_out</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Part (a): Output Shapes After Each Layer</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 1: INPUT → CONV-1</div>
+          <span class="step-math">Input: 64 × 64 × 3
+CONV-1: 16 filters, F=5, P=2, S=1
+
+Output spatial = ⌊(64 − 5 + 2×2) / 1⌋ + 1
+               = ⌊(64 − 5 + 4) / 1⌋ + 1
+               = ⌊63⌋ + 1
+               = 64
+
+→ CONV-1 output: 64 × 64 × 16</span>
+          <div class="step-explain">Padding P=2 exactly compensates for the 5×5 filter, keeping the spatial size at 64.</div>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Step 2: CONV-1 → POOL-1</div>
+          <span class="step-math">POOL-1: 2×2 max-pool, S=2
+
+Output spatial = ⌊(64 − 2) / 2⌋ + 1
+               = ⌊62/2⌋ + 1
+               = 31 + 1
+               = 32
+
+→ POOL-1 output: 32 × 32 × 16</span>
+          <div class="step-explain">Pooling halves the spatial dimensions. Channels stay the same (16).</div>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Step 3: POOL-1 → CONV-2</div>
+          <span class="step-math">CONV-2: 32 filters, F=3, P=1, S=1
+
+Output spatial = ⌊(32 − 3 + 2×1) / 1⌋ + 1
+               = ⌊(32 − 3 + 2) / 1⌋ + 1
+               = ⌊31⌋ + 1
+               = 32
+
+→ CONV-2 output: 32 × 32 × 32</span>
+          <div class="step-explain">Padding P=1 with F=3 keeps spatial size at 32. Channels increase from 16 to 32.</div>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Step 4: CONV-2 → POOL-2</div>
+          <span class="step-math">POOL-2: 2×2 max-pool, S=2
+
+Output spatial = ⌊(32 − 2) / 2⌋ + 1
+               = ⌊30/2⌋ + 1
+               = 15 + 1
+               = 16
+
+→ POOL-2 output: 16 × 16 × 32</span>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Summary of shapes</div>
+          <span class="step-math">INPUT:  64 × 64 × 3
+CONV-1: 64 × 64 × 16    (same spatial, more channels)
+POOL-1: 32 × 32 × 16    (half spatial, same channels)
+CONV-2: 32 × 32 × 32    (same spatial, more channels)
+POOL-2: 16 × 16 × 32    (half spatial, same channels)</span>
+        </div>
+
+        <h4>Part (b): Learnable Parameters</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 5: CONV-1 parameters</div>
+          <span class="step-math">Formula: (F × F × C_in + 1) × C_out
+
+CONV-1: F=5, C_in=3, C_out=16
+Params = (5 × 5 × 3 + 1) × 16
+       = (75 + 1) × 16
+       = 76 × 16
+       = 1,216 parameters</span>
+          <div class="step-explain">Each of the 16 filters has 5×5×3 = 75 weights + 1 bias = 76 parameters.</div>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Step 6: CONV-2 parameters</div>
+          <span class="step-math">CONV-2: F=3, C_in=16, C_out=32
+Params = (3 × 3 × 16 + 1) × 32
+       = (144 + 1) × 32
+       = 145 × 32
+       = 4,640 parameters</span>
+          <div class="step-explain">Each of the 32 filters has 3×3×16 = 144 weights + 1 bias = 145 parameters.</div>
+        </div>
+
+        <h4>Part (c): Pooling Parameters</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 7: POOL-1 and POOL-2</div>
+          <span class="step-math">POOL-1 adds 0 learnable parameters.
+POOL-2 adds 0 learnable parameters.
+
+Max-pooling has NO weights. It applies a fixed operation:
+take the maximum value in each 2×2 window. There is nothing
+to learn — the operation is entirely deterministic.</span>
+        </div>
+
+        <h4>Part (d): Conv vs Fully-Connected</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 8: Fully-connected alternative for CONV-1</div>
+          <span class="step-math">Flattened input: 64 × 64 × 3 = 12,288 values
+Desired output: 64 × 64 × 16 = 65,536 values
+
+FC layer params = 12,288 × 65,536 = 805,306,368 parameters
+                  ≈ 805 MILLION
+
+Conv layer params = 1,216 parameters
+
+Ratio = 805,306,368 / 1,216 ≈ 662,000×</span>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Subjective Reasoning</div>
+          <span class="step-math">Why convolution is the right choice for on-device fraud:
+
+1. PARAMETER EFFICIENCY: 1,216 vs 805 million. The FC layer
+   needs 662,000× more memory — impossible on a mobile device.
+
+2. WEIGHT SHARING: A conv filter slides across the entire image,
+   reusing the same 76 weights at every position. The FC layer
+   learns a separate weight for every input-output pair.
+
+3. TRANSLATION INVARIANCE: The same edge detector works in the
+   top-left and bottom-right of the cheque. FC treats every
+   spatial position as fundamentally different.
+
+4. ON-DEVICE CONSTRAINT: A typical mobile chip has 2-8 GB RAM.
+   805M float32 parameters = 3.2 GB just for one layer. 1,216
+   params = 4.9 KB. The choice is clear.</span>
+          <div class="solution-final">&#10003; CONV-1: 64×64×16 (1,216 params) | POOL-1: 32×32×16 (0) | CONV-2: 32×32×32 (4,640 params) | POOL-2: 16×16×32 (0) | FC alternative: 805M params — impractical</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q3: RNN Forward Pass
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Part B — Question 3</div>
+    <div class="q-difficulty easy">RNN · Forward Pass Over Three Time Steps</div>
+    <div class="q-text">A scalar RNN monitors patient vital signs. Given Wxh=0.6, Whh=0.7, bh=0.1, Why=1.2, by=−0.2, inputs x₁=1.0, x₂=−0.5, x₃=2.0, h₀=0.0. Compute h₁, h₂, h₃, ŷ₃, and explain what "memory" means mechanically.</div>
+    <div class="q-formula">h_t = tanh(W_xh · x_t + W_hh · h_{t-1} + b_h) &nbsp;|&nbsp; ŷ_t = W_hy · h_t + b_y</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Part (a): Compute h₁, h₂, h₃</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 1: Compute h₁ (time step 1)</div>
+          <span class="step-math">h₁ = tanh(W_xh × x₁ + W_hh × h₀ + b_h)
+   = tanh(0.6 × 1.0  +  0.7 × 0.0  +  0.1)
+   = tanh(0.6  +  0.0  +  0.1)
+   = tanh(0.7)
+   = 0.6044</span>
+          <div class="step-explain">The first reading x₁=1.0 is multiplied by Wxh=0.6, giving 0.6. Adding bh=0.1 gives 0.7. tanh(0.7) = 0.6044.</div>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Step 2: Compute h₂ (time step 2)</div>
+          <span class="step-math">h₂ = tanh(W_xh × x₂ + W_hh × h₁ + b_h)
+   = tanh(0.6 × (-0.5)  +  0.7 × 0.6044  +  0.1)
+   = tanh(-0.3  +  0.4231  +  0.1)
+   = tanh(0.2231)
+   = 0.2194</span>
+          <div class="step-explain">x₂=-0.5 contributes -0.3. But h₁=0.6044 (from x₁) feeds back through Whh=0.7, contributing +0.4231. The previous reading's influence carries forward.</div>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Step 3: Compute h₃ (time step 3)</div>
+          <span class="step-math">h₃ = tanh(W_xh × x₃ + W_hh × h₂ + b_h)
+   = tanh(0.6 × 2.0  +  0.7 × 0.2194  +  0.1)
+   = tanh(1.2  +  0.1536  +  0.1)
+   = tanh(1.4536)
+   = 0.8964</span>
+          <div class="step-explain">x₃=2.0 is the dominant input here (1.2). h₂ contributes a smaller but non-zero 0.1536.</div>
+        </div>
+
+        <h4>Part (b): Compute ŷ₃</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 4: Final output</div>
+          <span class="step-math">ŷ₃ = W_hy × h₃ + b_y
+   = 1.2 × 0.8964  +  (-0.2)
+   = 1.0757  -  0.2
+   = 0.8757</span>
+        </div>
+
+        <h4>Part (c): Where Does x₁ Influence h₃?</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Tracing x₁'s path through the network</div>
+          <span class="step-math">x₁ enters h₁:
+  h₁ = tanh(0.6×1.0 + 0.7×0.0 + 0.1) = 0.6044
+
+h₁ enters h₂:
+  h₂ = tanh(0.6×(-0.5) + 0.7×0.6044 + 0.1)
+     = tanh(-0.3 + 0.4231 + 0.1) = 0.2194
+
+h₂ enters h₃:
+  h₃ = tanh(0.6×2.0 + 0.7×0.2194 + 0.1)
+     = tanh(1.2 + 0.1536 + 0.1) = 0.8964
+
+The influence of x₁ on h₃ is:
+  x₁ → h₁ (×Wxh, ×tanh') → h₂ (×Whh, ×tanh') → h₃ (×Whh, ×tanh')
+  = 1.0 × 0.6 × tanh'(0.7) × 0.7 × tanh'(0.2231) × 0.7 × tanh'(1.4536)
+  = very small but non-zero</span>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">What "memory" means mechanically</div>
+          <span class="step-math">"Memory" = the hidden state h_t is a compressed summary of ALL
+previous inputs. It is not stored separately — it IS the running
+accumulation.
+
+h₁ "remembers" x₁ = 1.0 (encoded as 0.6044)
+h₂ "remembers" both x₁ and x₂ (encoded as 0.2194)
+h₃ "remembers" all three readings (encoded as 0.8964)
+
+Each new input OVERWRITES the hidden state, but the new state
+is a function of BOTH the old state and the new input. So past
+information persists — decaying but never fully erased — as long
+as the hidden state carries a trace of it forward.</span>
+        </div>
+
+        <h4>Part (d): Why Reuse the Same Weights?</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Two reasons for weight sharing across time steps</div>
+          <span class="step-math">REASON 1: VARIABLE-LENGTH INPUTS
+Separate weights per time step means you must decide the sequence
+length at training time. With shared weights, the same network
+handles sequences of ANY length — 3 readings or 3000.
+
+REASON 2: GENERALISATION ACROSS POSITIONS
+The dynamics of vital signs (how the current reading relates to
+recent history) are the SAME at every time step. Sharing weights
+encodes this inductive bias — the model learns one transition
+function and applies it everywhere, rather than memorising
+separate rules for step 1, step 2, step 3, etc.
+
+(Bonus) REASON 3: PARAMETER EFFICIENCY
+Separate weights: 3 × (Wxh + Whh + bh) = 3 sets.
+Shared weights: 1 set. Far fewer parameters to learn, less
+overfitting risk, faster training.</span>
+          <div class="solution-final">&#10003; h₁=0.6044, h₂=0.2194, h₃=0.8964, ŷ₃=0.8757</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q4: Vanishing vs Exploding Gradients
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Part B — Question 4</div>
+    <div class="q-difficulty medium">RNN · Vanishing vs Exploding Gradients</div>
+    <div class="q-text">During BPTT, the gradient from step t back to step k multiplies (t−k) per-step Jacobians. For a scalar RNN the per-step factor is (1−h²)×Whh. Config A: factor=0.54, Config B: factor=1.28. Analyse 15-step backpropagation.</div>
+    <div class="q-formula">Per-step factor = (1 − h²) × W_hh &nbsp;|&nbsp; Gradient over k steps = factor^k</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Part (a): Per-Step Gradient Factors</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 1: Compute factors</div>
+          <span class="step-math">Config A: (1 − h²) × W_hh = 0.6 × 0.9 = 0.54
+Config B: (1 − h²) × W_hh = 0.8 × 1.6 = 1.28</span>
+          <div class="step-explain">Config A has a moderate Whh (0.9 < 1) and typical tanh derivative (0.6). Config B has a large Whh (1.6 > 1), pushing the product above 1.</div>
+        </div>
+
+        <h4>Part (b): Gradient Over 15 Steps</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 2: Raise each factor to power 15</div>
+          <span class="step-math">Config A: 0.54^15
+= 0.54 × 0.54 × ... × 0.54  (15 times)
+= 9.68 × 10⁻⁵
+≈ 0.0000968
+
+Config B: 1.28^15
+= 1.28 × 1.28 × ... × 1.28  (15 times)
+= 40.6</span>
+        </div>
+
+        <h4>Part (c): Classification and Consequences</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 3: Classify each config</div>
+          <span class="step-math">CONFIG A: VANISHING
+Factor = 0.54 < 1, so 0.54^15 ≈ 0.0001
+The gradient is 10,000× smaller than the original.
+→ The sentiment-determining word at position (t-15) contributes
+  virtually ZERO gradient. The network CANNOT learn that the
+  word at step 1 influenced the classification at step 15.
+→ PRACTICAL CONSEQUENCE: The model can only learn from the
+  most recent ~5-7 tokens. Long-range dependencies are lost.
+
+CONFIG B: EXPLODING
+Factor = 1.28 > 1, so 1.28^15 ≈ 40.6
+The gradient is 40× LARGER than the original.
+→ Weight updates become enormous, causing the loss to diverge.
+  Training becomes unstable — loss oscillates or goes to NaN.
+→ PRACTICAL CONSEQUENCE: The model fails to train at all.
+  Weights receive huge updates that overshoot any minimum.</span>
+        </div>
+
+        <h4>Part (d): Why Vanishing Is More Common + Fix for Exploding</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 4: Tanh derivative bounds</div>
+          <span class="step-math">The tanh derivative is: (1 − h²) where h = tanh(z)
+
+Since tanh(z) ∈ (−1, 1), we have h² ∈ [0, 1)
+Therefore (1 − h²) ∈ (0, 1] — it is ALWAYS ≤ 1
+
+This means:
+  factor = (1 − h²) × W_hh
+
+For the factor to be ≥ 1 (exploding), we need:
+  W_hh ≥ 1/(1 − h²) ≥ 1
+
+But W_hh is typically initialised near 0 or ≤ 1.
+So (1 − h²) ≤ 1 AND W_hh ≤ 1 means factor ≤ 1.
+The gradient almost always SHRINKS → vanishing is the default.
+
+FIX FOR EXPLODING: Gradient clipping — if the gradient norm
+exceeds a threshold (e.g., 5.0), scale it down:
+  g = g × (threshold / max(threshold, ‖g‖))
+This caps the gradient without changing its direction.</span>
+          <div class="solution-final">&#10003; Config A: vanishing (0.54^15 ≈ 0.0001) | Config B: exploding (1.28^15 ≈ 40.6) | Fix: gradient clipping</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q5: LSTM Cell Update
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Part C — Question 5</div>
+    <div class="q-difficulty easy">LSTM · Single Cell Update</div>
+    <div class="q-text">Given C_{t-1}=0.40, h_{t-1}=0.20, x_t=0.60, and pre-activations zf=0.8, zi=−0.5, zC=1.0, zo=0.3. Compute gates, cell state, and hidden state.</div>
+    <div class="q-formula">f=σ(zf), i=σ(zi), o=σ(zo), C̃=tanh(zC) | C_t = f·C_{t-1} + i·C̃ | h_t = o·tanh(C_t)</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Part (a): Compute Gates and Candidate</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 1: Apply sigmoid and tanh to pre-activations</div>
+          <span class="step-math">Forget gate:  f_t = σ(z_f) = σ(0.8)  = 0.690
+Input gate:   i_t = σ(z_i) = σ(-0.5) = 0.378
+Output gate:  o_t = σ(z_o) = σ(0.3)  = 0.574
+
+Candidate:    C̃_t = tanh(z_C) = tanh(1.0) = 0.762</span>
+          <div class="step-explain">Sigmoid squashes to (0,1) — these are the gate values. tanh squashes to (-1,1) — this is the candidate memory.</div>
+        </div>
+
+        <h4>Part (b): Compute New Cell State C_t</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 2: Two-term update</div>
+          <span class="step-math">C_t = f_t × C_{t-1}  +  i_t × C̃_t
+    = 0.690 × 0.40    +  0.378 × 0.762
+    = 0.276            +  0.288
+    = 0.564</span>
+          <div class="step-explain">First term (0.276): the OLD memory that was kept (69% of 0.40). Second term (0.288): the NEW information being written (37.8% of the candidate 0.762).</div>
+        </div>
+
+        <h4>Part (c): Compute New Hidden State h_t</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 3: Output gate × tanh(cell state)</div>
+          <span class="step-math">h_t = o_t × tanh(C_t)
+    = 0.574 × tanh(0.564)
+    = 0.574 × 0.511
+    = 0.293</span>
+          <div class="step-explain">The output gate controls how much of the cell state is exposed as the hidden state. Here, 57.4% of tanh(0.564) passes through.</div>
+        </div>
+
+        <h4>Part (d): Forget Gate Interpretation</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Subjective: What f_t = 0.690 means</div>
+          <span class="step-math">f_t = 0.690 means 69% of the old cell memory (C_{t-1}=0.40)
+was KEPT. The cell retains a significant portion of this
+customer's historical transaction pattern.
+
+31% was discarded — the cell is making room for new information
+from the current transaction (x_t = 0.60).
+
+INTERPRETATION: The cell sees this transaction as partially
+consistent with the customer's history (keep 69%) but also
+carries some new signal that should be incorporated (write 31%).
+The cell is BALANCING history and novelty, not ignoring either.
+
+Compare: if f_t were 0.047 (near zero), the cell would almost
+completely forget the history and start fresh — indicating a
+dramatic shift in the customer's behaviour.</span>
+          <div class="solution-final">&#10003; f_t=0.690, i_t=0.378, o_t=0.574, C̃_t=0.762 | C_t=0.564 | h_t=0.293</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════
+       Q6: Gate Behaviour, Parameter Cost, Model Choice
+       ═══════════════════════════════════════════════════════════════════ -->
+  <div class="subjective-question">
+    <div class="q-number">Part C — Question 6</div>
+    <div class="q-difficulty hard">LSTM · Gate Behaviour, Parameters &amp; Model Selection</div>
+    <div class="q-text">An education team predicts student outcomes from weekly engagement (14 readings). Evaluate forget gates at zf=3.0 and zf=−3.0. Compare LSTM vs RNN parameter counts at n=20, m=10. Recommend a model and justify.</div>
+    <div class="q-formula">LSTM params = 4×((n+m)×n+n) | RNN params = (n+m)×n+n | f=σ(z)</div>
+    <button class="solution-toggle">&#128065; Reveal Full Solution</button>
+    <div class="solution-content">
+      <div class="solution-steps">
+
+        <h4>Part (a): Forget Gate Values</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 1: Sigmoid of pre-activations</div>
+          <span class="step-math">zf = 3.0:
+  f_t = σ(3.0) = 0.953
+  → 95.3% of old cell memory is KEPT
+  → The cell almost completely preserves its history
+
+zf = -3.0:
+  f_t = σ(-3.0) = 0.047
+  → Only 4.7% of old cell memory is kept
+  → The cell almost entirely FORGETS its history</span>
+          <div class="step-explain">Large positive zf → forget gate near 1 → strong memory retention. Large negative zf → forget gate near 0 → strong forgetting. This is how the LSTM decides what to remember and what to discard.</div>
+        </div>
+
+        <h4>Part (b): Parameter Comparison</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Step 2: LSTM recurrent parameters</div>
+          <span class="step-math">LSTM: 4 gates × ((n + m) × n + n)
+n = 20 hidden units, m = 10 input size
+
+= 4 × ((20 + 10) × 20 + 20)
+= 4 × (30 × 20 + 20)
+= 4 × (600 + 20)
+= 4 × 620
+= 2,480 parameters</span>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Step 3: Vanilla RNN parameters</div>
+          <span class="step-math">RNN: (n + m) × n + n
+= (20 + 10) × 20 + 20
+= 30 × 20 + 20
+= 600 + 20
+= 620 parameters</span>
+        </div>
+
+        <div class="solution-step">
+          <div class="step-label">Step 4: Ratio</div>
+          <span class="step-math">LSTM / RNN = 2,480 / 620 = 4×
+
+The LSTM has exactly 4× the recurrent parameters of the RNN.
+This is because the LSTM has 4 gates (forget, input, output,
+candidate) where the RNN has only 1 hidden state update.</span>
+        </div>
+
+        <h4>Part (c): Model Recommendation</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Subjective: RNN vs LSTM for 14-step sequence</div>
+          <span class="step-math">RECOMMENDATION: LSTM
+
+REASONS:
+1. LONG-RANGE DEPENDENCY: The decisive signal (mid-semester
+   drop-off) appears around step 7, but the prediction is made
+   at step 14. That's 7 steps of information that must persist.
+
+2. GRADIENT ANALYSIS (from Q4): A vanilla RNN with typical
+   factor 0.54 over 7 steps: 0.54^7 ≈ 0.013.
+   The gradient is 99% attenuated — the RNN can barely learn
+   from the mid-semester signal.
+
+3. LSTM's ADDITIVE CELL STATE: The cell update C_t = f·C_{t-1} + i·C̃
+   has a DIRECT (additive) path for gradients. The forget gate
+   at zf=3.0 gives f=0.953, meaning the cell can preserve
+   information almost unchanged across many steps.
+
+4. The 4× parameter cost is acceptable for n=20, m=10
+   (2,480 vs 620 — both are small). The memory cost is trivial.
+
+VERDICT: LSTM's ability to maintain long-range memory through
+the additive cell state makes it the clear choice when the
+decisive signal appears early in a 14-step sequence.</span>
+        </div>
+
+        <h4>Part (d): When to Prefer Vanilla RNN</h4>
+
+        <div class="solution-step">
+          <div class="step-label">Subjective: RNN advantages despite weaker memory</div>
+          <span class="step-math">SITUATION: SHORT SEQUENCES with NO long-range dependencies.
+
+Example: Predicting the next word given only the last 2-3 words
+in a simple autocomplete task. If the relevant context is always
+within the most recent 2-3 steps, the RNN's vanishing gradient
+is not a problem — it only needs to see 2-3 steps back.
+
+OTHER CASES FOR RNN:
+1. EDGE/MOBILE DEPLOYMENT where 4× parameters and 4× compute
+   per step are too expensive (e.g., IoT sensor processing).
+2. LARGE DATASETS where even a simple model can learn useful
+   short-range patterns, and the 4× parameter savings reduces
+   overfitting.
+3. BASELINE PROTOTYPING — always start simple, prove the task is
+   solvable, then upgrade to LSTM only if the RNN fails.</span>
+          <div class="solution-final">&#10003; f(3.0)=0.953 (95.3% kept) | f(-3.0)=0.047 (4.7% kept) | LSTM=2,480 params, RNN=620 (4× ratio) | Recommend LSTM for 14-step sequence with early decisive signal</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  </main>
+
+  <script src="script.js"></script>
+  <script src="practice.js"></script>
+</body>
+</html>
